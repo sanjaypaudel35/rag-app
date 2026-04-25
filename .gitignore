@@ -27,7 +27,5 @@ Thumbs.db
 # Laravel Boost & Gemini CLI
 boost.json
 project-context.md
-.agents/
-.gemini/
 .GeminiContext/
 06-routing.md
