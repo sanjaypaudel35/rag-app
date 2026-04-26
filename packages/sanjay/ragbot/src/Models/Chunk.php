@@ -26,7 +26,7 @@ class Chunk extends Model
      *
      * @var string
      */
-    protected $table = 'rag_document_chunks';
+    protected $table = "rag_document_chunks";
 
     /**
      * The attributes that are mass assignable.
@@ -34,11 +34,11 @@ class Chunk extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'document_id',
-        'content',
-        'chunk_index',
-        'token_count',
+        "project_id",
+        "document_id",
+        "content",
+        "chunk_index",
+        "token_count",
     ];
 
     /**

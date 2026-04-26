@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('health', function () {
+Route::get("health", function () {
     return response()->json([
-        'status' => 'ok',
-        'package' => 'sanjay/ragbot',
+        "status" => "ok",
+        "package" => "sanjay/ragbot",
     ]);
 });
