@@ -3,6 +3,9 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
+use Sanjay\Ragbot\Enums\LlmProvider;
+use Sanjay\Ragbot\Enums\VectorStore;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -11,10 +14,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property string $id
  * @property string $project_id
- * @property string $llm_provider
+ * @property LlmProvider $llm_provider
  * @property string|null $llm_api_key
  * @property string|null $llm_model
- * @property string $vector_store
+ * @property VectorStore $vector_store
  * @property bool $widget_enabled
  */
 class ProjectSetting extends Model
@@ -26,7 +29,7 @@ class ProjectSetting extends Model
      *
      * @var string
      */
-    protected $table = 'rag_project_settings';
+    protected $table = "rag_project_settings";
 
     /**
      * The attributes that are mass assignable.
@@ -34,12 +37,12 @@ class ProjectSetting extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'llm_provider',
-        'llm_api_key',
-        'llm_model',
-        'vector_store',
-        'widget_enabled',
+        "project_id",
+        "llm_provider",
+        "llm_api_key",
+        "llm_model",
+        "vector_store",
+        "widget_enabled",
     ];
 
     /**
@@ -48,7 +51,9 @@ class ProjectSetting extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'widget_enabled' => 'boolean',
+        "llm_provider" => LlmProvider::class,
+        "vector_store" => VectorStore::class,
+        "widget_enabled" => "boolean",
     ];
 
     /**

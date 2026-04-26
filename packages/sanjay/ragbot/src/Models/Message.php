@@ -5,15 +5,16 @@ namespace Sanjay\Ragbot\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Sanjay\Ragbot\Enums\MessageRole;
 
 /**
  * Model representing a chat message.
  *
- * @property string $id
- * @property string $project_id
- * @property string $conversation_id
- * @property string $role
- * @property string $content
+ * @property string 
+ * @property string 
+ * @property string 
+ * @property MessageRole 
+ * @property string 
  */
 class Message extends Model
 {
@@ -24,37 +25,46 @@ class Message extends Model
      *
      * @var string
      */
-    protected $table = 'rag_messages';
+    protected  = "rag_messages";
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'project_id',
-        'conversation_id',
-        'role',
-        'content',
+    protected  = [
+        "project_id",
+        "conversation_id",
+        "role",
+        "content",
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected  = [
+        "role" => MessageRole::class,
     ];
 
     /**
      * Get the project that owns the message.
      *
-     * @return BelongsTo<Project, $this>
+     * @return BelongsTo<Project, >
      */
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return ->belongsTo(Project::class);
     }
 
     /**
      * Get the conversation that owns the message.
      *
-     * @return BelongsTo<Conversation, $this>
+     * @return BelongsTo<Conversation, >
      */
     public function conversation(): BelongsTo
     {
-        return $this->belongsTo(Conversation::class);
+        return ->belongsTo(Conversation::class);
     }
 }

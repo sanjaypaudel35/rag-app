@@ -37,7 +37,8 @@ Each tenant (project) can:
 - configure API keys
 
 ### Vector Storage
-- choose pgvector or mysql fallback
+- primary: pgvector (PostgreSQL)
+- fallback: mysql (JSON)
 
 ### Chat Access
 - API mode (JSON)
@@ -126,8 +127,8 @@ Example structure:
 
 try {
     // call service
-} catch (\Throwable $e) {
-    return $this->handleException($e);
+} catch (\Throwable ) {
+    return ->handleException();
 }
 
 ### Request Validation

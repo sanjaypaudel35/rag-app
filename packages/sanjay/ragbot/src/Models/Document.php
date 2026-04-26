@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Sanjay\Ragbot\Enums\DocumentStatus;
 
 /**
  * Model representing an uploaded document.
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $file_path
  * @property string $mime_type
- * @property string $status
+ * @property DocumentStatus $status
  * @property string|null $error_message
  */
 class Document extends Model
@@ -27,7 +28,7 @@ class Document extends Model
      *
      * @var string
      */
-    protected $table = 'rag_documents';
+    protected $table = "rag_documents";
 
     /**
      * The attributes that are mass assignable.
@@ -35,12 +36,21 @@ class Document extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'name',
-        'file_path',
-        'mime_type',
-        'status',
-        'error_message',
+        "project_id",
+        "name",
+        "file_path",
+        "mime_type",
+        "status",
+        "error_message",
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        "status" => DocumentStatus::class,
     ];
 
     /**

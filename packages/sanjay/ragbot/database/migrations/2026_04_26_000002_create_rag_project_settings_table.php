@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Sanjay\Ragbot\Enums\LlmProvider;
+use Sanjay\Ragbot\Enums\VectorStore;
 
 return new class extends Migration
 {
@@ -14,10 +16,10 @@ return new class extends Migration
         Schema::create("rag_project_settings", function (Blueprint $table) {
             $table->uuid("id")->primary()->comment("The unique identifier for the settings");
             $table->foreignUuid("project_id")->unique()->constrained("rag_projects")->cascadeOnDelete()->comment("The ID of the project these settings belong to");
-            $table->string("llm_provider")->default("openai")->comment("The AI provider used for LLM operations");
+            $table->string("llm_provider")->default(LlmProvider::OpenAI->value)->comment("The AI provider used for LLM operations");
             $table->string("llm_api_key")->nullable()->comment("The API key for the LLM provider");
             $table->string("llm_model")->nullable()->comment("The specific model name for the LLM");
-            $table->string("vector_store")->default("mysql")->comment("The storage driver used for vector embeddings");
+            $table->string("vector_store")->default(VectorStore::PgVector->value)->comment("The storage driver used for vector embeddings");
             $table->boolean("widget_enabled")->default(true)->comment("Whether the chat widget is enabled for this project");
             $table->timestamps();
 
