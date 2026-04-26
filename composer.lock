@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "72f2ea6a64c95c5df621f2608ea2e2de",
+    "content-hash": "142c5747cbe07597e8debbb8cdf3ab37",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3729,6 +3729,45 @@
                 "source": "https://github.com/ramsey/uuid/tree/4.9.2"
             },
             "time": "2025-12-14T04:43:48+00:00"
+        },
+        {
+            "name": "sanjay/ragbot",
+            "version": "dev-feature/development",
+            "dist": {
+                "type": "path",
+                "url": "packages/sanjay/ragbot",
+                "reference": "c51d37e1a469001233728b8e622ecb577ead7334"
+            },
+            "require": {
+                "laravel/framework": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sanjay\\Ragbot\\RagbotServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sanjay\\Ragbot\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sanjay",
+                    "email": "jaysanpaudel35@gmail.com"
+                }
+            ],
+            "description": "A multi-tenant RAG chatbot system for Laravel.",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "symfony/clock",
@@ -8849,7 +8888,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "sanjay/ragbot": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
