@@ -10,11 +10,11 @@ use Sanjay\Ragbot\Enums\MessageRole;
 /**
  * Model representing a chat message.
  *
- * @property string 
- * @property string 
- * @property string 
- * @property MessageRole 
- * @property string 
+ * @property string $id
+ * @property string $project_id
+ * @property string $conversation_id
+ * @property MessageRole $role
+ * @property string $content
  */
 class Message extends Model
 {
@@ -25,18 +25,18 @@ class Message extends Model
      *
      * @var string
      */
-    protected  = "rag_messages";
+    protected $table = 'rag_messages';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
-    protected  = [
-        "project_id",
-        "conversation_id",
-        "role",
-        "content",
+    protected $fillable = [
+        'project_id',
+        'conversation_id',
+        'role',
+        'content',
     ];
 
     /**
@@ -44,27 +44,27 @@ class Message extends Model
      *
      * @var array<string, string>
      */
-    protected  = [
-        "role" => MessageRole::class,
+    protected $casts = [
+        'role' => MessageRole::class,
     ];
 
     /**
      * Get the project that owns the message.
      *
-     * @return BelongsTo<Project, >
+     * @return BelongsTo<Project, $this>
      */
     public function project(): BelongsTo
     {
-        return ->belongsTo(Project::class);
+        return $this->belongsTo(Project::class);
     }
 
     /**
      * Get the conversation that owns the message.
      *
-     * @return BelongsTo<Conversation, >
+     * @return BelongsTo<Conversation, $this>
      */
     public function conversation(): BelongsTo
     {
-        return ->belongsTo(Conversation::class);
+        return $this->belongsTo(Conversation::class);
     }
 }

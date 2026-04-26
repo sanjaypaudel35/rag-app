@@ -1,18 +1,119 @@
 <?php
 
 return [
-    /**
-     * The URL prefix for the package routes.
-     */
-    'prefix' => 'ragbot',
 
-    /**
-     * The middleware applied to the package's web routes.
-     */
-    'middleware' => ['web'],
+    /*
+    |--------------------------------------------------------------------------
+    | Route Prefix & Middleware
+    |--------------------------------------------------------------------------
+    */
+    "prefix"         => env("RAGBOT_PREFIX", "ragbot"),
+    "middleware"     => ["web"],
+    "api_middleware" => ["api"],
 
-    /**
-     * The middleware applied to the package's API routes.
-     */
-    'api_middleware' => ['api'],
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guard
+    |--------------------------------------------------------------------------
+    */
+    "guard" => "ragbot",
+
+    /*
+    |--------------------------------------------------------------------------
+    | LLM Configuration
+    |--------------------------------------------------------------------------
+    */
+    "llm" => [
+        "default" => env("RAGBOT_LLM_PROVIDER", "openai"),
+        "providers" => [
+            "openai" => [
+                "model"    => env("RAGBOT_OPENAI_MODEL", "gpt-4o-mini"),
+                "base_url" => "https://api.openai.com/v1",
+            ],
+            "anthropic" => [
+                "model"    => env("RAGBOT_ANTHROPIC_MODEL", "claude-3-haiku-20240307"),
+                "base_url" => "https://api.anthropic.com",
+            ],
+            "stub" => [],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Embedding Configuration
+    |--------------------------------------------------------------------------
+    */
+    "embedding" => [
+        "default"    => env("RAGBOT_EMBEDDING_PROVIDER", "openai"),
+        "dimensions" => 1536,
+        "providers"  => [
+            "openai" => [
+                "model"    => "text-embedding-3-small",
+                "base_url" => "https://api.openai.com/v1",
+            ],
+            "stub" => [],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Vector Store Configuration
+    |--------------------------------------------------------------------------
+    */
+    "vector_store" => [
+        "default" => env("RAGBOT_VECTOR_STORE", "mysql"),
+        "drivers" => [
+            "pgvector" => [],
+            "mysql"    => [],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chunking Configuration
+    |--------------------------------------------------------------------------
+    */
+    "chunking" => [
+        "size"    => 500,
+        "overlap" => 50,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retrieval Configuration
+    |--------------------------------------------------------------------------
+    */
+    "retrieval" => [
+        "top_k" => 5,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Widget Configuration
+    |--------------------------------------------------------------------------
+    */
+    "widget" => [
+        "enabled"         => true,
+        "allowed_origins" => "*",
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Storage
+    |--------------------------------------------------------------------------
+    */
+    "storage" => [
+        "disk" => env("RAGBOT_STORAGE_DISK", "local"),
+        "path" => "ragbot/{project_id}/documents",
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting
+    |--------------------------------------------------------------------------
+    */
+    "rate_limit" => [
+        "chat_api" => env("RAGBOT_RATE_LIMIT", 60), // requests per minute per project
+    ],
+
 ];
