@@ -21,16 +21,14 @@ class EmbeddingRepository extends BaseRepository implements EmbeddingRepositoryI
     }
 
     /**
-     * Find embedding by chunk scoped by project.
+     * Find embedding by chunk.
      *
-     * @param string $projectId
      * @param string $chunkId
      * @return Embedding|null
      */
-    public function findByChunk(string $projectId, string $chunkId): ?Embedding
+    public function findByChunk(string $chunkId): ?Embedding
     {
         return $this->model
-            ->where("project_id", $projectId)
             ->where("chunk_id", $chunkId)
             ->first();
     }

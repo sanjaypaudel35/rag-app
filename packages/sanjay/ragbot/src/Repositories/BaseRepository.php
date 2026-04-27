@@ -4,39 +4,45 @@ namespace Sanjay\Ragbot\Repositories;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Sanjay\Ragbot\Contracts\Repositories\BaseRepositoryInterface;
 
 /**
- * Base repository class providing common data access patterns with project scoping.
+ * Base repository class providing common data access patterns.
+ *
+ * @template TModel of Model
+ * @implements BaseRepositoryInterface<TModel>
  */
-abstract class BaseRepository
+abstract class BaseRepository implements BaseRepositoryInterface
 {
     /**
      * Create a new repository instance.
+     *
+     * @param TModel $model
      */
     public function __construct(protected Model $model)
     {
     }
 
     /**
-     * Find a model by its unique identifier scoped by project.
+     * Find a model by its unique identifier.
      *
      * @param string $id
-     * @param string $projectId
-     * @return Model|null
+     * @param array $relationships
+     * @return TModel
+     *
+     * @throws ModelNotFoundException
      */
-    public function findById(string $id, string $projectId): ?Model
+    public function findById(string $id, array $relationships = []): Model
     {
-        return $this->model
-            ->where("id", $id)
-            ->where("project_id", $projectId)
-            ->first();
+        return $this->model->with($relationships)->findOrFail($id);
     }
 
     /**
      * Create a new model instance in the database.
      *
      * @param array<string, mixed> $data
-     * @return Model
+     * @return TModel
      */
     public function create(array $data): Model
     {
@@ -44,50 +50,47 @@ abstract class BaseRepository
     }
 
     /**
-     * Update an existing model instance scoped by project.
+     * Update an existing model instance.
      *
      * @param string $id
-     * @param string $projectId
      * @param array<string, mixed> $data
-     * @return bool
+     * @return TModel
      */
-    public function update(string $id, string $projectId, array $data): bool
+    public function update(string $id, array $data): Model
     {
-        $record = $this->findById($id, $projectId);
-
-        if (!$record) {
-            return false;
+        try {
+            $record = $this->findById($id);
+            $record->update($data);
+            return $record;
+        } catch (ModelNotFoundException $e) {
+            throw $e;
         }
-
-        return $record->update($data);
     }
 
     /**
-     * Delete a model instance from the database scoped by project.
+     * Delete a model instance from the database.
      *
      * @param string $id
-     * @param string $projectId
-     * @return bool
+     * @return void
      */
-    public function delete(string $id, string $projectId): bool
+    public function delete(string $id): void
     {
-        $record = $this->findById($id, $projectId);
-
-        if (!$record) {
-            return false;
+        try {
+            $record = $this->findById($id);
+            $record->delete();
+        } catch (ModelNotFoundException $e) {
+            throw $e;
         }
-
-        return $record->delete();
     }
 
     /**
-     * Get all records scoped by project_id.
+     * Get all records.
      *
-     * @param string $projectId
-     * @return Collection<int, Model>
+     * @param array $relationships
+     * @return Collection<int, TModel>
      */
-    public function allForProject(string $projectId): Collection
+    public function all(array $relationships = []): Collection
     {
-        return $this->model->where("project_id", $projectId)->get();
+        return $this->model->with($relationships)->get();
     }
 }

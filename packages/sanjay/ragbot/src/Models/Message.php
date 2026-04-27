@@ -3,9 +3,12 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Sanjay\Ragbot\Database\Factories\MessageFactory;
 use Sanjay\Ragbot\Enums\MessageRole;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing a chat message.
@@ -19,13 +22,15 @@ use Sanjay\Ragbot\Enums\MessageRole;
 class Message extends Model
 {
     use HasUuids;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'rag_messages';
+    protected $table = "rag_messages";
 
     /**
      * The attributes that are mass assignable.
@@ -33,10 +38,10 @@ class Message extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'conversation_id',
-        'role',
-        'content',
+        "project_id",
+        "conversation_id",
+        "role",
+        "content",
     ];
 
     /**
@@ -45,17 +50,15 @@ class Message extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'role' => MessageRole::class,
+        "role" => MessageRole::class,
     ];
 
     /**
-     * Get the project that owns the message.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return MessageFactory::new();
     }
 
     /**

@@ -10,14 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Sanjay\Ragbot\Database\Factories\ProjectFactory;
 
 /**
- * Model representing a Project (Tenant) in the Ragbot system.
+ * Model representing a Project (Tenant).
  *
  * @property string $id
  * @property string $name
  * @property string $slug
  * @property string $api_key
  * @property bool $is_active
- * @property array|null $settings
  */
 class Project extends Model
 {
@@ -41,7 +40,6 @@ class Project extends Model
         "slug",
         "api_key",
         "is_active",
-        "settings",
     ];
 
     /**
@@ -51,15 +49,12 @@ class Project extends Model
      */
     protected $casts = [
         "is_active" => "boolean",
-        "settings" => "array",
     ];
 
     /**
      * Create a new factory instance for the model.
-     *
-     * @return ProjectFactory
      */
-    protected static function newFactory(): ProjectFactory
+    protected static function newFactory()
     {
         return ProjectFactory::new();
     }

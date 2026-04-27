@@ -23,13 +23,10 @@ class ProjectSettingRepository extends BaseRepository implements ProjectSettingR
     /**
      * Find settings by project.
      *
-     * @param string $projectId
      * @return ProjectSetting|null
      */
-    public function findByProject(string $projectId): ?ProjectSetting
+    public function findByProject(): ?ProjectSetting
     {
-        return $this->model
-            ->where("project_id", $projectId)
-            ->first();
+        return $this->model->first();
     }
 }

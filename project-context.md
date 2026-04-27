@@ -429,17 +429,6 @@ public function store(ChatRequest $request): JsonResponse
 - No business logic
 - Implement a corresponding interface
 
-### BaseRepository must implement
-```php
-findById(string $id): ?Model
-create(array $data): Model
-update(string $id, array $data): bool
-delete(string $id): bool
-allForProject(string $projectId): Collection
-```
-
----
-
 ## Multi-Tenancy Rules
 
 - Middleware `ResolveProjectFromApiKey` reads `X-Api-Key` header

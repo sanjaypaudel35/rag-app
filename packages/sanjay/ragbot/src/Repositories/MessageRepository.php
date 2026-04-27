@@ -22,16 +22,14 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
     }
 
     /**
-     * Find messages by conversation scoped by project.
+     * Find messages by conversation.
      *
-     * @param string $projectId
      * @param string $conversationId
      * @return Collection<int, Message>
      */
-    public function findByConversation(string $projectId, string $conversationId): Collection
+    public function findByConversation(string $conversationId): Collection
     {
         return $this->model
-            ->where("project_id", $projectId)
             ->where("conversation_id", $conversationId)
             ->get();
     }

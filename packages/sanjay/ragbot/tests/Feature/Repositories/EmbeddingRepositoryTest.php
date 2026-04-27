@@ -22,28 +22,34 @@ class EmbeddingRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_find_embedding_by_chunk_scoped_by_project(): void
+    public function test_it_can_find_embedding_by_chunk_scoped_by_project(): void
     {
         $projectA = Project::factory()->create();
         $projectB = Project::factory()->create();
 
-        $chunkA = Chunk::factory()->create(['project_id' => $projectA->id]);
-        $chunkB = Chunk::factory()->create(['project_id' => $projectB->id]);
+        $chunkA = Chunk::factory()->create(["project_id" => $projectA->id]);
+        $chunkB = Chunk::factory()->create(["project_id" => $projectB->id]);
 
         $embeddingA = Embedding::factory()->create([
-            'project_id' => $projectA->id,
-            'chunk_id' => $chunkA->id
+            "project_id" => $projectA->id,
+            "chunk_id" => $chunkA->id
         ]);
         $embeddingB = Embedding::factory()->create([
-            'project_id' => $projectB->id,
-            'chunk_id' => $chunkB->id
+            "project_id" => $projectB->id,
+            "chunk_id" => $chunkB->id
         ]);
 
-        $foundA = $this->repository->findByChunk($projectA->id, $chunkA->id);
+        $this->app->instance("ragbot.project", $projectA);
+        $foundA = $this->repository->findByChunk($chunkA->id);
         $this->assertNotNull($foundA);
         $this->assertEquals($embeddingA->id, $foundA->id);
 
-        $foundAcross = $this->repository->findByChunk($projectA->id, $chunkB->id);
+        $foundAcross = $this->repository->findByChunk($chunkB->id);
         $this->assertNull($foundAcross);
+
+        $this->app->instance("ragbot.project", $projectB);
+        $foundB = $this->repository->findByChunk($chunkB->id);
+        $this->assertNotNull($foundB);
+        $this->assertEquals($embeddingB->id, $foundB->id);
     }
 }

@@ -22,65 +22,6 @@ class ProjectRepository extends BaseRepository implements ProjectRepositoryInter
     }
 
     /**
-     * Find a project by its unique identifier.
-     *
-     * @param string $id
-     * @param string|null $projectId Unused for Project model
-     * @return Project|null
-     */
-    public function findById(string $id, ?string $projectId = null): ?Project
-    {
-        return $this->model->find($id);
-    }
-
-    /**
-     * Update an existing project.
-     *
-     * @param string $id
-     * @param array<string, mixed> $data
-     * @param string|null $projectId Unused for Project model
-     * @return bool
-     */
-    public function update(string $id, array $data, ?string $projectId = null): bool
-    {
-        $record = $this->findById($id);
-
-        if (!$record) {
-            return false;
-        }
-
-        return $record->update($data);
-    }
-
-    /**
-     * Delete a project from the database.
-     *
-     * @param string $id
-     * @param string|null $projectId Unused for Project model
-     * @return bool
-     */
-    public function delete(string $id, ?string $projectId = null): bool
-    {
-        $record = $this->findById($id);
-
-        if (!$record) {
-            return false;
-        }
-
-        return $record->delete();
-    }
-
-    /**
-     * Get all projects.
-     *
-     * @return Collection<int, Project>
-     */
-    public function all(): Collection
-    {
-        return $this->model->all();
-    }
-
-    /**
      * Find a project by its unique API key.
      *
      * @param string $apiKey

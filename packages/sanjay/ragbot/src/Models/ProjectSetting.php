@@ -3,11 +3,12 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Sanjay\Ragbot\Database\Factories\ProjectSettingFactory;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Enums\VectorStore;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing Project-specific settings.
@@ -23,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProjectSetting extends Model
 {
     use HasUuids;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
@@ -57,12 +60,10 @@ class ProjectSetting extends Model
     ];
 
     /**
-     * Get the project that owns the settings.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return ProjectSettingFactory::new();
     }
 }

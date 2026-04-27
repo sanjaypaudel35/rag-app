@@ -3,10 +3,12 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Sanjay\Ragbot\Database\Factories\DocumentFactory;
 use Sanjay\Ragbot\Enums\DocumentStatus;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing an uploaded document.
@@ -22,6 +24,8 @@ use Sanjay\Ragbot\Enums\DocumentStatus;
 class Document extends Model
 {
     use HasUuids;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
@@ -54,13 +58,11 @@ class Document extends Model
     ];
 
     /**
-     * Get the project that owns the document.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return DocumentFactory::new();
     }
 
     /**

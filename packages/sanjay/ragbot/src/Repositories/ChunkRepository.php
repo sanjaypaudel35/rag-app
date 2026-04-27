@@ -22,16 +22,14 @@ class ChunkRepository extends BaseRepository implements ChunkRepositoryInterface
     }
 
     /**
-     * Find chunks by document scoped by project.
+     * Find chunks by document.
      *
-     * @param string $projectId
      * @param string $documentId
      * @return Collection<int, Chunk>
      */
-    public function findByDocument(string $projectId, string $documentId): Collection
+    public function findByDocument(string $documentId): Collection
     {
         return $this->model
-            ->where("project_id", $projectId)
             ->where("document_id", $documentId)
             ->get();
     }

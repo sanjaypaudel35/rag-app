@@ -3,9 +3,12 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Sanjay\Ragbot\Database\Factories\ChunkFactory;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing a document chunk.
@@ -20,6 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Chunk extends Model
 {
     use HasUuids;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
@@ -42,13 +47,11 @@ class Chunk extends Model
     ];
 
     /**
-     * Get the project that owns the chunk.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return ChunkFactory::new();
     }
 
     /**

@@ -3,8 +3,11 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Sanjay\Ragbot\Database\Factories\EmbeddingFactory;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing a vector embedding.
@@ -17,13 +20,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Embedding extends Model
 {
     use HasUuids;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'rag_embeddings';
+    protected $table = "rag_embeddings";
 
     /**
      * The attributes that are mass assignable.
@@ -31,9 +36,9 @@ class Embedding extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'chunk_id',
-        'vector',
+        "project_id",
+        "chunk_id",
+        "vector",
     ];
 
     /**
@@ -42,17 +47,15 @@ class Embedding extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'vector' => 'array',
+        "vector" => "array",
     ];
 
     /**
-     * Get the project that owns the embedding.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return EmbeddingFactory::new();
     }
 
     /**

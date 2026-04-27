@@ -21,16 +21,14 @@ class ConversationRepository extends BaseRepository implements ConversationRepos
     }
 
     /**
-     * Find conversation by session scoped by project.
+     * Find conversation by session.
      *
-     * @param string $projectId
      * @param string $sessionId
      * @return Conversation|null
      */
-    public function findBySession(string $projectId, string $sessionId): ?Conversation
+    public function findBySession(string $sessionId): ?Conversation
     {
         return $this->model
-            ->where("project_id", $projectId)
             ->where("session_id", $sessionId)
             ->first();
     }

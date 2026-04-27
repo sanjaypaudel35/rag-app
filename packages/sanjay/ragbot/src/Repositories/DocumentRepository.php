@@ -22,16 +22,14 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
     }
 
     /**
-     * Find documents by status scoped by project.
+     * Find documents by status.
      *
-     * @param string $projectId
      * @param string $status
      * @return Collection<int, Document>
      */
-    public function findByStatus(string $projectId, string $status): Collection
+    public function findByStatus(string $status): Collection
     {
         return $this->model
-            ->where("project_id", $projectId)
             ->where("status", $status)
             ->get();
     }
@@ -40,12 +38,11 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
      * Update document status.
      *
      * @param string $id
-     * @param string $projectId
      * @param string $status
      * @param string|null $error
      * @return bool
      */
-    public function updateStatus(string $id, string $projectId, string $status, ?string $error = null): bool
+    public function updateStatus(string $id, string $status, ?string $error = null): bool
     {
         $data = ["status" => $status];
 
@@ -53,6 +50,6 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
             $data["error_message"] = $error;
         }
 
-        return $this->update($id, $projectId, $data);
+        return $this->update($id, $data);
     }
 }

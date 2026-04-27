@@ -3,9 +3,11 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Sanjay\Ragbot\Database\Factories\ConversationFactory;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing a chat conversation.
@@ -18,13 +20,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Conversation extends Model
 {
     use HasUuids;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'rag_conversations';
+    protected $table = "rag_conversations";
 
     /**
      * The attributes that are mass assignable.
@@ -32,9 +36,9 @@ class Conversation extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'session_id',
-        'metadata',
+        "project_id",
+        "session_id",
+        "metadata",
     ];
 
     /**
@@ -43,17 +47,15 @@ class Conversation extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'metadata' => 'array',
+        "metadata" => "array",
     ];
 
     /**
-     * Get the project that owns the conversation.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return ConversationFactory::new();
     }
 
     /**

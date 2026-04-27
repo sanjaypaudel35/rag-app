@@ -3,9 +3,11 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Sanjay\Ragbot\Database\Factories\RagbotUserFactory;
+use Sanjay\Ragbot\Models\Traits\BelongsToProject;
 
 /**
  * Model representing a tenant-specific user.
@@ -20,13 +22,15 @@ use Illuminate\Notifications\Notifiable;
 class RagbotUser extends Authenticatable
 {
     use HasUuids, Notifiable;
+    use HasFactory;
+    use BelongsToProject;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'ragbot_users';
+    protected $table = "ragbot_users";
 
     /**
      * The attributes that are mass assignable.
@@ -34,10 +38,10 @@ class RagbotUser extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'project_id',
-        'name',
-        'email',
-        'password',
+        "project_id",
+        "name",
+        "email",
+        "password",
     ];
 
     /**
@@ -46,17 +50,15 @@ class RagbotUser extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        "password",
+        "remember_token",
     ];
 
     /**
-     * Get the project that owns the user.
-     *
-     * @return BelongsTo<Project, $this>
+     * Create a new factory instance for the model.
      */
-    public function project(): BelongsTo
+    protected static function newFactory()
     {
-        return $this->belongsTo(Project::class);
+        return RagbotUserFactory::new();
     }
 }
