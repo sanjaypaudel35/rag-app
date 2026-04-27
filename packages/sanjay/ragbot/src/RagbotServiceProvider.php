@@ -4,6 +4,9 @@ namespace Sanjay\Ragbot;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
+use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromApiKey;
+use Sanjay\Ragbot\Repositories\ProjectRepository;
 
 /**
  * Service provider for the Sanjay\Ragbot package.
@@ -16,8 +19,16 @@ class RagbotServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/ragbot.php', 'ragbot'
+            __DIR__."/../config/ragbot.php", "ragbot"
         );
+
+        $this->app->bind(ProjectRepositoryInterface::class, ProjectRepository::class);
+        $this->app->bind(\Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface::class, \Sanjay\Ragbot\Repositories\DocumentRepository::class);
+        $this->app->bind(\Sanjay\Ragbot\Contracts\Repositories\ChunkRepositoryInterface::class, \Sanjay\Ragbot\Repositories\ChunkRepository::class);
+        $this->app->bind(\Sanjay\Ragbot\Contracts\Repositories\EmbeddingRepositoryInterface::class, \Sanjay\Ragbot\Repositories\EmbeddingRepository::class);
+        $this->app->bind(\Sanjay\Ragbot\Contracts\Repositories\ConversationRepositoryInterface::class, \Sanjay\Ragbot\Repositories\ConversationRepository::class);
+        $this->app->bind(\Sanjay\Ragbot\Contracts\Repositories\MessageRepositoryInterface::class, \Sanjay\Ragbot\Repositories\MessageRepository::class);
+        $this->app->bind(\Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface::class, \Sanjay\Ragbot\Repositories\ProjectSettingRepository::class);
     }
 
     /**
@@ -26,17 +37,27 @@ class RagbotServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerRoutes();
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__."/../database/migrations");
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/ragbot.php' => config_path('ragbot.php'),
-            ], 'ragbot-config');
+                __DIR__."/../config/ragbot.php" => config_path("ragbot.php"),
+            ], "ragbot-config");
 
             $this->publishes([
-                __DIR__.'/../database/migrations/' => database_path('migrations'),
-            ], 'ragbot-migrations');
+                __DIR__."/../database/migrations/" => database_path("migrations"),
+            ], "ragbot-migrations");
         }
+
+        $this->registerMiddleware();
+    }
+
+    /**
+     * Register the package middleware.
+     */
+    protected function registerMiddleware(): void
+    {
+        $this->app["router"]->aliasMiddleware("ragbot.auth", ResolveProjectFromApiKey::class);
     }
 
     /**
@@ -45,11 +66,11 @@ class RagbotServiceProvider extends ServiceProvider
     protected function registerRoutes(): void
     {
         Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+            $this->loadRoutesFrom(__DIR__."/../routes/web.php");
         });
 
         Route::group($this->apiRouteConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+            $this->loadRoutesFrom(__DIR__."/../routes/api.php");
         });
     }
 
@@ -61,8 +82,8 @@ class RagbotServiceProvider extends ServiceProvider
     protected function routeConfiguration(): array
     {
         return [
-            'prefix' => config('ragbot.prefix', 'ragbot'),
-            'middleware' => config('ragbot.middleware', ['web']),
+            "prefix" => config("ragbot.prefix", "ragbot"),
+            "middleware" => config("ragbot.middleware", ["web"]),
         ];
     }
 
@@ -74,8 +95,8 @@ class RagbotServiceProvider extends ServiceProvider
     protected function apiRouteConfiguration(): array
     {
         return [
-            'prefix' => 'api/'.config('ragbot.prefix', 'ragbot'),
-            'middleware' => config('ragbot.api_middleware', ['api']),
+            "prefix" => config("ragbot.prefix", "ragbot") . "/api",
+            "middleware" => config("ragbot.api_middleware", ["api"]),
         ];
     }
 }

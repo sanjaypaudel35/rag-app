@@ -3,9 +3,11 @@
 namespace Sanjay\Ragbot\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Sanjay\Ragbot\Database\Factories\ProjectFactory;
 
 /**
  * Model representing a Project (Tenant) in the Ragbot system.
@@ -20,13 +22,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Project extends Model
 {
     use HasUuids;
+    use HasFactory;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'rag_projects';
+    protected $table = "rag_projects";
 
     /**
      * The attributes that are mass assignable.
@@ -34,11 +37,11 @@ class Project extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'slug',
-        'api_key',
-        'is_active',
-        'settings',
+        "name",
+        "slug",
+        "api_key",
+        "is_active",
+        "settings",
     ];
 
     /**
@@ -47,9 +50,19 @@ class Project extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'is_active' => 'boolean',
-        'settings' => 'array',
+        "is_active" => "boolean",
+        "settings" => "array",
     ];
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return ProjectFactory
+     */
+    protected static function newFactory(): ProjectFactory
+    {
+        return ProjectFactory::new();
+    }
 
     /**
      * Get the settings associated with the project.

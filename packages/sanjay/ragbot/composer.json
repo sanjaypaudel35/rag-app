@@ -15,7 +15,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Sanjay\\Ragbot\\": "src/"
+            "Sanjay\\Ragbot\\": "src/",
+            "Sanjay\\Ragbot\\Database\\Factories\\": "database/factories/",
+            "Sanjay\\Ragbot\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sanjay\\Ragbot\\Tests\\": "tests/"
         }
     },
     "extra": {

@@ -12,6 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() === "pgsql") {
+            DB::statement("CREATE EXTENSION IF NOT EXISTS vector;");
+        }
+
         Schema::create("rag_embeddings", function (Blueprint $table) {
             $table->uuid("id")->primary()->comment("The unique identifier for the embedding");
             $table->foreignUuid("project_id")->constrained("rag_projects")->cascadeOnDelete()->comment("The ID of the project the embedding belongs to");
