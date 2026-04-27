@@ -7,34 +7,31 @@ We are building a **production-ready, reusable Laravel package** named `sanjay/r
 It implements a **multi-tenant RAG (Retrieval-Augmented Generation) chatbot system** where each
 tenant (project) has strict data isolation across documents, embeddings, conversations, and settings.
 
----
+## Package Identity
 
-## Environment
-
-| Concern        | Value                          |
-|----------------|-------------------------------|
-| PHP            | 8.3                           |
-| Laravel        | 13                            |
-| Livewire       | 4                             |
-| Flux UI        | 2 (free tier)                 |
-| Tailwind CSS   | 4                             |
-| Queue driver   | database (default), redis     |
-| Primary DB     | PostgreSQL (pgvector)         |
-| Fallback DB    | MySQL (JSON vector fallback)  |
-| Package name   | sanjay/ragbot                 |
-| Root namespace | Sanjay\Ragbot                 |
-| Package path   | packages/sanjay/ragbot/       |
+| Concern        | Value                        |
+|----------------|------------------------------|
+| Package name   | sanjay/ragbot                |
+| Root namespace | Sanjay\Ragbot                |
+| Package path   | packages/sanjay/ragbot/      |
+| PHP            | 8.3                          |
+| Laravel        | 13.6.0                       |
+| Livewire       | 4.2.4                        |
+| Flux UI        | 2.13.2 (free tier only)      |
+| Tailwind CSS   | 4.2.2                        |
+| Primary DB     | PostgreSQL (pgvector)        |
+| Fallback DB    | MySQL (JSON vector fallback) |
+| Queue driver   | database (default), redis    |
 
 ---
 
-## String Quoting Rule
+## What This Package Does
 
-Always use double quotes `"` instead of single quotes `'` for all PHP strings.
+A **production-ready, multi-tenant RAG chatbot** Laravel package.
+Each tenant (project) has strict data isolation across documents, embeddings,
+conversations, and settings.
 
----
-
-## Core Flow
-
+Core flow:
 ```
 Document → Chunk → Embed → Store
 Query → Embed → Retrieve → Prompt → LLM → Response
@@ -42,454 +39,115 @@ Query → Embed → Retrieve → Prompt → LLM → Response
 
 ---
 
-## Package Folder Structure
+## Non-Negotiable Code Rules
 
-```
-packages/sanjay/ragbot/
-├── composer.json
-├── config/
-│   └── ragbot.php
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-├── resources/
-│   └── views/
-│       ├── layouts/
-│       │   ├── auth.blade.php
-│       │   └── dashboard.blade.php
-│       └── livewire/
-├── routes/
-│   ├── web.php
-│   └── api.php
-└── src/
-    ├── RagbotServiceProvider.php
-    ├── Contracts/
-    │   ├── Repositories/
-    │   │   ├── ProjectRepositoryInterface.php
-    │   │   ├── UserRepositoryInterface.php
-    │   │   ├── DocumentRepositoryInterface.php
-    │   │   ├── ChunkRepositoryInterface.php
-    │   │   ├── EmbeddingRepositoryInterface.php
-    │   │   ├── ConversationRepositoryInterface.php
-    │   │   ├── MessageRepositoryInterface.php
-    │   │   └── ProjectSettingsRepositoryInterface.php
-    │   └── Services/
-    │       ├── EmbeddingInterface.php
-    │       ├── VectorStoreInterface.php
-    │       └── LLMInterface.php
-    ├── Exceptions/
-    │   ├── DocumentProcessingException.php
-    │   ├── EmbeddingException.php
-    │   ├── RetrievalException.php
-    │   └── LlmResponseException.php
-    ├── Http/
-    │   ├── Controllers/
-    │   │   ├── Api/
-    │   │   │   └── ChatController.php
-    │   │   └── WidgetController.php
-    │   ├── Middleware/
-    │   │   ├── ResolveProjectFromApiKey.php
-    │   │   └── RedirectIfNotRagbotAuthenticated.php
-    │   ├── Requests/
-    │   │   ├── UploadDocumentRequest.php
-    │   │   └── ChatRequest.php
-    │   ├── Resources/
-    │   │   ├── ChatResource.php
-    │   │   └── ConversationResource.php
-    │   └── Traits/
-    │       └── HandlesApiExceptions.php
-    ├── Jobs/
-    │   ├── ProcessDocumentJob.php
-    │   ├── ChunkDocumentJob.php
-    │   ├── EmbedChunksJob.php
-    │   └── StoreVectorsJob.php
-    ├── Livewire/
-    │   ├── Dashboard.php
-    │   ├── DocumentManager.php
-    │   ├── SettingsManager.php
-    │   └── ApiKeyManager.php
-    ├── LLM/
-    │   ├── LLMManager.php
-    │   ├── OpenAILLMService.php
-    │   ├── AnthropicLLMService.php
-    │   └── StubLLMService.php
-    ├── Models/
-    │   ├── Project.php
-    │   ├── User.php
-    │   ├── Document.php
-    │   ├── Chunk.php
-    │   ├── Embedding.php
-    │   ├── Conversation.php
-    │   ├── Message.php
-    │   └── ProjectSettings.php
-    ├── Repositories/
-    │   ├── BaseRepository.php
-    │   ├── ProjectRepository.php
-    │   ├── UserRepository.php
-    │   ├── DocumentRepository.php
-    │   ├── ChunkRepository.php
-    │   ├── EmbeddingRepository.php
-    │   ├── ConversationRepository.php
-    │   ├── MessageRepository.php
-    │   └── ProjectSettingsRepository.php
-    ├── Services/
-    │   ├── DocumentService.php
-    │   ├── ChunkingService.php
-    │   ├── EmbeddingService.php
-    │   ├── RetrievalService.php
-    │   ├── PromptBuilderService.php
-    │   ├── ChatService.php
-    │   ├── ProjectSettingsService.php
-    │   ├── ApiKeyService.php
-    │   └── WidgetService.php
-    ├── Support/
-    │   └── TextExtractor.php
-    └── VectorStore/
-        ├── VectorStoreManager.php
-        ├── MysqlVectorStoreService.php
-        └── PgvectorStoreService.php
-```
+- **String quoting:** Always `"` double quotes, never `'` single quotes for PHP strings.
+- **Primary keys:** UUID `char(36)` on every table.
+- **project_id:** Every table has `project_id` (UUID, indexed, FK → rag_projects). Every repository query must scope by it — no exceptions.
+- **PHP 8.3 features:** Constructor property promotion, readonly properties, enums for status fields, named arguments where they aid clarity.
+- **PSR-12** throughout.
+- **PHPDoc** required on all classes and public methods (`@param`, `@return`). Service classes need a responsibility description.
+- No inline comments except for exceptionally complex logic.
+- Always use curly braces on control structures.
 
 ---
 
-## Config File Structure
-
-The complete shape of `config/ragbot.php` must be defined from Stage 1 and never changed
-structurally in later stages — only values are filled in as features are built.
-
-```php
-<?php
-
-return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Route Prefix & Middleware
-    |--------------------------------------------------------------------------
-    */
-    "prefix"         => env("RAGBOT_PREFIX", "ragbot"),
-    "middleware"     => ["web"],
-    "api_middleware" => ["api"],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Authentication Guard
-    |--------------------------------------------------------------------------
-    */
-    "guard" => "ragbot",
-
-    /*
-    |--------------------------------------------------------------------------
-    | LLM Configuration
-    |--------------------------------------------------------------------------
-    */
-    "llm" => [
-        "default" => env("RAGBOT_LLM_PROVIDER", "openai"),
-        "providers" => [
-            "openai" => [
-                "model"    => env("RAGBOT_OPENAI_MODEL", "gpt-4o-mini"),
-                "base_url" => "https://api.openai.com/v1",
-            ],
-            "anthropic" => [
-                "model"    => env("RAGBOT_ANTHROPIC_MODEL", "claude-3-haiku-20240307"),
-                "base_url" => "https://api.anthropic.com",
-            ],
-            "stub" => [],
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Embedding Configuration
-    |--------------------------------------------------------------------------
-    */
-    "embedding" => [
-        "default"    => env("RAGBOT_EMBEDDING_PROVIDER", "openai"),
-        "dimensions" => 1536,
-        "providers"  => [
-            "openai" => [
-                "model"    => "text-embedding-3-small",
-                "base_url" => "https://api.openai.com/v1",
-            ],
-            "stub" => [],
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Vector Store Configuration
-    |--------------------------------------------------------------------------
-    */
-    "vector_store" => [
-        "default" => env("RAGBOT_VECTOR_STORE", "mysql"),
-        "drivers" => [
-            "pgvector" => [],
-            "mysql"    => [],
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Chunking Configuration
-    |--------------------------------------------------------------------------
-    */
-    "chunking" => [
-        "size"    => 500,
-        "overlap" => 50,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Retrieval Configuration
-    |--------------------------------------------------------------------------
-    */
-    "retrieval" => [
-        "top_k" => 5,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Widget Configuration
-    |--------------------------------------------------------------------------
-    */
-    "widget" => [
-        "enabled"         => true,
-        "allowed_origins" => "*",
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Storage
-    |--------------------------------------------------------------------------
-    */
-    "storage" => [
-        "disk" => env("RAGBOT_STORAGE_DISK", "local"),
-        "path" => "ragbot/{project_id}/documents",
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Rate Limiting
-    |--------------------------------------------------------------------------
-    */
-    "rate_limit" => [
-        "chat_api" => env("RAGBOT_RATE_LIMIT", 60), // requests per minute per project
-    ],
-
-];
-```
-
----
-
-## Database Schema
-
-### Rules
-- All primary keys: UUID (`char(36)`)
-- Every table includes `project_id` (UUID, indexed, FK → projects)
-- All migrations must include column-level comments
-- Soft deletes only on `documents` table
-- Timestamps on all tables
-
-### Tables
-
-#### projects
-| Column     | Type          | Notes                        |
-|------------|---------------|------------------------------|
-| id         | uuid PK       |                              |
-| name       | string        |                              |
-| slug       | string unique |                              |
-| api_key    | string unique | indexed, used for resolution |
-| is_active  | boolean       | default true                 |
-| timestamps |               |                              |
-
-#### ragbot_users
-| Column         | Type    | Notes                          |
-|----------------|---------|--------------------------------|
-| id             | uuid PK |                                |
-| project_id     | uuid FK | → projects, cascade delete     |
-| name           | string  |                                |
-| email          | string  | unique per project_id          |
-| password       | string  |                                |
-| remember_token | string  |                                |
-| timestamps     |         |                                |
-
-#### documents
-| Column        | Type                                        | Notes              |
-|---------------|---------------------------------------------|--------------------|
-| id            | uuid PK                                     |                    |
-| project_id    | uuid FK                                     | → projects         |
-| name          | string                                      |                    |
-| file_path     | string                                      |                    |
-| mime_type     | string                                      |                    |
-| status        | enum(pending, processing, completed, failed)|                    |
-| error_message | text nullable                               |                    |
-| deleted_at    | timestamp nullable                          | soft delete        |
-| timestamps    |                                             |                    |
-
-#### chunks
-| Column      | Type    | Notes              |
-|-------------|---------|--------------------|
-| id          | uuid PK |                    |
-| project_id  | uuid FK | → projects         |
-| document_id | uuid FK | → documents        |
-| content     | text    |                    |
-| chunk_index | integer |                    |
-| token_count | integer | nullable           |
-| timestamps  |         |                    |
-
-#### embeddings
-| Column     | Type    | Notes                              |
-|------------|---------|------------------------------------|
-| id         | uuid PK |                                    |
-| project_id | uuid FK | → projects                         |
-| chunk_id   | uuid FK | → chunks                           |
-| vector     | json    | MySQL fallback (pgvector uses tsvector column instead) |
-| timestamps |         |                                    |
-
-#### conversations
-| Column     | Type    | Notes         |
-|------------|---------|---------------|
-| id         | uuid PK |               |
-| project_id | uuid FK | → projects    |
-| session_id | string  | indexed       |
-| metadata   | json    | nullable      |
-| timestamps |         |               |
-
-#### messages
-| Column          | Type              | Notes           |
-|-----------------|-------------------|-----------------|
-| id              | uuid PK           |                 |
-| project_id      | uuid FK           | → projects      |
-| conversation_id | uuid FK           | → conversations |
-| role            | enum(user,assistant)|               |
-| content         | text              |                 |
-| timestamps      |                   |                 |
-
-#### project_settings
-| Column         | Type    | Notes                          |
-|----------------|---------|--------------------------------|
-| id             | uuid PK |                                |
-| project_id     | uuid FK | unique, → projects             |
-| llm_provider   | string  | default: openai                |
-| llm_api_key    | string  | nullable, **encrypted at rest**|
-| llm_model      | string  | nullable                       |
-| embedding_provider | string | default: openai              |
-| vector_store   | string  | default: mysql                 |
-| widget_enabled | boolean | default: true                  |
-| timestamps     |         |                                |
-
----
-
-## Architecture Rules
-
-### Layer Responsibilities
+## Architecture — Layer Rules
 
 ```
 Request → Middleware → Controller → Service → Repository → Model
                                  ↘ Exception → HandlesApiExceptions
 ```
 
-| Layer       | Responsibility                                         | Can it touch Model directly? |
-|-------------|--------------------------------------------------------|------------------------------|
-| Controller  | Accept request, call service, return response          | No                           |
-| Service     | Business logic, throw exceptions                       | No — via repository only     |
-| Repository  | Data access, enforce project_id scope                  | Yes                          |
-| Middleware  | Resolve tenant, bind to container                      | Yes (lookup only)            |
-| Livewire    | Trigger service actions, hold UI state                 | No                           |
-
-### Controller Rules
-- Must use Form Request for all validation
-- Must be wrapped in try/catch using `HandlesApiExceptions` trait
-- Must return API Resources for all JSON responses
-- No business logic whatsoever
-
-```php
-public function store(ChatRequest $request): JsonResponse
-{
-    try {
-        $result = $this->chatService->chat(...);
-        return new ChatResource($result);
-    } catch (\Throwable $e) {
-        return $this->handleException($e);
-    }
-}
-```
-
-### Service Rules
-- Contain all business logic
-- Throw custom exceptions — never catch them internally
-- Never return raw Eloquent models — return DTOs or arrays
-- Always receive Project via constructor injection (from container binding)
-- Must have PHPDoc class description explaining responsibility
-
-### Repository Rules
-- Extend `BaseRepository`
-- ALL queries must scope by `project_id`
-- No business logic
-- Implement a corresponding interface
-
-## Multi-Tenancy Rules
-
-- Middleware `ResolveProjectFromApiKey` reads `X-Api-Key` header
-- Looks up `Project` where `api_key = ? AND is_active = true`
-- Binds to container: `app()->instance("ragbot.project", $project)`
-- All services receive Project via DI — never pass `project_id` as raw string if avoidable
-- Every repository method that queries data must accept and filter by `project_id`
+| Layer      | Rule                                                                 |
+|------------|----------------------------------------------------------------------|
+| Controller | Form Request for validation. Try/catch via HandlesApiExceptions. Return API Resources. Zero business logic. |
+| Service    | All business logic. Throws custom exceptions — never catches internally. Returns DTOs/arrays, not Eloquent models. Receives `Project` via constructor DI. |
+| Repository | Data access only. ALL queries scoped by `project_id`. Implements interface. No business logic. |
+| Middleware | Resolves tenant, binds to container. Lookup only. |
+| Livewire   | UI state only. Calls services via DI. Zero business logic. |
 
 ---
 
-## Service Contracts (Interfaces)
+## Multi-Tenancy
 
-### EmbeddingInterface
-```php
-public function embed(string $text): array; // returns float[]
-```
+- Middleware `ResolveProjectFromApiKey` reads `X-Api-Key` header.
+- Resolves `Project` where `api_key = ? AND is_active = true`.
+- Binds as: `app()->instance("ragbot.project", $project)`.
+- Services always receive `Project` via DI — never pass raw `project_id` strings if avoidable.
 
-### VectorStoreInterface
+---
+
+## Custom Authentication
+
+- Guard name: `ragbot`
+- Table: `ragbot_users` (not Laravel's `users`)
+- Users are scoped to `project_id` — a user from Project A cannot auth under Project B.
+- Login redirects to `{prefix}/dashboard`, logout to `{prefix}/login`.
+
+---
+
+## Database Tables
+
+All tables have `timestamps`. All PKs are UUID.
+
+| Table                  | Key columns (beyond id + timestamps)                                                      |
+|------------------------|-------------------------------------------------------------------------------------------|
+| `rag_projects`         | name, slug (unique), api_key (unique, indexed), is_active (bool, default true), settings (json nullable) |
+| `ragbot_users`         | project_id FK, name, email (unique per project_id), password, remember_token             |
+| `rag_documents`        | project_id FK, name, file_path, mime_type, status (enum), error_message (text nullable)  |
+| `rag_document_chunks`  | project_id FK, document_id FK, content (text), chunk_index (int), token_count (int nullable) |
+| `rag_embeddings`       | project_id FK, chunk_id FK, vector (pgvector 1536-dim)                                   |
+| `rag_conversations`    | project_id FK, session_id (indexed), metadata (json nullable)                             |
+| `rag_messages`         | project_id FK, conversation_id FK, role (enum: user/assistant), content (text)           |
+| `rag_project_settings` | project_id FK (unique), llm_provider, llm_api_key (nullable, encrypted cast), llm_model (nullable), vector_store, widget_enabled (bool) |
+
+> Migration rule: all columns must have a column-level comment.
+
+---
+
+## Service Contracts
+
 ```php
+// EmbeddingInterface
+public function embed(string $text): array; // float[]
+
+// VectorStoreInterface
 public function store(Project $project, string $chunkId, array $vector): void;
 public function search(Project $project, array $queryVector, int $topK): Collection;
-```
 
-### LLMInterface
-```php
+// LLMInterface
 public function complete(string $prompt, array $options = []): string;
 ```
 
 ---
 
-## Exception Mapping
+## Queue Jobs
 
-| Exception                    | HTTP Status |
-|------------------------------|-------------|
-| `DocumentProcessingException`| 422         |
-| `EmbeddingException`         | 502         |
-| `RetrievalException`         | 502         |
-| `LlmResponseException`       | 502         |
-| `\Illuminate\Auth\AuthenticationException` | 401 |
-| `\Illuminate\Validation\ValidationException` | 422 |
-| Generic `\Throwable`         | 500         |
+| Job                  | Idempotent skip condition      |
+|----------------------|-------------------------------|
+| `ProcessDocumentJob` | Skip if status = completed     |
+| `ChunkDocumentJob`   | Skip if chunks exist           |
+| `EmbedChunksJob`     | Skip if embeddings exist       |
+| `StoreVectorsJob`    | Skip if vectors stored         |
+
+All jobs implement `ShouldQueue`. Failures set document status → `failed` with error message.
 
 ---
 
-## API Standards
+## API
 
-- All API routes: `{prefix}/api/v1/`
-- All API routes protected by `ragbot.auth` middleware
-- All responses use Laravel API Resources
-- HTTP status codes must be explicit (never rely on defaults)
-- Versioning via URL prefix (`v1`)
+- Base path: `{prefix}/api/v1/`
+- Auth: `ragbot.auth` middleware on all API routes.
+- Responses: Laravel API Resources only. Always explicit HTTP status codes.
 
-### Chat Endpoint
+### Chat endpoint
 ```
 POST {prefix}/api/v1/chat
 Header: X-Api-Key: {key}
 Body: { "message": string, "session_id": string }
-Response: ChatResource
 ```
-
-### ChatResource shape
+ChatResource response shape:
 ```json
 {
   "data": {
@@ -503,94 +161,47 @@ Response: ChatResource
 
 ---
 
-## Queue Jobs
+## Exception → HTTP Mapping
 
-| Job                | Triggers              | Idempotent check           |
-|--------------------|-----------------------|----------------------------|
-| ProcessDocumentJob | After document upload | Skip if status = completed |
-| ChunkDocumentJob   | After ProcessDocument | Skip if chunks exist       |
-| EmbedChunksJob     | After ChunkDocument   | Skip if embeddings exist   |
-| StoreVectorsJob    | After EmbedChunks     | Skip if vectors stored     |
-
-All jobs implement `ShouldQueue`. Failures update document status to `failed` with error message.
+| Exception                              | Status |
+|----------------------------------------|--------|
+| `DocumentProcessingException`          | 422    |
+| `EmbeddingException`                   | 502    |
+| `RetrievalException`                   | 502    |
+| `LlmResponseException`                 | 502    |
+| `AuthenticationException`              | 401    |
+| `ValidationException`                  | 422    |
+| Generic `\Throwable`                   | 500    |
 
 ---
 
 ## Security Rules
 
-- LLM API keys stored in `project_settings.llm_api_key` must use Laravel `encrypted` cast
-- API keys for widget/integration must never be exposed in full after creation
-- Chat API must be rate limited per project (default: 60 req/min)
-- Widget JS endpoint must check `widget_enabled` before serving script
-- CORS must be open (`*`) only for `/api/v1/chat` and `/widget.js`
-- All other routes use standard Laravel CSRF protection
+- `llm_api_key` in project_settings → Laravel `encrypted` cast.
+- API keys never exposed in full after creation.
+- Chat API rate-limited per project (default 60 req/min).
+- CORS open (`*`) only for `/api/v1/chat` and `/widget.js`.
+- All other routes use standard Laravel CSRF protection.
 
 ---
 
-## Widget Rules
+## Widget
 
-- Served at: `GET {prefix}/widget.js?api_key={key}`
-- Content-Type: `application/javascript`
-- If `widget_enabled = false` → return empty JS file (200, no error)
-- If `api_key` invalid → return empty JS file (200, no error — never expose 401 to public)
-- Widget is pure vanilla JS + inline CSS — zero external dependencies
-- Widget must work when embedded on non-Laravel sites
-- Embed snippet format:
-```html
-<script src="https://yourdomain.com/ragbot/widget.js?api_key=YOUR_KEY"></script>
-```
+- Endpoint: `GET {prefix}/widget.js?api_key={key}` → `Content-Type: application/javascript`
+- If `widget_enabled = false` OR invalid `api_key` → return empty JS (200, never 401).
+- Pure vanilla JS + inline CSS, zero external dependencies.
+- Must work when embedded on non-Laravel sites.
 
 ---
 
-## Authentication
+## Testing
 
-- Package uses a custom `ragbot` guard
-- Guard uses `ragbot_users` table (not Laravel's default `users`)
-- Auth is per-project: `ragbot_users` are scoped to `project_id`
-- A user from Project A cannot authenticate under Project B
-- Password reset emails resolve the correct project via session-stored `project_id`
-- After login → redirect to `{prefix}/dashboard`
-- After logout → redirect to `{prefix}/login`
-
----
-
-## UI Rules
-
-- Use Livewire 4 components (class-based)
-- Use Flux UI v2 free components only
-- Use Tailwind CSS v4 utility classes
-- Livewire components must NOT contain business logic
-- Components call services via injected dependencies
-- Components may hold UI state (loading, errors, flash messages)
-
----
-
-## Code Quality Standards
-
-- PSR-12 coding standard throughout
-- PHPDoc required on:
-  - All classes (with responsibility description on service classes)
-  - All public methods (with `@param` and `@return`)
-- PHP 8.3 features encouraged:
-  - Constructor property promotion
-  - Readonly properties where applicable
-  - Enums for status fields
-  - Named arguments where clarity improves
-- No inline comments except for exceptionally complex logic
-- Always use curly braces on control structures
-
----
-
-## Testing Rules
-
-- Framework: PHPUnit (no Pest)
-- Test type: Feature tests preferred, unit tests for pure logic
-- Every repository must have a test verifying `project_id` scoping
-- Every service must have tests for happy path, failure path, and edge cases
-- Use model factories — never create models manually in tests
-- Mock HTTP calls to LLM providers — never make real API calls in tests
-
----
+- PHPUnit only (no Pest).
+- Feature tests preferred; unit tests for pure logic.
+- Every repository must have a test verifying `project_id` scoping.
+- Every service: happy path + failure path + edge cases.
+- Use model factories — never create models manually in tests.
+- Mock all HTTP calls to LLM providers — no real API calls in tests.
 
 ## What This Package Does NOT Include (Future Scope)
 
