@@ -21,16 +21,16 @@ use Sanjay\Ragbot\Models\Traits\BelongsToProject;
  */
 class RagbotUser extends Authenticatable
 {
-    use HasUuids, Notifiable;
-    use HasFactory;
     use BelongsToProject;
+    use HasFactory;
+    use HasUuids, Notifiable;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "ragbot_users";
+    protected $table = 'ragbot_users';
 
     /**
      * The attributes that are mass assignable.
@@ -38,10 +38,10 @@ class RagbotUser extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        "project_id",
-        "name",
-        "email",
-        "password",
+        'project_id',
+        'name',
+        'email',
+        'password',
     ];
 
     /**
@@ -50,9 +50,21 @@ class RagbotUser extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        "password",
-        "remember_token",
+        'password',
+        'remember_token',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 
     /**
      * Create a new factory instance for the model.
