@@ -82,10 +82,18 @@ Request → Middleware → Controller → Service → Repository → Model
 
 ## Custom Authentication
 
-- Guard name: `ragbot`
-- Table: `ragbot_users` (not Laravel's `users`)
+- **Guards:** `ragbot` (for tenants), `web` (for platform default).
+- **Tables:** `ragbot_users` (for tenants), `users` (for platform).
 - Users are scoped to `project_id` — a user from Project A cannot auth under Project B.
-- Login redirects to `{prefix}/dashboard`, logout to `{prefix}/login`.
+- **Tenant Auth Flow:**
+  - Routes: `tenant/{project_slug}/login` and `tenant/{project_slug}/register`.
+  - Redirects: Login → `tenant/{project_slug}/dashboard`, Logout → `tenant/{project_slug}/login`.
+  - Registration: **Manual login required** after successful registration (redirects to login).
+- **Platform Auth Flow:**
+  - Routes: `login` and `register`.
+  - Redirects: Login → `dashboard`, Logout → `login`.
+  - Registration: **Manual login required** after successful registration.
+- **Middleware:** `guest` applied to all auth views; authenticated users are redirected to their respective dashboards if they hit login/register.
 
 ---
 
