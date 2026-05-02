@@ -20,6 +20,6 @@ class LogoutResponse implements LogoutResponseContract
 
         return $request->wantsJson()
                     ? response()->json(['logged_out' => true])
-                    : redirect()->route('ragbot.login', ['project_slug' => $projectSlug]);
+                    : redirect()->route('ragbot.tenant.login', ['project_slug' => $projectSlug]);
     }
 }

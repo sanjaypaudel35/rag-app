@@ -16,7 +16,8 @@ class LoginResponse implements LoginResponseContract
      */
     public function toResponse($request)
     {
-        $slug = app('ragbot.project')->slug;
+        $project = app('ragbot.project');
+        $slug = $project->slug;
 
         return $request->wantsJson()
                     ? response()->json(['two_factor' => false])

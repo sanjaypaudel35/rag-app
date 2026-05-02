@@ -19,6 +19,7 @@ class SetRagbotAuthGuard
     public function handle(Request $request, Closure $next): Response
     {
         config(['fortify.guard' => 'ragbot']);
+        config(['auth.defaults.guard' => 'ragbot']);
 
         if (app()->bound('ragbot.project')) {
             config(['fortify.home' => route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug, 'absolute' => false])]);

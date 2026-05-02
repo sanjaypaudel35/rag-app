@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
-use Laravel\Fortify\Http\Controllers\NewPasswordController;
-use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
-use Laravel\Fortify\Http\Controllers\RegisteredUserController;
+use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
+use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\LoginController as TenantLoginController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\RegisterController as TenantRegisterController;
 use Sanjay\Ragbot\Livewire\Dashboard;
 
 Route::get('health', function () {
@@ -14,50 +14,45 @@ Route::get('health', function () {
     ]);
 });
 
-// Registration
-Route::get('register', [RegisteredUserController::class, 'create'])
-    ->middleware(['guest:ragbot'])
-    ->name('register');
+// Platform Authentication (Normal)
+Route::group(['middleware' => ['web']], function () {
+    Route::middleware(['guest'])->group(function () {
+        Route::get('register', [RegisterController::class, 'create'])->name('register');
+        Route::post('register', [RegisterController::class, 'store'])->name('register.store');
+        Route::get('login', [LoginController::class, 'create'])->name('login');
+        Route::post('login', [LoginController::class, 'store'])->name('login.store');
+    });
 
-Route::post('register', [RegisteredUserController::class, 'store'])
-    ->middleware(['guest:ragbot']);
+    Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
 
-// Login
-Route::get('login', [AuthenticatedSessionController::class, 'create'])
-    ->middleware(['guest:ragbot'])
-    ->name('login');
+    Route::middleware(['auth'])->get('dashboard', function () {
+        return view('ragbot::auth.platform.dashboard');
+    })->name('platform.dashboard');
+});
 
-Route::post('login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware(['guest:ragbot']);
+// Tenant Authentication
+Route::group([
+    'prefix' => 'tenant/{project_slug}',
+    'middleware' => ['web', Sanjay\Ragbot\Http\Middleware\ResolveProjectFromSlug::class, Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard::class],
+], function () {
+    Route::middleware(['guest:ragbot'])->group(function () {
+        Route::get('register', [TenantRegisterController::class, 'create'])->name('tenant.register');
+        Route::post('register', [TenantRegisterController::class, 'store'])->name('tenant.register.store');
+        Route::get('login', [TenantLoginController::class, 'create'])->name('tenant.login');
+        Route::post('login', [TenantLoginController::class, 'store'])->name('tenant.login.store');
+    });
 
-Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->name('logout');
+    Route::post('logout', [TenantLoginController::class, 'destroy'])->name('tenant.logout');
 
-// Password Reset
-Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-    ->middleware(['guest:ragbot'])
-    ->name('password.request');
+    Route::middleware(['ragbot.authenticated'])->group(function () {
+        Route::get('dashboard', Dashboard::class)->name('dashboard');
 
-Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-    ->middleware(['guest:ragbot'])
-    ->name('password.email');
+        Route::get('documents', function () {
+            return view('ragbot::layouts.dashboard', ['slot' => 'Documents coming soon']);
+        })->name('documents');
 
-Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-    ->middleware(['guest:ragbot'])
-    ->name('password.reset');
-
-Route::post('reset-password', [NewPasswordController::class, 'store'])
-    ->middleware(['guest:ragbot'])
-    ->name('password.update');
-
-Route::middleware(['ragbot.authenticated'])->group(function () {
-    Route::get('dashboard', Dashboard::class)->name('dashboard');
-
-    Route::get('documents', function () {
-        return view('ragbot::layouts.dashboard', ['slot' => 'Documents coming soon']);
-    })->name('documents');
-
-    Route::get('settings', function () {
-        return view('ragbot::layouts.dashboard', ['slot' => 'Settings coming soon']);
-    })->name('settings');
+        Route::get('settings', function () {
+            return view('ragbot::layouts.dashboard', ['slot' => 'Settings coming soon']);
+        })->name('settings');
+    });
 });

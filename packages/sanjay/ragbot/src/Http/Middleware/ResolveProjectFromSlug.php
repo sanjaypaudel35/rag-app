@@ -30,7 +30,7 @@ class ResolveProjectFromSlug
             return $next($request);
         }
 
-        $project = $this->projectRepository->all()->where('slug', $slug)->first();
+        $project = $this->projectRepository->findBySlug($slug);
 
         if (! $project) {
             abort(404, 'Project not found for slug: '.$slug);

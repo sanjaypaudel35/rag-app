@@ -49,6 +49,8 @@ Query → Embed → Retrieve → Prompt → LLM → Response
 - **PHPDoc** required on all classes and public methods (`@param`, `@return`). Service classes need a responsibility description.
 - No inline comments except for exceptionally complex logic.
 - Always use curly braces on control structures.
+- Use existing project folder structure if relatable.
+- Use inline comment on design pattern or resolved class through service container.
 
 ---
 

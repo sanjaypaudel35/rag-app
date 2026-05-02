@@ -34,4 +34,17 @@ class ProjectRepository extends BaseRepository implements ProjectRepositoryInter
             ->where("is_active", true)
             ->first();
     }
+
+    /**
+     * Find a project by its slug.
+     *
+     * @param string $slug
+     * @return Project|null
+     */
+    public function findBySlug(string $slug): ?Project
+    {
+        return $this->model
+            ->where("slug", $slug)
+            ->first();
+    }
 }

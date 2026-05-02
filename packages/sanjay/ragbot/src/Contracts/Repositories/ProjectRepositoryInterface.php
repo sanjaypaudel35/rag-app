@@ -16,4 +16,11 @@ interface ProjectRepositoryInterface extends BaseRepositoryInterface
      * @return Model|null
      */
     public function findByApiKey(string $apiKey): ?Model;
+    /**
+     * Find a project by its slug.
+     *
+     * @param string $slug
+     * @return Model|null
+     */
+    public function findBySlug(string $slug): ?Model;
 }

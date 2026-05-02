@@ -2,10 +2,10 @@
 
 @section("content")
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400 text-center font-semibold">
-        Register for {{ app("ragbot.project")->name }}
+        Register a new platform account
     </div>
 
-    <form method="POST" action="{{ route("ragbot.register", ["project_slug" => request()->route("project_slug")]) }}">
+    <form method="POST" action="{{ route("ragbot.register.store") }}">
         @csrf
 
         <div>
@@ -38,7 +38,7 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800" href="{{ route("ragbot.login", ["project_slug" => request()->route("project_slug")]) }}">
+            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800" href="{{ route("ragbot.login") }}">
                 Already registered?
             </a>
 

@@ -3,15 +3,22 @@
 namespace Sanjay\Ragbot;
 
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Laravel\Fortify\Contracts\LoginResponse as FortifyLoginResponse;
+use Laravel\Fortify\Contracts\LogoutResponse as FortifyLogoutResponse;
+use Laravel\Fortify\Contracts\RegisterResponse as FortifyRegisterResponse;
 use Laravel\Fortify\Fortify;
-use Livewire\Livewire;
-use Sanjay\Ragbot\Actions\Fortify\CreateNewUser;
-use Sanjay\Ragbot\Actions\Fortify\LoginResponse;
-use Sanjay\Ragbot\Actions\Fortify\LogoutResponse;
-use Sanjay\Ragbot\Actions\Fortify\RegisterResponse;
+use Laravel\Fortify\Http\Responses\LoginResponse as DefaultLoginResponse;
+use Laravel\Fortify\Http\Responses\LogoutResponse as DefaultLogoutResponse;
+use Laravel\Fortify\Http\Responses\RegisterResponse as DefaultRegisterResponse;
+use Sanjay\Ragbot\Actions\Fortify\CreateNewUser as TenantCreateNewUser;
+use Sanjay\Ragbot\Actions\Fortify\LoginResponse as TenantLoginResponse;
+use Sanjay\Ragbot\Actions\Fortify\LogoutResponse as TenantLogoutResponse;
+use Sanjay\Ragbot\Actions\Fortify\RegisterResponse as TenantRegisterResponse;
 use Sanjay\Ragbot\Contracts\Repositories\ChunkRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ConversationRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
@@ -20,6 +27,10 @@ use Sanjay\Ragbot\Contracts\Repositories\MessageRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
+use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
+use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\LoginController as TenantLoginController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\RegisterController as TenantRegisterController;
 use Sanjay\Ragbot\Http\Middleware\RedirectIfNotRagbotAuthenticated;
 use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromApiKey;
 use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromSlug;
@@ -34,6 +45,10 @@ use Sanjay\Ragbot\Repositories\MessageRepository;
 use Sanjay\Ragbot\Repositories\ProjectRepository;
 use Sanjay\Ragbot\Repositories\ProjectSettingRepository;
 use Sanjay\Ragbot\Repositories\UserRepository;
+use Sanjay\Ragbot\Services\Auth\LoginService;
+use Sanjay\Ragbot\Services\Auth\RegisterService;
+use Sanjay\Ragbot\Services\Auth\Tenant\LoginService as TenantLoginService;
+use Sanjay\Ragbot\Services\Auth\Tenant\RegisterService as TenantRegisterService;
 
 /**
  * Service provider for the Sanjay\Ragbot package.
@@ -85,11 +100,18 @@ class RagbotServiceProvider extends ServiceProvider
 
         $this->registerMiddleware();
         $this->configureGuard();
-        $this->configureFortify();
+        $this->configureContextualBindings();
+
+        // Set default Fortify home to platform dashboard
+        config(['fortify.home' => '/ragbot/dashboard']);
 
         RedirectIfAuthenticated::redirectUsing(function ($request) {
             if (Auth::guard('ragbot')->check() && app()->bound('ragbot.project')) {
                 return route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]);
+            }
+
+            if (Auth::guard(config('auth.defaults.guard'))->check()) {
+                return route('ragbot.platform.dashboard');
             }
 
             return null;
@@ -121,42 +143,63 @@ class RagbotServiceProvider extends ServiceProvider
     }
 
     /**
-     * Configure Laravel Fortify.
+     * Configure contextual bindings for Fortify contracts and Services.
      */
-    protected function configureFortify(): void
+    protected function configureContextualBindings(): void
     {
-        Fortify::createUsersUsing(CreateNewUser::class);
+        // CreatesNewUsers injection into Services
+        $this->app->when(RegisterService::class)
+            ->needs(CreatesNewUsers::class)
+            ->give(\App\Actions\Fortify\CreateNewUser::class);
 
-        $this->app->singleton(
-            \Laravel\Fortify\Contracts\LoginResponse::class,
-            LoginResponse::class
-        );
+        $this->app->when(TenantRegisterService::class)
+            ->needs(CreatesNewUsers::class)
+            ->give(TenantCreateNewUser::class);
 
-        $this->app->singleton(
-            \Laravel\Fortify\Contracts\RegisterResponse::class,
-            RegisterResponse::class
-        );
+        // RegisterResponse
+        $this->app->when(RegisterController::class)
+            ->needs(FortifyRegisterResponse::class)
+            ->give(DefaultRegisterResponse::class);
 
-        $this->app->singleton(
-            \Laravel\Fortify\Contracts\LogoutResponse::class,
-            LogoutResponse::class
-        );
+        $this->app->when(TenantRegisterController::class)
+            ->needs(FortifyRegisterResponse::class)
+            ->give(TenantRegisterResponse::class);
 
-        Fortify::loginView(function () {
-            return view('ragbot::auth.login');
-        });
+        // LoginResponse
+        $this->app->when(LoginController::class)
+            ->needs(FortifyLoginResponse::class)
+            ->give(DefaultLoginResponse::class);
 
-        Fortify::registerView(function () {
-            return view('ragbot::auth.register');
-        });
+        $this->app->when(TenantLoginController::class)
+            ->needs(FortifyLoginResponse::class)
+            ->give(TenantLoginResponse::class);
 
-        Fortify::requestPasswordResetLinkView(function () {
-            return view('ragbot::auth.forgot-password');
-        });
+        // LogoutResponse
+        $this->app->when(LoginController::class)
+            ->needs(FortifyLogoutResponse::class)
+            ->give(DefaultLogoutResponse::class);
 
-        Fortify::resetPasswordView(function ($request) {
-            return view('ragbot::auth.reset-password', ['request' => $request]);
-        });
+        $this->app->when(TenantLoginController::class)
+            ->needs(FortifyLogoutResponse::class)
+            ->give(TenantLogoutResponse::class);
+
+        // StatefulGuard - Platform (resolves to default guard)
+        foreach ([RegisterController::class, LoginController::class, LoginService::class] as $class) {
+            $this->app->when($class)
+                ->needs(StatefulGuard::class)
+                ->give(function () {
+                    return Auth::guard(config('auth.defaults.guard'));
+                });
+        }
+
+        // StatefulGuard - Tenant (resolves to 'ragbot' guard)
+        foreach ([TenantRegisterController::class, TenantLoginController::class, TenantLoginService::class] as $class) {
+            $this->app->when($class)
+                ->needs(StatefulGuard::class)
+                ->give(function () {
+                    return Auth::guard('ragbot');
+                });
+        }
     }
 
     /**
@@ -176,27 +219,16 @@ class RagbotServiceProvider extends ServiceProvider
      */
     protected function registerRoutes(): void
     {
-        Route::group($this->routeConfiguration(), function () {
+        Route::group([
+            'as' => 'ragbot.',
+            'prefix' => config('ragbot.prefix', 'ragbot'),
+        ], function () {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         });
 
         Route::group($this->apiRouteConfiguration(), function () {
             $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         });
-    }
-
-    /**
-     * Get the web route group configuration.
-     *
-     * @return array<string, mixed>
-     */
-    protected function routeConfiguration(): array
-    {
-        return [
-            'as' => 'ragbot.',
-            'prefix' => config('ragbot.prefix', 'ragbot').'/{project_slug}',
-            'middleware' => array_merge(config('ragbot.middleware', ['web']), [ResolveProjectFromSlug::class, SetRagbotAuthGuard::class]),
-        ];
     }
 
     /**
