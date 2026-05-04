@@ -5,7 +5,10 @@ use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\LoginController as TenantLoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\RegisterController as TenantRegisterController;
+use Sanjay\Ragbot\Http\Controllers\Tenant\DocumentPreviewController;
+use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
+use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 
 Route::get('health', function () {
     return response()->json([
@@ -33,7 +36,10 @@ Route::group(['middleware' => ['web']], function () {
 // Tenant Authentication
 Route::group([
     'prefix' => 'tenant/{project_slug}',
-    'middleware' => ['web', Sanjay\Ragbot\Http\Middleware\ResolveProjectFromSlug::class, Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard::class],
+    'middleware' => [
+        'web',
+        SetRagbotAuthGuard::class,
+    ],
 ], function () {
     Route::middleware(['guest:ragbot'])->group(function () {
         Route::get('register', [TenantRegisterController::class, 'create'])->name('tenant.register');
@@ -46,10 +52,8 @@ Route::group([
 
     Route::middleware(['ragbot.authenticated'])->group(function () {
         Route::get('dashboard', Dashboard::class)->name('dashboard');
-
-        Route::get('documents', function () {
-            return view('ragbot::layouts.dashboard', ['slot' => 'Documents coming soon']);
-        })->name('documents');
+        Route::get('documents', DocumentManager::class)->name('documents');
+        Route::get('documents/{document}/preview', [DocumentPreviewController::class, 'show'])->name('documents.preview');
 
         Route::get('settings', function () {
             return view('ragbot::layouts.dashboard', ['slot' => 'Settings coming soon']);

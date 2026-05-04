@@ -51,8 +51,16 @@ Query → Embed → Retrieve → Prompt → LLM → Response
 - Always use curly braces on control structures.
 - Use existing project folder structure if relatable.
 - Use inline comment on design pattern or resolved class through service container.
+- Always place all import/use statements at the top of the file (after the namespace) and never use fully qualified class names inside the code body.
+- Use short class names with proper imports; avoid inline full paths like \App\Services\SomeClass in methods or logic.
 
 ---
+
+## Prompt Rules
+
+- Write production ready high quality code, each code should be workable, dont change existing working feature.
+- when writing code if you think it might be reusable then you can put it to the trait or helper function
+
 
 ## Architecture — Layer Rules
 
@@ -73,10 +81,11 @@ Request → Middleware → Controller → Service → Repository → Model
 
 ## Multi-Tenancy
 
-- Middleware `ResolveProjectFromApiKey` reads `X-Api-Key` header.
-- Resolves `Project` where `api_key = ? AND is_active = true`.
+- Middleware `ResolveProjectFromSlug` or `ResolveProjectFromApiKey` resolves the project.
 - Binds as: `app()->instance("ragbot.project", $project)`.
-- Services always receive `Project` via DI — never pass raw `project_id` strings if avoidable.
+- **Access Standard:** Access the current project instance using `app("ragbot.project")`.
+- Do not use class-based injection for the `Project` model if you need the current tenant instance, as it is no longer bound to the class in the Service Provider.
+- Services and Livewire components should resolve the project from the container via the `"ragbot.project"` key.
 
 ---
 

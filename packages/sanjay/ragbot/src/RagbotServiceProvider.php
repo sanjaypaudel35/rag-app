@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot;
 
+use App\Actions\Fortify\CreateNewUser;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Responses\LoginResponse as DefaultLoginResponse;
 use Laravel\Fortify\Http\Responses\LogoutResponse as DefaultLogoutResponse;
 use Laravel\Fortify\Http\Responses\RegisterResponse as DefaultRegisterResponse;
+use Livewire\Livewire;
 use Sanjay\Ragbot\Actions\Fortify\CreateNewUser as TenantCreateNewUser;
 use Sanjay\Ragbot\Actions\Fortify\LoginResponse as TenantLoginResponse;
 use Sanjay\Ragbot\Actions\Fortify\LogoutResponse as TenantLogoutResponse;
@@ -27,6 +29,8 @@ use Sanjay\Ragbot\Contracts\Repositories\MessageRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
+use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\LoginController as TenantLoginController;
@@ -36,6 +40,7 @@ use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromApiKey;
 use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromSlug;
 use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
+use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Models\RagbotUser;
 use Sanjay\Ragbot\Repositories\ChunkRepository;
 use Sanjay\Ragbot\Repositories\ConversationRepository;
@@ -49,6 +54,9 @@ use Sanjay\Ragbot\Services\Auth\LoginService;
 use Sanjay\Ragbot\Services\Auth\RegisterService;
 use Sanjay\Ragbot\Services\Auth\Tenant\LoginService as TenantLoginService;
 use Sanjay\Ragbot\Services\Auth\Tenant\RegisterService as TenantRegisterService;
+use Sanjay\Ragbot\Services\Tenant\DocumentService;
+use Sanjay\Ragbot\Services\Tenant\MysqlVectorStoreService;
+use Sanjay\Ragbot\Services\Tenant\StubEmbeddingService;
 
 /**
  * Service provider for the Sanjay\Ragbot package.
@@ -72,6 +80,11 @@ class RagbotServiceProvider extends ServiceProvider
         $this->app->bind(ConversationRepositoryInterface::class, ConversationRepository::class);
         $this->app->bind(MessageRepositoryInterface::class, MessageRepository::class);
         $this->app->bind(ProjectSettingRepositoryInterface::class, ProjectSettingRepository::class);
+
+        $this->app->bind(EmbeddingInterface::class, StubEmbeddingService::class);
+        $this->app->bind(VectorStoreInterface::class, MysqlVectorStoreService::class);
+
+        $this->app->singleton(DocumentService::class);
     }
 
     /**
@@ -123,7 +136,8 @@ class RagbotServiceProvider extends ServiceProvider
      */
     protected function registerLivewireComponents(): void
     {
-        // Livewire::component('ragbot::dashboard', Dashboard::class);
+        Livewire::component('ragbot.dashboard', Dashboard::class);
+        Livewire::component('ragbot.document-manager', DocumentManager::class);
     }
 
     /**
@@ -150,7 +164,7 @@ class RagbotServiceProvider extends ServiceProvider
         // CreatesNewUsers injection into Services
         $this->app->when(RegisterService::class)
             ->needs(CreatesNewUsers::class)
-            ->give(\App\Actions\Fortify\CreateNewUser::class);
+            ->give(CreateNewUser::class);
 
         $this->app->when(TenantRegisterService::class)
             ->needs(CreatesNewUsers::class)
@@ -208,6 +222,8 @@ class RagbotServiceProvider extends ServiceProvider
     protected function registerMiddleware(): void
     {
         $router = $this->app['router'];
+        $router->pushMiddlewareToGroup('web', ResolveProjectFromSlug::class);
+
         $router->aliasMiddleware('ragbot.auth', ResolveProjectFromApiKey::class);
         $router->aliasMiddleware('ragbot.project', ResolveProjectFromSlug::class);
         $router->aliasMiddleware('ragbot.guard', SetRagbotAuthGuard::class);

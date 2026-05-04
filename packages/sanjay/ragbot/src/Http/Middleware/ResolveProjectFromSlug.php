@@ -4,7 +4,9 @@ namespace Sanjay\Ragbot\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
+use Sanjay\Ragbot\Models\RagbotUser;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -26,7 +28,24 @@ class ResolveProjectFromSlug
     {
         $slug = $request->route('project_slug');
 
+        // Fallback for Livewire requests where the slug might not be in the route.
         if (! $slug) {
+            // Try to get slug from Referer if this is a Livewire update
+            if ($request->hasHeader('X-Livewire')) {
+                $referer = $request->header('Referer');
+                if ($referer && preg_match("/tenant\/([^\/]+)/", $referer, $matches)) {
+                    $slug = $matches[1];
+                }
+            }
+        }
+
+        if (! $slug) {
+            if (Auth::guard('ragbot')->check()) {
+                /** @var RagbotUser $user */
+                $user = Auth::guard('ragbot')->user();
+                app()->instance('ragbot.project', $user->project);
+            }
+
             return $next($request);
         }
 

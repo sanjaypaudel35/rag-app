@@ -11,57 +11,128 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
 </head>
-<body class="min-h-screen bg-white dark:bg-zinc-800 antialiased h-full">
+<body class="min-h-screen bg-zinc-50 dark:bg-zinc-950 antialiased h-full font-sans text-zinc-900 dark:text-zinc-100">
     <div class="flex min-h-screen">
-        <flux:sidebar sticky collapsible class="bg-zinc-50 dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
-            <flux:sidebar.header>
+        <!-- Sidebar -->
+        <flux:sidebar sticky collapsible class="bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800">
+            <flux:sidebar.header class="mb-6">
                 <flux:sidebar.brand
-                    href="{{ route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) }}"
+                    href="{{ app()->bound('ragbot.project') ? route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) : '#' }}"
                     name="Ragbot"
+                    logo="https://fluxui.dev/img/demo/logo.png"
                 />
                 <flux:sidebar.collapse class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2" />
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="home" href="{{ route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) }}" :current="request()->routeIs('ragbot.dashboard')">Dashboard</flux:sidebar.item>
-                <flux:sidebar.item icon="document-text" href="{{ route('ragbot.documents', ['project_slug' => app('ragbot.project')->slug]) }}" :current="request()->routeIs('ragbot.documents')">Documents</flux:sidebar.item>
+                <flux:sidebar.item icon="squares-2x2" href="{{ app()->bound('ragbot.project') ? route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.dashboard')">Dashboard</flux:sidebar.item>
+                <flux:sidebar.item icon="document-duplicate" href="{{ app()->bound('ragbot.project') ? route('ragbot.documents', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.documents')">Documents</flux:sidebar.item>
+                <flux:sidebar.item icon="rectangle-stack" href="#">Collections</flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-path" href="#">Processing Queue</flux:sidebar.item>
+                
+                <flux:separator class="my-4 mx-4" />
+                
+                <flux:sidebar.item icon="cog-8-tooth" href="#">Settings</flux:sidebar.item>
+                <flux:sidebar.item icon="users" href="#">Team</flux:sidebar.item>
+                <flux:sidebar.item icon="key" href="#">API Keys</flux:sidebar.item>
+                <flux:sidebar.item icon="credit-card" href="#">Billing</flux:sidebar.item>
+                <flux:sidebar.item icon="list-bullet" href="#">Activity Logs</flux:sidebar.item>
             </flux:sidebar.nav>
 
             <flux:sidebar.spacer />
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="cog-6-tooth" href="{{ route('ragbot.settings', ['project_slug' => app('ragbot.project')->slug]) }}" :current="request()->routeIs('ragbot.settings')">Settings</flux:sidebar.item>
-            </flux:sidebar.nav>
+            <!-- Project Card at Bottom -->
+            @if (app()->bound('ragbot.project'))
+                <div class="p-4 mx-2 mb-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden in-data-flux-sidebar-collapsed-desktop:hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Current Project</flux:text>
+                        <flux:badge size="sm" variant="success" inset="top bottom" class="text-[10px] px-1.5 py-0">Pro Plan</flux:badge>
+                    </div>
+                    <flux:heading size="sm" class="truncate">{{ app('ragbot.project')->name }}</flux:heading>
+                    <div class="flex items-center gap-2 mt-2">
+                        <div class="flex -space-x-2">
+                            <div class="w-5 h-5 rounded-full border border-white dark:border-zinc-800 bg-zinc-200 dark:bg-zinc-700"></div>
+                            <div class="w-5 h-5 rounded-full border border-white dark:border-zinc-800 bg-zinc-300 dark:bg-zinc-600"></div>
+                        </div>
+                        <flux:text size="xs" class="text-zinc-500">3 Members</flux:text>
+                    </div>
+                    <flux:button variant="subtle" size="sm" class="mt-3 px-0 text-indigo-600 dark:text-indigo-400 font-medium">Upgrade Plan</flux:button>
+                </div>
+            @endif
 
             <flux:dropdown position="top" align="start" class="max-lg:hidden">
-                <flux:sidebar.profile name="{{ Auth::guard('ragbot')->user()->name }}" />
+                <flux:sidebar.profile 
+                    name="{{ Auth::guard('ragbot')->user()->name ?? 'Sanjay Paudel' }}" 
+                    initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->name ?? 'S', 0, 1)) }}"
+                />
                 <flux:menu>
+                    <flux:menu.item icon="user-circle">Profile Settings</flux:menu.item>
+                    <flux:menu.separator />
                     <flux:menu.item icon="arrow-right-start-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</flux:menu.item>
                 </flux:menu>
             </flux:dropdown>
         </flux:sidebar>
 
         <div class="flex-1 flex flex-col">
-            <flux:header class="lg:hidden">
-                <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
-                <flux:spacer />
-                <flux:dropdown position="top" align="start">
-                    <flux:profile name="{{ Auth::guard('ragbot')->user()->name }}" />
-                    <flux:menu>
-                        <flux:menu.item icon="arrow-right-start-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</flux:menu.item>
-                    </flux:menu>
-                </flux:dropdown>
-            </flux:header>
+            <!-- Header -->
+            <header class="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10 px-6 py-4 md:px-10">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 lg:hidden">
+                        <flux:sidebar.toggle icon="bars-2" inset="left" />
+                        <flux:brand name="Ragbot" logo="https://fluxui.dev/img/demo/logo.png" />
+                    </div>
 
-            <flux:main class="flex-1">
+                    <!-- Breadcrumbs & Titles -->
+                    <div class="hidden md:block">
+                        <div class="flex items-center gap-2 text-xs text-zinc-400 mb-1">
+                            <span>Dashboard</span>
+                            <flux:icon icon="chevron-right" variant="mini" class="w-3 h-3" />
+                            <span class="text-zinc-900 dark:text-zinc-100 font-medium">{{ request()->routeIs('ragbot.documents') ? 'Documents' : 'Overview' }}</span>
+                        </div>
+                        <flux:heading size="xl" level="1">{{ request()->routeIs('ragbot.documents') ? 'Documents' : 'Overview' }}</flux:heading>
+                    </div>
+
+                    <!-- Header Actions -->
+                    <div class="flex items-center gap-4 md:gap-6">
+                        <flux:button icon="magnifying-glass" variant="ghost" size="sm" class="text-zinc-400" />
+                        
+                        <div class="relative">
+                            <flux:button icon="bell" variant="ghost" size="sm" class="text-zinc-400" />
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-zinc-900"></span>
+                        </div>
+
+                        <div class="h-8 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-2 hidden sm:block"></div>
+
+                        <div class="flex items-center gap-3">
+                            <div class="hidden sm:block text-right">
+                                <flux:text size="sm" class="font-semibold text-zinc-900 dark:text-zinc-100">{{ Auth::guard('ragbot')->user()->name ?? 'Sanjay Paudel' }}</flux:text>
+                                <flux:text size="xs" class="text-zinc-500">Owner</flux:text>
+                            </div>
+                            <flux:dropdown align="end">
+                                <flux:avatar size="sm" initials="SP" class="cursor-pointer" />
+                                <flux:menu>
+                                    <flux:menu.item icon="user">Account Settings</flux:menu.item>
+                                    <flux:menu.item icon="cog-8-tooth">Preferences</flux:menu.item>
+                                    <flux:menu.separator />
+                                    <flux:menu.item icon="arrow-right-start-on-rectangle" variant="danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</flux:menu.item>
+                                </flux:menu>
+                            </flux:dropdown>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <flux:main class="flex-1 px-6 py-8 md:px-10 md:py-10 bg-zinc-50/50 dark:bg-zinc-950/50">
                 {{ $slot }}
             </flux:main>
         </div>
     </div>
 
+    @if (app()->bound('ragbot.project'))
     <form id="logout-form" action="{{ route('ragbot.logout', ['project_slug' => app('ragbot.project')->slug]) }}" method="POST" class="hidden">
         @csrf
     </form>
+    @endif
 
     @fluxScripts
 </body>

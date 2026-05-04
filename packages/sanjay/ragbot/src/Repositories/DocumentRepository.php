@@ -13,8 +13,6 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
 {
     /**
      * Create a new document repository instance.
-     *
-     * @param Document $model
      */
     public function __construct(Document $model)
     {
@@ -24,32 +22,28 @@ class DocumentRepository extends BaseRepository implements DocumentRepositoryInt
     /**
      * Find documents by status.
      *
-     * @param string $status
      * @return Collection<int, Document>
      */
     public function findByStatus(string $status): Collection
     {
         return $this->model
-            ->where("status", $status)
+            ->where('status', $status)
             ->get();
     }
 
     /**
      * Update document status.
-     *
-     * @param string $id
-     * @param string $status
-     * @param string|null $error
-     * @return bool
      */
     public function updateStatus(string $id, string $status, ?string $error = null): bool
     {
-        $data = ["status" => $status];
+        $data = ['status' => $status];
 
         if ($error !== null) {
-            $data["error_message"] = $error;
+            $data['error_message'] = $error;
         }
 
-        return $this->update($id, $data);
+        $this->update($id, $data);
+
+        return true;
     }
 }
