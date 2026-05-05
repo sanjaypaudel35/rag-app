@@ -18,21 +18,25 @@ use Sanjay\Ragbot\Models\Traits\BelongsToProject;
  * @property LlmProvider $llm_provider
  * @property string|null $llm_api_key
  * @property string|null $llm_model
+ * @property string|null $llm_model_for_embedding
+ * @property string|null $llm_api_endpoint
+ * @property string|null $embedding_api_endpoint
  * @property VectorStore $vector_store
  * @property bool $widget_enabled
+ * @property int $total_tokens_used
  */
 class ProjectSetting extends Model
 {
-    use HasUuids;
-    use HasFactory;
     use BelongsToProject;
+    use HasFactory;
+    use HasUuids;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "rag_project_settings";
+    protected $table = 'rag_project_settings';
 
     /**
      * The attributes that are mass assignable.
@@ -40,12 +44,16 @@ class ProjectSetting extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "project_id",
-        "llm_provider",
-        "llm_api_key",
-        "llm_model",
-        "vector_store",
-        "widget_enabled",
+        'project_id',
+        'llm_provider',
+        'llm_api_key',
+        'llm_model',
+        'llm_model_for_embedding',
+        'llm_api_endpoint',
+        'embedding_api_endpoint',
+        'vector_store',
+        'widget_enabled',
+        'total_tokens_used',
     ];
 
     /**
@@ -54,9 +62,10 @@ class ProjectSetting extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "llm_provider" => LlmProvider::class,
-        "vector_store" => VectorStore::class,
-        "widget_enabled" => "boolean",
+        'llm_provider' => LlmProvider::class,
+        'vector_store' => VectorStore::class,
+        'widget_enabled' => 'boolean',
+        'total_tokens_used' => 'integer',
     ];
 
     /**

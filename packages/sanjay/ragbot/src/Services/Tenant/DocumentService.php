@@ -44,7 +44,7 @@ class DocumentService
 
         try {
             // Store file to storage/ragbot/{project_id}/documents/
-            $path = $file->store("ragbot/{$project->id}/documents", $disk);
+            $path = $file->store("ragbot/{$project->slug}/documents", $disk);
 
             if (! $path) {
                 throw new DocumentProcessingException('Failed to store file.');

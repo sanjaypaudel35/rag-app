@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Enums\VectorStore;
@@ -30,14 +31,22 @@ class ProjectSettingFactory extends Factory
      */
     public function definition(): array
     {
+        $defaultVectorStore = DB::getDriverName() === 'pgsql'
+            ? VectorStore::PgVector->value
+            : VectorStore::MySql->value;
+
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "llm_provider" => LlmProvider::OpenAI->value,
-            "llm_api_key" => "sk-" . Str::random(32),
-            "llm_model" => "gpt-4o-mini",
-            "vector_store" => VectorStore::PgVector->value,
-            "widget_enabled" => true,
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'llm_provider' => LlmProvider::OpenAI->value,
+            'llm_api_key' => 'sk-'.Str::random(32),
+            'llm_model' => 'gpt-4o-mini',
+            'llm_model_for_embedding' => 'text-embedding-3-small',
+            'llm_api_endpoint' => 'https://api.openai.com/v1',
+            'embedding_api_endpoint' => 'https://api.openai.com/v1',
+            'vector_store' => $defaultVectorStore,
+            'widget_enabled' => true,
+            'total_tokens_used' => $this->faker->numberBetween(0, 100000),
         ];
     }
 }

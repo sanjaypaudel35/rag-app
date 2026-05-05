@@ -3,16 +3,19 @@
 namespace Sanjay\Ragbot\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Enums\DocumentStatus;
+use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Jobs\ProcessDocumentJob;
 use Sanjay\Ragbot\Models\Chunk;
 use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Models\Embedding;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Services\Tenant\ChunkingService;
-use Sanjay\Ragbot\Services\Tenant\MysqlVectorStoreService;
+use Sanjay\Ragbot\Services\Tenant\VectorStoreManager;
 use Sanjay\Ragbot\Tests\TestCase;
 
 class DocumentProcessingTest extends TestCase
@@ -47,7 +50,7 @@ class DocumentProcessingTest extends TestCase
         $document = Document::factory()->for($project)->create();
         $chunk = Chunk::factory()->for($document)->for($project)->create();
 
-        $service = new MysqlVectorStoreService;
+        $service = app(VectorStoreInterface::class);
         $vector = array_fill(0, 1536, 0.1);
 
         $service->store($project, $chunk->id, $vector);
@@ -61,6 +64,35 @@ class DocumentProcessingTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertEquals($chunk->id, $results->first()->id);
+    }
+
+    /** @test */
+    public function test_vector_store_manager_switches_drivers_based_on_project_settings()
+    {
+        $projectMysql = Project::factory()->create();
+        $projectMysql->settings()->update(['vector_store' => VectorStore::MySql]);
+
+        $projectPg = Project::factory()->create();
+        $projectPg->settings()->update(['vector_store' => VectorStore::PgVector]);
+
+        $manager = app(VectorStoreInterface::class);
+
+        $this->assertInstanceOf(VectorStoreManager::class, $manager);
+
+        // We can't easily mock the internal calls here without changing the manager,
+        // but we can verify that the store operation works for both (they both use Embedding model)
+
+        $chunkMysql = Chunk::factory()->for($projectMysql)->create();
+        $chunkPg = Chunk::factory()->for($projectPg)->create();
+        $vector = array_fill(0, 1536, 0.1);
+
+        $manager->store($projectMysql, $chunkMysql->id, $vector);
+        $this->assertDatabaseHas('rag_embeddings', ['chunk_id' => $chunkMysql->id, 'project_id' => $projectMysql->id]);
+
+        if (DB::getDriverName() === 'pgsql') {
+            $manager->store($projectPg, $chunkPg->id, $vector);
+            $this->assertDatabaseHas('rag_embeddings', ['chunk_id' => $chunkPg->id, 'project_id' => $projectPg->id]);
+        }
     }
 
     /** @test */

@@ -30,6 +30,7 @@ use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Sanjay\Ragbot\Contracts\Services\LlmInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
@@ -40,7 +41,9 @@ use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromApiKey;
 use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromSlug;
 use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
+use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
+use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
 use Sanjay\Ragbot\Models\RagbotUser;
 use Sanjay\Ragbot\Repositories\ChunkRepository;
 use Sanjay\Ragbot\Repositories\ConversationRepository;
@@ -55,8 +58,9 @@ use Sanjay\Ragbot\Services\Auth\RegisterService;
 use Sanjay\Ragbot\Services\Auth\Tenant\LoginService as TenantLoginService;
 use Sanjay\Ragbot\Services\Auth\Tenant\RegisterService as TenantRegisterService;
 use Sanjay\Ragbot\Services\Tenant\DocumentService;
-use Sanjay\Ragbot\Services\Tenant\MysqlVectorStoreService;
-use Sanjay\Ragbot\Services\Tenant\StubEmbeddingService;
+use Sanjay\Ragbot\Services\Tenant\EmbeddingManager;
+use Sanjay\Ragbot\Services\Tenant\LlmManager;
+use Sanjay\Ragbot\Services\Tenant\VectorStoreManager;
 
 /**
  * Service provider for the Sanjay\Ragbot package.
@@ -81,8 +85,9 @@ class RagbotServiceProvider extends ServiceProvider
         $this->app->bind(MessageRepositoryInterface::class, MessageRepository::class);
         $this->app->bind(ProjectSettingRepositoryInterface::class, ProjectSettingRepository::class);
 
-        $this->app->bind(EmbeddingInterface::class, StubEmbeddingService::class);
-        $this->app->bind(VectorStoreInterface::class, MysqlVectorStoreService::class);
+        $this->app->singleton(LlmInterface::class, LlmManager::class);
+        $this->app->singleton(EmbeddingInterface::class, EmbeddingManager::class);
+        $this->app->singleton(VectorStoreInterface::class, VectorStoreManager::class);
 
         $this->app->singleton(DocumentService::class);
     }
@@ -138,6 +143,8 @@ class RagbotServiceProvider extends ServiceProvider
     {
         Livewire::component('ragbot.dashboard', Dashboard::class);
         Livewire::component('ragbot.document-manager', DocumentManager::class);
+        Livewire::component('ragbot.settings-manager', SettingsManager::class);
+        Livewire::component('ragbot.chatbot-manager', ChatbotManager::class);
     }
 
     /**

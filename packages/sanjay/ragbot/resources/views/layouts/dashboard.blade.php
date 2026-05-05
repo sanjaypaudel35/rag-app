@@ -32,9 +32,9 @@
                 
                 <flux:separator class="my-4 mx-4" />
                 
-                <flux:sidebar.item icon="cog-8-tooth" href="#">Settings</flux:sidebar.item>
+                <flux:sidebar.item icon="cog-8-tooth" href="{{ app()->bound('ragbot.project') ? route('ragbot.settings', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.settings')">Settings</flux:sidebar.item>
                 <flux:sidebar.item icon="users" href="#">Team</flux:sidebar.item>
-                <flux:sidebar.item icon="key" href="#">API Keys</flux:sidebar.item>
+                <flux:sidebar.item icon="chat-bubble-left-right" href="{{ app()->bound('ragbot.project') ? route('ragbot.settings.chatbots', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.settings.chatbots')">Chatbots</flux:sidebar.item>
                 <flux:sidebar.item icon="credit-card" href="#">Billing</flux:sidebar.item>
                 <flux:sidebar.item icon="list-bullet" href="#">Activity Logs</flux:sidebar.item>
             </flux:sidebar.nav>

@@ -12,8 +12,6 @@ class ProjectSettingRepository extends BaseRepository implements ProjectSettingR
 {
     /**
      * Create a new project setting repository instance.
-     *
-     * @param ProjectSetting $model
      */
     public function __construct(ProjectSetting $model)
     {
@@ -22,11 +20,36 @@ class ProjectSettingRepository extends BaseRepository implements ProjectSettingR
 
     /**
      * Find settings by project.
-     *
-     * @return ProjectSetting|null
      */
     public function findByProject(): ?ProjectSetting
     {
         return $this->model->first();
+    }
+
+    /**
+     * Create or update a model instance.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $values
+     */
+    public function updateOrCreate(array $attributes, array $values = []): ProjectSetting
+    {
+        /** @var ProjectSetting $record */
+        $record = $this->model->updateOrCreate($attributes, $values);
+
+        return $record;
+    }
+
+    /**
+     * Find one model by attributes.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function findOneBy(array $attributes): ?ProjectSetting
+    {
+        /** @var ProjectSetting|null $record */
+        $record = $this->model->where($attributes)->first();
+
+        return $record;
     }
 }

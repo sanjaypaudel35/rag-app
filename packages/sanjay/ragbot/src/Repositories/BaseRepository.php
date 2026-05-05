@@ -11,6 +11,7 @@ use Sanjay\Ragbot\Contracts\Repositories\BaseRepositoryInterface;
  * Base repository class providing common data access patterns.
  *
  * @template TModel of Model
+ *
  * @implements BaseRepositoryInterface<TModel>
  */
 abstract class BaseRepository implements BaseRepositoryInterface
@@ -18,17 +19,13 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Create a new repository instance.
      *
-     * @param TModel $model
+     * @param  TModel  $model
      */
-    public function __construct(protected Model $model)
-    {
-    }
+    public function __construct(protected Model $model) {}
 
     /**
      * Find a model by its unique identifier.
      *
-     * @param string $id
-     * @param array $relationships
      * @return TModel
      *
      * @throws ModelNotFoundException
@@ -41,7 +38,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Create a new model instance in the database.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return TModel
      */
     public function create(array $data): Model
@@ -52,8 +49,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Update an existing model instance.
      *
-     * @param string $id
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return TModel
      */
     public function update(string $id, array $data): Model
@@ -61,6 +57,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         try {
             $record = $this->findById($id);
             $record->update($data);
+
             return $record;
         } catch (ModelNotFoundException $e) {
             throw $e;
@@ -68,10 +65,30 @@ abstract class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * Delete a model instance from the database.
+     * Create or update a model instance.
      *
-     * @param string $id
-     * @return void
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $values
+     * @return TModel
+     */
+    public function updateOrCreate(array $attributes, array $values = []): Model
+    {
+        return $this->model->updateOrCreate($attributes, $values);
+    }
+
+    /**
+     * Find one model by attributes.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return TModel|null
+     */
+    public function findOneBy(array $attributes): ?Model
+    {
+        return $this->model->where($attributes)->first();
+    }
+
+    /**
+     * Delete a model instance from the database.
      */
     public function delete(string $id): void
     {
@@ -86,7 +103,6 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * Get all records.
      *
-     * @param array $relationships
      * @return Collection<int, TModel>
      */
     public function all(array $relationships = []): Collection

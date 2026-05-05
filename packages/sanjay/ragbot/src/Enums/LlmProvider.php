@@ -7,7 +7,8 @@ namespace Sanjay\Ragbot\Enums;
  */
 enum LlmProvider: string
 {
-    case OpenAI = "openai";
-    case Anthropic = "anthropic";
-    case Gemini = "gemini";
+    case OpenAI = 'openai';
+    case Anthropic = 'anthropic';
+    case Gemini = 'gemini';
+    case Stub = 'stub';
 }

@@ -20,15 +20,15 @@ use Sanjay\Ragbot\Database\Factories\ProjectFactory;
  */
 class Project extends Model
 {
-    use HasUuids;
     use HasFactory;
+    use HasUuids;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "rag_projects";
+    protected $table = 'rag_projects';
 
     /**
      * The attributes that are mass assignable.
@@ -36,10 +36,10 @@ class Project extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "name",
-        "slug",
-        "api_key",
-        "is_active",
+        'name',
+        'slug',
+        'api_key',
+        'is_active',
     ];
 
     /**
@@ -48,7 +48,7 @@ class Project extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "is_active" => "boolean",
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -97,5 +97,15 @@ class Project extends Model
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    /**
+     * Get the chatbots associated with the project.
+     *
+     * @return HasMany<Chatbot, $this>
+     */
+    public function chatbots(): HasMany
+    {
+        return $this->hasMany(Chatbot::class);
     }
 }

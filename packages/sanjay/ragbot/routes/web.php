@@ -8,7 +8,9 @@ use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\RegisterController as TenantRegis
 use Sanjay\Ragbot\Http\Controllers\Tenant\DocumentPreviewController;
 use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
+use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
+use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
 
 Route::get('health', function () {
     return response()->json([
@@ -55,8 +57,7 @@ Route::group([
         Route::get('documents', DocumentManager::class)->name('documents');
         Route::get('documents/{document}/preview', [DocumentPreviewController::class, 'show'])->name('documents.preview');
 
-        Route::get('settings', function () {
-            return view('ragbot::layouts.dashboard', ['slot' => 'Settings coming soon']);
-        })->name('settings');
+        Route::get('settings', SettingsManager::class)->name('settings');
+        Route::get('settings/chatbots', ChatbotManager::class)->name('settings.chatbots');
     });
 });

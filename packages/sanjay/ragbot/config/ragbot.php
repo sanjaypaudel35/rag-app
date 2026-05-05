@@ -7,34 +7,34 @@ return [
     | Route Prefix & Middleware
     |--------------------------------------------------------------------------
     */
-    "prefix"         => env("RAGBOT_PREFIX", "ragbot"),
-    "middleware"     => ["web"],
-    "api_middleware" => ["api"],
+    'prefix' => env('RAGBOT_PREFIX', 'ragbot'),
+    'middleware' => ['web'],
+    'api_middleware' => ['api'],
 
     /*
     |--------------------------------------------------------------------------
     | Authentication Guard
     |--------------------------------------------------------------------------
     */
-    "guard" => "ragbot",
+    'guard' => 'ragbot',
 
     /*
     |--------------------------------------------------------------------------
     | LLM Configuration
     |--------------------------------------------------------------------------
     */
-    "llm" => [
-        "default" => env("RAGBOT_LLM_PROVIDER", "openai"),
-        "providers" => [
-            "openai" => [
-                "model"    => env("RAGBOT_OPENAI_MODEL", "gpt-4o-mini"),
-                "base_url" => "https://api.openai.com/v1",
+    'llm' => [
+        'default' => env('RAGBOT_LLM_PROVIDER', 'openai'),
+        'providers' => [
+            'openai' => [
+                'model' => env('RAGBOT_OPENAI_MODEL', 'gpt-4o-mini'),
+                'base_url' => 'https://api.openai.com/v1',
             ],
-            "anthropic" => [
-                "model"    => env("RAGBOT_ANTHROPIC_MODEL", "claude-3-haiku-20240307"),
-                "base_url" => "https://api.anthropic.com",
+            'anthropic' => [
+                'model' => env('RAGBOT_ANTHROPIC_MODEL', 'claude-3-haiku-20240307'),
+                'base_url' => 'https://api.anthropic.com',
             ],
-            "stub" => [],
+            'stub' => [],
         ],
     ],
 
@@ -43,15 +43,15 @@ return [
     | Embedding Configuration
     |--------------------------------------------------------------------------
     */
-    "embedding" => [
-        "default"    => env("RAGBOT_EMBEDDING_PROVIDER", "openai"),
-        "dimensions" => 1536,
-        "providers"  => [
-            "openai" => [
-                "model"    => "text-embedding-3-small",
-                "base_url" => "https://api.openai.com/v1",
+    'embedding' => [
+        'default' => env('RAGBOT_EMBEDDING_PROVIDER', 'openai'),
+        'dimensions' => 1536,
+        'providers' => [
+            'openai' => [
+                'model' => 'text-embedding-3-small',
+                'base_url' => 'https://api.openai.com/v1',
             ],
-            "stub" => [],
+            'stub' => [],
         ],
     ],
 
@@ -60,11 +60,11 @@ return [
     | Vector Store Configuration
     |--------------------------------------------------------------------------
     */
-    "vector_store" => [
-        "default" => env("RAGBOT_VECTOR_STORE", "mysql"),
-        "drivers" => [
-            "pgvector" => [],
-            "mysql"    => [],
+    'vector_store' => [
+        'default' => env('RAGBOT_VECTOR_STORE', 'pgvector'),
+        'drivers' => [
+            'pgvector' => [],
+            'mysql' => [],
         ],
     ],
 
@@ -73,9 +73,9 @@ return [
     | Chunking Configuration
     |--------------------------------------------------------------------------
     */
-    "chunking" => [
-        "size"    => 500,
-        "overlap" => 50,
+    'chunking' => [
+        'size' => 500,
+        'overlap' => 50,
     ],
 
     /*
@@ -83,8 +83,8 @@ return [
     | Retrieval Configuration
     |--------------------------------------------------------------------------
     */
-    "retrieval" => [
-        "top_k" => 5,
+    'retrieval' => [
+        'top_k' => 5,
     ],
 
     /*
@@ -92,9 +92,9 @@ return [
     | Widget Configuration
     |--------------------------------------------------------------------------
     */
-    "widget" => [
-        "enabled"         => true,
-        "allowed_origins" => "*",
+    'widget' => [
+        'enabled' => true,
+        'allowed_origins' => '*',
     ],
 
     /*
@@ -102,9 +102,9 @@ return [
     | Storage
     |--------------------------------------------------------------------------
     */
-    "storage" => [
-        "disk" => env("RAGBOT_STORAGE_DISK", "local"),
-        "path" => "ragbot/{project_id}/documents",
+    'storage' => [
+        'disk' => env('RAGBOT_STORAGE_DISK', 'local'),
+        'path' => 'ragbot/{project_id}/documents',
     ],
 
     /*
@@ -112,8 +112,8 @@ return [
     | Rate Limiting
     |--------------------------------------------------------------------------
     */
-    "rate_limit" => [
-        "chat_api" => env("RAGBOT_RATE_LIMIT", 60), // requests per minute per project
+    'rate_limit' => [
+        'chat_api' => env('RAGBOT_RATE_LIMIT', 60), // requests per minute per project
     ],
 
 ];
