@@ -45,6 +45,7 @@ Query → Embed → Retrieve → Prompt → LLM → Response
 - **Primary keys:** UUID `char(36)` on every table.
 - **project_id:** Every table has `project_id` (UUID, indexed, FK → rag_projects). Every repository query must scope by it — no exceptions.
 - **PHP 8.3 features:** Constructor property promotion, readonly properties, enums for status fields, named arguments where they aid clarity.
+- **Strict Typing:** All methods must have explicit return type declarations and type hints for all parameters.
 - **PSR-12** throughout.
 - **PHPDoc** required on all classes and public methods (`@param`, `@return`). Service classes need a responsibility description.
 - No inline comments except for exceptionally complex logic.
@@ -52,7 +53,8 @@ Query → Embed → Retrieve → Prompt → LLM → Response
 - Use existing project folder structure if relatable.
 - Use inline comment on design pattern or resolved class through service container.
 - Always place all import/use statements at the top of the file (after the namespace) and never use fully qualified class names inside the code body.
-- Use short class names with proper imports; avoid inline full paths like \App\Services\SomeClass in methods or logic.
+- Use short class names with proper imports; avoid inline full paths like \App\Services\SomeClass in methods or logic.ch
+- always use try catch block on outer layer of the code which wrap the flow
 
 ---
 
@@ -75,7 +77,7 @@ Request → Middleware → Controller → Service → Repository → Model
 | Service    | All business logic. Throws custom exceptions — never catches internally. Returns DTOs/arrays, not Eloquent models. Receives `Project` via constructor DI. |
 | Repository | Data access only. ALL queries scoped by `project_id`. Implements interface. No business logic. |
 | Middleware | Resolves tenant, binds to container. Lookup only. |
-| Livewire   | UI state only. Calls services via DI. Zero business logic. |
+| Livewire   | UI state and performance monitoring. Calls services via DI. Uses `#[Computed]` properties for statistics, counts, and cost calculations. Zero business logic. |
 
 ---
 
@@ -114,12 +116,13 @@ All tables have `timestamps`. All PKs are UUID.
 |------------------------|-------------------------------------------------------------------------------------------|
 | `rag_projects`         | name, slug (unique), api_key (unique, indexed), is_active (bool, default true), settings (json nullable) |
 | `ragbot_users`         | project_id FK, name, email (unique per project_id), password, remember_token             |
-| `rag_documents`        | project_id FK, name, file_path, mime_type, status (enum), error_message (text nullable)  |
+| `rag_documents`        | project_id FK, name, file_path, mime_type, status (enum: DocumentStatus), error_message (text nullable) |
 | `rag_document_chunks`  | project_id FK, document_id FK, content (text), chunk_index (int), token_count (int nullable) |
 | `rag_embeddings`       | project_id FK, chunk_id FK, vector (pgvector 1536-dim)                                   |
 | `rag_conversations`    | project_id FK, session_id (indexed), metadata (json nullable)                             |
 | `rag_messages`         | project_id FK, conversation_id FK, role (enum: user/assistant), content (text)           |
-| `rag_project_settings` | project_id FK (unique), llm_provider, llm_api_key (nullable, encrypted cast), llm_model (nullable), vector_store, widget_enabled (bool) |
+| `rag_chatbots`         | project_id FK, name, api_key (unique), total_tokens_used (bigint), total_conversations (int) |
+| `rag_project_settings` | project_id FK (unique), llm_provider, llm_api_key (nullable, encrypted), llm_model (nullable), vector_store, widget_enabled (bool), total_tokens_used (bigint) |
 
 > Migration rule: all columns must have a column-level comment.
 

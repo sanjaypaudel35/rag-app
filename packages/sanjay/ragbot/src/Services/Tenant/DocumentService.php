@@ -94,6 +94,6 @@ class DocumentService
      */
     public function listForProject(): Collection
     {
-        return $this->documentRepository->all();
+        return Document::withCount('chunks')->latest()->get();
     }
 }

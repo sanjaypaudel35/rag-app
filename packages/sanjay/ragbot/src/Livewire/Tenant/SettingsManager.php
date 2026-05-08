@@ -2,6 +2,9 @@
 
 namespace Sanjay\Ragbot\Livewire\Tenant;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Livewire\Component;
 use Sanjay\Ragbot\Enums\LlmModel;
 use Sanjay\Ragbot\Enums\LlmProvider;
@@ -26,22 +29,31 @@ class SettingsManager extends Component
         'settings.widget_enabled' => 'required|boolean',
     ];
 
-    public function mount(ProjectSettingsService $service)
+    public function mount(ProjectSettingsService $service): void
     {
         $this->project = app('ragbot.project');
         $this->settings = $service->getForProject($this->project)->toArray();
     }
 
-    public function save(ProjectSettingsService $service)
+    public function save(ProjectSettingsService $service): void
     {
         $this->validate();
 
-        $service->update($this->project, $this->settings);
+        DB::beginTransaction();
 
-        session()->flash('success', 'Settings updated successfully.');
+        try {
+            $service->update($this->project, $this->settings);
+
+            DB::commit();
+            session()->flash('success', 'Settings updated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Failed to update settings: '.$e->getMessage());
+            session()->flash('error', 'Failed to update settings.');
+        }
     }
 
-    public function render()
+    public function render(): View
     {
         $provider = LlmProvider::tryFrom($this->settings['llm_provider']) ?? LlmProvider::OpenAI;
 

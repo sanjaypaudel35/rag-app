@@ -13,13 +13,13 @@ use Sanjay\Ragbot\Models\ProjectSetting;
 class EmbeddingManager implements EmbeddingInterface
 {
     /**
-     * Generate a vector embedding for the given text using the current project's provider.
+     * Generate a vector embedding for the given text using the given project's provider.
      *
      * @return array<float>
      */
-    public function embed(string $text): array
+    public function embed(string $text, ?Project $project = null): array
     {
-        $project = app('ragbot.project');
+        $project = $project ?? app('ragbot.project');
 
         return $this->resolve($project)->embed($text);
     }

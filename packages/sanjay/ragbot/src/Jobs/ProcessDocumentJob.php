@@ -34,6 +34,8 @@ class ProcessDocumentJob implements ShouldQueue
 
         $this->document->update([
             'status' => DocumentStatus::Processing,
+            'error_message' => null,
+            'processing_batch_id' => null,
         ]);
 
         ChunkDocumentJob::dispatch($this->document);

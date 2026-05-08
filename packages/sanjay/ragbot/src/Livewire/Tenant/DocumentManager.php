@@ -3,6 +3,8 @@
 namespace Sanjay\Ragbot\Livewire\Tenant;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -71,7 +73,7 @@ class DocumentManager extends Component
         $project = app('ragbot.project');
         $documents = $documentService->listForProject();
 
-        // Calculate file sizes for display
+        // Calculate file sizes and fetch batch info for display
         $documents->each(function ($doc) {
             $disk = config('ragbot.storage.disk', 'local');
             try {
@@ -83,6 +85,12 @@ class DocumentManager extends Component
                 }
             } catch (\Throwable $e) {
                 $doc->display_size = 'Unknown';
+            }
+
+            // Fetch batch info to detect partial failures
+            $doc->batch = null;
+            if ($doc->processing_batch_id) {
+                $doc->batch = Bus::findBatch($doc->processing_batch_id);
             }
         });
 
@@ -132,18 +140,23 @@ class DocumentManager extends Component
             'selectedFile' => ['required', 'file', 'mimes:pdf,doc,docx,txt', 'max:10240'],
         ]);
 
+        DB::beginTransaction();
+
         try {
             $documentService->store($this->selectedFile);
 
+            DB::commit();
             $this->reset('selectedFile');
             $this->showUploadModal = false;
             $this->successMessage = 'Document uploaded successfully and is being processed.';
             $this->errorMessage = null;
         } catch (DocumentProcessingException $e) {
+            DB::rollBack();
             $this->errorMessage = $e->getMessage();
             $this->successMessage = null;
             Log::error('Document upload failed: '.$e->getMessage());
         } catch (\Throwable $e) {
+            DB::rollBack();
             $this->errorMessage = 'An unexpected error occurred during upload.';
             $this->successMessage = null;
             Log::error('Unexpected document upload error: '.$e->getMessage());
@@ -155,11 +168,16 @@ class DocumentManager extends Component
      */
     public function delete(DocumentService $documentService, string $documentId): void
     {
+        DB::beginTransaction();
+
         try {
             $documentService->delete($documentId);
+
+            DB::commit();
             $this->successMessage = 'Document deleted successfully.';
             $this->errorMessage = null;
         } catch (\Throwable $e) {
+            DB::rollBack();
             $this->errorMessage = 'Failed to delete document.';
             $this->successMessage = null;
             Log::error('Document deletion failed: '.$e->getMessage());

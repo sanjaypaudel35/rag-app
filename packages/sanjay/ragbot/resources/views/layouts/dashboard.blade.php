@@ -28,7 +28,7 @@
                 <flux:sidebar.item icon="squares-2x2" href="{{ app()->bound('ragbot.project') ? route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.dashboard')">Dashboard</flux:sidebar.item>
                 <flux:sidebar.item icon="document-duplicate" href="{{ app()->bound('ragbot.project') ? route('ragbot.documents', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.documents')">Documents</flux:sidebar.item>
                 <flux:sidebar.item icon="rectangle-stack" href="#">Collections</flux:sidebar.item>
-                <flux:sidebar.item icon="arrow-path" href="#">Processing Queue</flux:sidebar.item>
+                <flux:sidebar.item icon="arrow-path" href="{{ app()->bound('ragbot.project') ? route('ragbot.processing-queue', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.processing-queue')">Processing Queue</flux:sidebar.item>
                 
                 <flux:separator class="my-4 mx-4" />
                 

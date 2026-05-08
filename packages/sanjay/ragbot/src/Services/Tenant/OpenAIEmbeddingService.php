@@ -38,7 +38,7 @@ class OpenAIEmbeddingService implements EmbeddingInterface
      *
      * @throws EmbeddingException
      */
-    public function embed(string $text): array
+    public function embed(string $text, ?Project $project = null): array
     {
         $apiKey = $this->settings->llm_api_key;
         $baseUrl = $this->settings->embedding_api_endpoint ?? 'https://api.openai.com/v1';

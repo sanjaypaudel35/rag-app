@@ -7,8 +7,8 @@ namespace Sanjay\Ragbot\Enums;
  */
 enum DocumentStatus: string
 {
-    case Pending = "pending";
-    case Processing = "processing";
-    case Completed = "completed";
-    case Failed = "failed";
+    case Pending = 'pending';
+    case Processing = 'processing';
+    case Completed = 'completed';
+    case Failed = 'failed';
 }

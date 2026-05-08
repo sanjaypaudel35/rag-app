@@ -135,6 +135,7 @@
                     <flux:table.column>Status</flux:table.column>
                     <flux:table.column>Uploaded On</flux:table.column>
                     <flux:table.column>File Size</flux:table.column>
+                    <flux:table.column>Chunks</flux:table.column>
                     <flux:table.column>Uploaded By</flux:table.column>
                     <flux:table.column align="end"></flux:table.column>
                 </flux:table.columns>
@@ -157,14 +158,19 @@
                             </flux:table.cell>
                             <flux:table.cell>
                                 @php
-                                    $status = match($document->status->value) {
-                                        "completed" => ["color" => "green", "label" => "Completed"],
-                                        "failed" => ["color" => "red", "label" => "Failed"],
-                                        "processing" => ["color" => "yellow", "label" => "Processing"],
+                                    $hasBatchFailures = $document->batch && $document->batch->failedJobs > 0;
+                                    $isFailed = $document->status->value === 'failed' || $hasBatchFailures;
+                                    
+                                    $status = match(true) {
+                                        $isFailed => ["color" => "red", "label" => "Failed"],
+                                        $document->status->value === "completed" => ["color" => "emerald", "label" => "Completed"],
+                                        $document->status->value === "processing" => ["color" => "amber", "label" => "Processing"],
                                         default => ["color" => "zinc", "label" => "Pending"],
                                     };
                                 @endphp
-                                <flux:badge :color="$status['color']" size="sm" class="px-2">{{ $status['label'] }}</flux:badge>
+                                <div class="flex items-center gap-2">
+                                    <flux:badge :color="$status['color']" size="sm" class="px-2">{{ $status['label'] }}</flux:badge>
+                                </div>
                             </flux:table.cell>
                             <flux:table.cell class="text-zinc-500 text-sm">
                                 <div class="flex flex-col">
@@ -174,6 +180,9 @@
                             </flux:table.cell>
                             <flux:table.cell class="text-zinc-500 text-sm italic">
                                 {{ $document->display_size ?? '---' }}
+                            </flux:table.cell>
+                            <flux:table.cell>
+                                <flux:badge color="zinc" size="sm" inset="top bottom">{{ $document->chunks_count ?? 0 }}</flux:badge>
                             </flux:table.cell>
                             <flux:table.cell>
                                 <div class="flex items-center gap-2">
@@ -221,15 +230,13 @@
                 <flux:heading size="lg">{{ $previewName }}</flux:heading>
                 <flux:text size="xs" class="mt-0.5">Document Preview</flux:text>
             </div>
-            <flux:modal.close>
-                <flux:button icon="x-mark" variant="ghost" size="sm" />
-            </flux:modal.close>
+            <flux:button icon="x-mark" variant="ghost" size="sm" wire:click="$set('showPreviewModal', false)" />
         </div>
 
         <div class="flex-1 bg-zinc-100 dark:bg-zinc-950 p-4">
-            @if($previewUrl)
+            @if($showPreviewModal && $previewUrl)
                 <iframe src="{{ $previewUrl }}" class="w-full h-full rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-inner bg-white" frameborder="0"></iframe>
-            @else
+            @elseif($showPreviewModal)
                 <div class="w-full h-full flex flex-col items-center justify-center text-zinc-400">
                     <flux:icon icon="document-text" class="w-12 h-12 mb-4 opacity-20" />
                     <flux:text>No document selected for preview</flux:text>
@@ -238,9 +245,7 @@
         </div>
         
         <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end bg-zinc-50 dark:bg-zinc-900/50">
-            <flux:modal.close>
-                <flux:button variant="primary" size="sm">Close Preview</flux:button>
-            </flux:modal.close>
+            <flux:button variant="primary" size="sm" wire:click="$set('showPreviewModal', false)">Close Preview</flux:button>
         </div>
     </flux:modal>
 

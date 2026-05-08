@@ -2,6 +2,8 @@
 
 namespace Sanjay\Ragbot\Contracts\Services;
 
+use Sanjay\Ragbot\Models\Project;
+
 interface EmbeddingInterface
 {
     /**
@@ -9,5 +11,5 @@ interface EmbeddingInterface
      *
      * @return array<float>
      */
-    public function embed(string $text): array;
+    public function embed(string $text, ?Project $project = null): array;
 }

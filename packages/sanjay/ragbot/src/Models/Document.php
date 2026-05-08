@@ -47,6 +47,7 @@ class Document extends Model
         'mime_type',
         'status',
         'error_message',
+        'processing_batch_id',
     ];
 
     /**

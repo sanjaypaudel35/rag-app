@@ -10,6 +10,7 @@ use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
+use Sanjay\Ragbot\Livewire\Tenant\ProcessingQueue;
 use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
 
 Route::get('health', function () {
@@ -56,6 +57,7 @@ Route::group([
         Route::get('dashboard', Dashboard::class)->name('dashboard');
         Route::get('documents', DocumentManager::class)->name('documents');
         Route::get('documents/{document}/preview', [DocumentPreviewController::class, 'show'])->name('documents.preview');
+        Route::get('processing-queue', ProcessingQueue::class)->name('processing-queue');
 
         Route::get('settings', SettingsManager::class)->name('settings');
         Route::get('settings/chatbots', ChatbotManager::class)->name('settings.chatbots');

@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Services\Tenant;
 
 use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Sanjay\Ragbot\Models\Project;
 
 class StubEmbeddingService implements EmbeddingInterface
 {
@@ -11,7 +12,7 @@ class StubEmbeddingService implements EmbeddingInterface
      *
      * @return array<float>
      */
-    public function embed(string $text): array
+    public function embed(string $text, ?Project $project = null): array
     {
         $dimensions = config('ragbot.embedding.dimensions', 1536);
         $vector = [];

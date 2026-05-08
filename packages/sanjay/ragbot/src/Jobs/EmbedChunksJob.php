@@ -2,44 +2,101 @@
 
 namespace Sanjay\Ragbot\Jobs;
 
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Models\Document;
+use Throwable;
 
+/**
+ * Job to orchestrate the embedding batch for a document.
+ */
 class EmbedChunksJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     */
+    public array $backoff = [10, 30];
+
+    /**
      * Create a new job instance.
      */
-    public function __construct(public Document $document) {}
+    public function __construct(
+        public Document $document
+    ) {}
 
     /**
      * Execute the job.
      */
-    public function handle(EmbeddingInterface $embeddingService): void
+    public function handle(): void
     {
         try {
+            // 1. Validation: Ensure chunks exist
             $chunks = $this->document->chunks;
-            $embeddings = [];
 
-            foreach ($chunks as $chunk) {
-                $embeddings[$chunk->id] = $embeddingService->embed($chunk->content);
+            if ($chunks->isEmpty()) {
+                throw new \Exception("No chunks found for document: {$this->document->id}");
             }
 
-            StoreVectorsJob::dispatch($this->document, $embeddings);
-        } catch (Exception $e) {
+            // 2. Update Status -> Processing
+            $this->document->update([
+                'status' => DocumentStatus::Processing,
+            ]);
+
+            // 3. Prepare Batch
+            $jobs = $chunks->map(fn ($chunk) => new EmbedChunkJob($chunk))->toArray();
+
+            $documentId = $this->document->id;
+
+            $batch = Bus::batch($jobs)
+                ->name("Embedding: {$this->document->name}")
+                ->allowFailures()
+                ->finally(function ($batch) use ($documentId) {
+                    $document = Document::find($documentId);
+                    if (! $document) {
+                        return;
+                    }
+
+                    if ($batch->failedJobs > 0) {
+                        $document->update([
+                            'status' => DocumentStatus::Failed,
+                            'error_message' => "Embedding failed for {$batch->failedJobs} out of {$batch->totalJobs} chunks.",
+                        ]);
+                    } else {
+                        // Final transition to Completed
+                        MarkDocumentAsCompletedJob::dispatch($document);
+                    }
+                })
+                ->dispatch();
+
+            $this->document->update([
+                'processing_batch_id' => $batch->id,
+            ]);
+
+        } catch (Throwable $e) {
             $this->document->update([
                 'status' => DocumentStatus::Failed,
                 'error_message' => $e->getMessage(),
             ]);
+
+            Log::error("EmbedChunksJob failed for document {$this->document->id}", [
+                'stage' => 'dispatch_batch',
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
         }
     }
 }

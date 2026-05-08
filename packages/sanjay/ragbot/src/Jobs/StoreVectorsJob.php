@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Models\Document;
@@ -31,6 +32,8 @@ class StoreVectorsJob implements ShouldQueue
      */
     public function handle(VectorStoreInterface $vectorStore): void
     {
+        DB::beginTransaction();
+
         try {
             $project = $this->document->project;
 
@@ -41,7 +44,11 @@ class StoreVectorsJob implements ShouldQueue
             $this->document->update([
                 'status' => DocumentStatus::Completed,
             ]);
+
+            DB::commit();
         } catch (Exception $e) {
+            DB::rollBack();
+
             $this->document->update([
                 'status' => DocumentStatus::Failed,
                 'error_message' => $e->getMessage(),

@@ -3,6 +3,8 @@
 namespace Sanjay\Ragbot\Livewire\Tenant;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -56,10 +58,19 @@ class ChatbotManager extends Component
 
     public function regenerateProjectKey(ApiKeyService $service): void
     {
-        $this->newProjectKey = $service->regenerate($this->project);
-        $this->project->refresh();
+        DB::beginTransaction();
 
-        session()->flash('success', 'Project API key regenerated successfully.');
+        try {
+            $this->newProjectKey = $service->regenerate($this->project);
+            $this->project->refresh();
+
+            DB::commit();
+            session()->flash('success', 'Project API key regenerated successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Failed to regenerate project key: '.$e->getMessage());
+            session()->flash('error', 'Failed to regenerate project key.');
+        }
     }
 
     #[Computed]
@@ -87,34 +98,63 @@ class ChatbotManager extends Component
             'selectedDocuments' => 'required|array|min:1',
         ]);
 
-        $apiKey = 'rb_'.Str::random(40);
+        DB::beginTransaction();
 
-        /** @var Chatbot $chatbot */
-        $chatbot = $this->project->chatbots()->create([
-            'name' => $this->name,
-            'api_key' => $apiKey,
-        ]);
+        try {
+            $apiKey = 'rb_'.Str::random(40);
 
-        $chatbot->documents()->sync($this->selectedDocuments);
+            /** @var Chatbot $chatbot */
+            $chatbot = $this->project->chatbots()->create([
+                'name' => $this->name,
+                'api_key' => $apiKey,
+            ]);
 
-        $this->newlyGeneratedKey = $apiKey;
+            $chatbot->documents()->sync($this->selectedDocuments);
+
+            $this->newlyGeneratedKey = $apiKey;
+
+            DB::commit();
+            session()->flash('success', 'Chatbot created successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Failed to create chatbot: '.$e->getMessage());
+            session()->flash('error', 'Failed to create chatbot.');
+        }
+
         $this->showingCreateModal = false;
-
-        session()->flash('success', 'Chatbot created successfully.');
     }
 
     public function regenerateKey(Chatbot $chatbot): void
     {
-        $newKey = 'rb_'.Str::random(40);
-        $chatbot->update(['api_key' => $newKey]);
+        DB::beginTransaction();
 
-        session()->flash('success', "API key for {$chatbot->name} regenerated.");
+        try {
+            $newKey = 'rb_'.Str::random(40);
+            $chatbot->update(['api_key' => $newKey]);
+
+            DB::commit();
+            session()->flash('success', "API key for {$chatbot->name} regenerated.");
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Failed to regenerate chatbot key: '.$e->getMessage());
+            session()->flash('error', 'Failed to regenerate API key.');
+        }
     }
 
     public function deleteChatbot(Chatbot $chatbot): void
     {
-        $chatbot->delete();
-        session()->flash('success', 'Chatbot deleted successfully.');
+        DB::beginTransaction();
+
+        try {
+            $chatbot->delete();
+
+            DB::commit();
+            session()->flash('success', 'Chatbot deleted successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Failed to delete chatbot: '.$e->getMessage());
+            session()->flash('error', 'Failed to delete chatbot.');
+        }
     }
 
     public function maskKey(string $key): string
