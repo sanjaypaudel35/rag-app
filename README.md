@@ -1,98 +1,74 @@
-## 🧠 Project Overview
+# 🤖 RAGBot: Multi-Tenant AI Platform
 
-RAGBot is a **multi-tenant Retrieval-Augmented Generation (RAG) system** built with Laravel, designed to enable AI-powered conversations grounded in your own data.
-
-Instead of relying solely on pre-trained knowledge, RAGBot allows you to upload documents, transform them into embeddings, and retrieve relevant context at query time—ensuring responses are accurate, contextual, and domain-specific.
+RAGBot is a sophisticated **multi-tenant Retrieval-Augmented Generation (RAG)** system built with Laravel. It empowers businesses and developers to create custom AI chatbots grounded in their own unique data, ensuring accurate, contextual, and domain-specific responses.
 
 ---
 
-### 🔍 What Problem It Solves
+## 🚀 For Clients & Tenants: What RAGBot Does
 
-Traditional chatbots:
+RAGBot doesn't just "chat." It understands your specific business data. By uploading your documents, RAGBot indexes them into a high-performance database, allowing the AI to use your files as a "knowledge base" when answering questions.
 
-* ❌ Hallucinate answers
-* ❌ Lack domain-specific knowledge
-* ❌ Cannot use private/internal data
+### 📂 Secure Document Management
+- **Universal Support:** Upload PDF, Microsoft Word (DOCX), and Text (TXT) files.
+- **Automated Pipeline:** Documents are automatically processed, split into segments, and converted into searchable "AI vectors."
+- **In-Browser Preview:** View and manage your uploaded files directly from your dashboard.
 
-RAGBot solves this by:
+### 🤖 Custom AI Chatbots
+- **Selective Knowledge:** Choose exactly which documents each chatbot should "know." Have one bot for HR and another for Customer Support.
+- **Embeddable Widget:** Add your chatbot to any website with a single line of code.
+- **Real-time Diagnostics:** Monitor processing in real-time. If a task fails, we provide detailed logs and a one-click retry button.
 
-* ✅ Indexing your documents into vector embeddings
-* ✅ Retrieving relevant context per query
-* ✅ Feeding context into LLMs for accurate responses
+### 📊 Analytics & Transparency
+- **Usage Tracking:** Monitor token consumption and active conversations across all your bots.
+- **Data Privacy:** Your data and AI configurations are strictly isolated and encrypted.
 
 ---
 
-### ⚙️ How It Works
+## 🛠️ For Developers: Technical Architecture
 
+RAGBot is built using a clean, layered architecture following the **Service-Repository pattern**, ensuring the core RAG logic remains decoupled and highly testable.
+
+### ⚙️ The RAG Pipeline
 ```text
-Document → Chunk → Embed → Store  
-User Query → Embed → Retrieve → Context + Prompt → LLM → Response
+Ingestion:   Document → Chunking → Embedding (API) → Vector Store
+Retrieval:   User Query → Embedding → Semantic Search → Context Retrieval
+Generation:  Context + Prompt → LLM (OpenAI/Anthropic) → Response
 ```
 
----
-
-### 🏢 Multi-Tenant Architecture
-
-RAGBot is designed for **multi-project (multi-tenant) environments**:
-
-* Each tenant has isolated:
-
-  * Documents
-  * Embeddings
-  * Conversations
-  * API keys
-  * AI configurations
-
-* Tenant resolution is handled via API key:
-
+### 🏢 Multi-Tenant Engine
+RAGBot is designed for **SaaS environments**. Tenant resolution is handled via unique API keys, with strict container-based context isolation:
 ```php
+// Re-establishes tenant context in background jobs or web requests
 app()->instance('ragbot.project', $project);
 ```
 
-This ensures **strict data isolation** and scalability for SaaS use cases.
+### 🤖 AI SDK & Pluggable Drivers
+- **First-Party Integration:** Uses the **Laravel AI SDK (`laravel/ai`)** for native embedding and text generation.
+- **Flexible Providers:** Pluggable support for OpenAI, Anthropic, and local LLMs (via Ollama).
+- **Resilient Batching:** Large documents are processed in parallel batches with `allowFailures()` support to handle temporary API glitches without stopping the entire pipeline.
+
+### 📦 Core Tech Stack
+- **Framework:** Laravel 13
+- **Frontend:** Livewire 4 + Flux UI
+- **Database:** PostgreSQL (with `pgvector`) or MySQL
+- **Background Tasks:** Laravel Queues + Bus Batching
+- **Authentication:** Custom Tenant Guards & API Key Security
 
 ---
 
-### 🤖 AI Capabilities
-
-* Pluggable LLM providers (OpenAI, Anthropic)
-* Configurable models per tenant (e.g. `gpt-4o-mini`)
-* Embedding-based semantic search (`text-embedding-3-small`)
-* Context-aware response generation
+## 🧩 Key Use Cases
+- **Customer Support:** Automated answers based on product manuals.
+- **Internal Knowledge:** An AI assistant for employee handbooks and policies.
+- **Enterprise Search:** Semantic retrieval across massive document libraries.
 
 ---
 
-### 📦 Core Features
-
-* 📄 Document ingestion & processing pipeline
-* 🧠 Vector-based semantic retrieval
-* 💬 Chat API for AI interactions
-* 🌐 Embeddable chat widget
-* ⚡ Asynchronous job processing (queue-based)
-* 🔐 Secure API key authentication
-* 🏗️ Clean layered architecture (Service + Repository pattern)
+## 🚀 Getting Started (Technical)
+1. **Clone & Setup:** Run `composer setup` to install dependencies and run migrations.
+2. **Configure AI:** Set your `OPENAI_API_KEY` in the Dashboard Settings.
+3. **Start Workers:** `php artisan queue:work` to process document embeddings.
+4. **Deploy Widget:** Access your chatbot's unique API key and embed the `widget.js` on your site.
 
 ---
 
-### 🧩 Use Cases
-
-* Customer support automation
-* Internal knowledge base assistant
-* SaaS AI chat integrations
-* Documentation Q&A systems
-* Enterprise search assistants
-
----
-
-### 🚀 Why This Project
-
-RAGBot is built to be:
-
-* **Scalable** → multi-tenant ready
-* **Extensible** → pluggable LLMs & vector stores
-* **Production-ready** → queue processing, security, testing
-* **Developer-friendly** → clean architecture, Laravel-native
-
----
-
-This project demonstrates how to build a **real-world AI system using Laravel**, combining modern LLM capabilities with structured backend engineering.
+*RAGBot: Empowering your data with the intelligence of AI.*
