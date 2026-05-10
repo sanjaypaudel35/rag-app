@@ -11,9 +11,11 @@ interface ConversationRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Find conversation by session.
-     *
-     * @param string $sessionId
-     * @return Model|null
      */
     public function findBySession(string $sessionId): ?Model;
+
+    /**
+     * Find or create a conversation by chatbot and session.
+     */
+    public function findOrCreate(string $chatbotId, string $sessionId, array $metadata = []): Model;
 }

@@ -31,6 +31,8 @@ use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
 use Sanjay\Ragbot\Contracts\Services\LlmInterface;
+use Sanjay\Ragbot\Contracts\Services\PromptBuilderServiceInterface;
+use Sanjay\Ragbot\Contracts\Services\RetrievalServiceInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
@@ -57,9 +59,12 @@ use Sanjay\Ragbot\Services\Auth\LoginService;
 use Sanjay\Ragbot\Services\Auth\RegisterService;
 use Sanjay\Ragbot\Services\Auth\Tenant\LoginService as TenantLoginService;
 use Sanjay\Ragbot\Services\Auth\Tenant\RegisterService as TenantRegisterService;
+use Sanjay\Ragbot\Services\Tenant\ChatService;
 use Sanjay\Ragbot\Services\Tenant\DocumentService;
 use Sanjay\Ragbot\Services\Tenant\EmbeddingManager;
 use Sanjay\Ragbot\Services\Tenant\LlmManager;
+use Sanjay\Ragbot\Services\Tenant\PromptBuilderService;
+use Sanjay\Ragbot\Services\Tenant\RetrievalService;
 use Sanjay\Ragbot\Services\Tenant\VectorStoreManager;
 
 /**
@@ -88,6 +93,10 @@ class RagbotServiceProvider extends ServiceProvider
         $this->app->singleton(LlmInterface::class, LlmManager::class);
         $this->app->singleton(EmbeddingInterface::class, EmbeddingManager::class);
         $this->app->singleton(VectorStoreInterface::class, VectorStoreManager::class);
+
+        $this->app->singleton(RetrievalServiceInterface::class, RetrievalService::class);
+        $this->app->singleton(PromptBuilderServiceInterface::class, PromptBuilderService::class);
+        $this->app->singleton(ChatService::class);
 
         $this->app->singleton(DocumentService::class);
     }

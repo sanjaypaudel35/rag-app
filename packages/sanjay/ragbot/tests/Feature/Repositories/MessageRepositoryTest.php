@@ -27,26 +27,26 @@ class MessageRepositoryTest extends TestCase
         $projectA = Project::factory()->create();
         $projectB = Project::factory()->create();
 
-        $convA = Conversation::factory()->create(["project_id" => $projectA->id]);
-        $convB = Conversation::factory()->create(["project_id" => $projectB->id]);
+        $convA = Conversation::factory()->create(['project_id' => $projectA->id]);
+        $convB = Conversation::factory()->create(['project_id' => $projectB->id]);
 
         Message::factory()->count(3)->create([
-            "project_id" => $projectA->id,
-            "conversation_id" => $convA->id
+            'project_id' => $projectA->id,
+            'conversation_id' => $convA->id,
         ]);
         Message::factory()->count(2)->create([
-            "project_id" => $projectB->id,
-            "conversation_id" => $convB->id
+            'project_id' => $projectB->id,
+            'conversation_id' => $convB->id,
         ]);
 
-        $this->app->instance("ragbot.project", $projectA);
+        $this->app->instance('ragbot.project', $projectA);
         $msgsA = $this->repository->findByConversation($convA->id);
         $this->assertCount(3, $msgsA);
 
         $msgsAcross = $this->repository->findByConversation($convB->id);
         $this->assertCount(0, $msgsAcross);
 
-        $this->app->instance("ragbot.project", $projectB);
+        $this->app->instance('ragbot.project', $projectB);
         $msgsB = $this->repository->findByConversation($convB->id);
         $this->assertCount(2, $msgsB);
     }

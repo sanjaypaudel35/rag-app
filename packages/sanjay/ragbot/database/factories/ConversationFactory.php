@@ -29,10 +29,10 @@ class ConversationFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "session_id" => Str::random(16),
-            "metadata" => null,
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'session_id' => Str::random(16),
+            'metadata' => null,
         ];
     }
 }

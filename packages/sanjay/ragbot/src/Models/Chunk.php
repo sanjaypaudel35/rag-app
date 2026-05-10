@@ -22,16 +22,16 @@ use Sanjay\Ragbot\Models\Traits\BelongsToProject;
  */
 class Chunk extends Model
 {
-    use HasUuids;
-    use HasFactory;
     use BelongsToProject;
+    use HasFactory;
+    use HasUuids;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "rag_document_chunks";
+    protected $table = 'rag_document_chunks';
 
     /**
      * The attributes that are mass assignable.
@@ -39,11 +39,11 @@ class Chunk extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "project_id",
-        "document_id",
-        "content",
-        "chunk_index",
-        "token_count",
+        'project_id',
+        'document_id',
+        'content',
+        'chunk_index',
+        'token_count',
     ];
 
     /**

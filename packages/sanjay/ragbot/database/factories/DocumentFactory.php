@@ -4,9 +4,9 @@ namespace Sanjay\Ragbot\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Models\Project;
-use Sanjay\Ragbot\Enums\DocumentStatus;
 
 /**
  * Factory for the Document model.
@@ -30,13 +30,13 @@ class DocumentFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "name" => $this->faker->word() . ".pdf",
-            "file_path" => "documents/" . $this->faker->uuid() . ".pdf",
-            "mime_type" => "application/pdf",
-            "status" => DocumentStatus::Pending->value,
-            "error_message" => null,
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'name' => $this->faker->word().'.pdf',
+            'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
+            'mime_type' => 'application/pdf',
+            'status' => DocumentStatus::Pending->value,
+            'error_message' => null,
         ];
     }
 }

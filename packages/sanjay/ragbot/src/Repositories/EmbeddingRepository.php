@@ -12,8 +12,6 @@ class EmbeddingRepository extends BaseRepository implements EmbeddingRepositoryI
 {
     /**
      * Create a new embedding repository instance.
-     *
-     * @param Embedding $model
      */
     public function __construct(Embedding $model)
     {
@@ -22,14 +20,11 @@ class EmbeddingRepository extends BaseRepository implements EmbeddingRepositoryI
 
     /**
      * Find embedding by chunk.
-     *
-     * @param string $chunkId
-     * @return Embedding|null
      */
     public function findByChunk(string $chunkId): ?Embedding
     {
         return $this->model
-            ->where("chunk_id", $chunkId)
+            ->where('chunk_id', $chunkId)
             ->first();
     }
 }

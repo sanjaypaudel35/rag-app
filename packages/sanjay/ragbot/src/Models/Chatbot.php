@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Sanjay\Ragbot\Database\Factories\ChatbotFactory;
 
 /**
@@ -81,5 +82,15 @@ class Chatbot extends Model
     {
         return $this->belongsToMany(Document::class, 'rag_chatbot_documents', 'chatbot_id', 'document_id')
             ->using(ChatbotDocument::class);
+    }
+
+    /**
+     * Get the conversations associated with the chatbot.
+     *
+     * @return HasMany<Conversation, $this>
+     */
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
     }
 }

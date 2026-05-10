@@ -31,11 +31,11 @@ class MessageFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "conversation_id" => Conversation::factory(),
-            "role" => MessageRole::User->value,
-            "content" => $this->faker->sentence(),
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'conversation_id' => Conversation::factory(),
+            'role' => MessageRole::User->value,
+            'content' => $this->faker->sentence(),
         ];
     }
 }

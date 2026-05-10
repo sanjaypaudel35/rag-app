@@ -12,8 +12,6 @@ class ConversationRepository extends BaseRepository implements ConversationRepos
 {
     /**
      * Create a new conversation repository instance.
-     *
-     * @param Conversation $model
      */
     public function __construct(Conversation $model)
     {
@@ -22,14 +20,28 @@ class ConversationRepository extends BaseRepository implements ConversationRepos
 
     /**
      * Find conversation by session.
-     *
-     * @param string $sessionId
-     * @return Conversation|null
      */
     public function findBySession(string $sessionId): ?Conversation
     {
         return $this->model
-            ->where("session_id", $sessionId)
+            ->where('session_id', $sessionId)
             ->first();
+    }
+
+    /**
+     * Find or create a conversation by chatbot and session.
+     */
+    public function findOrCreate(string $chatbotId, string $sessionId, array $metadata = []): Conversation
+    {
+        return $this->model->firstOrCreate(
+            [
+                'chatbot_id' => $chatbotId,
+                'session_id' => $sessionId,
+            ],
+            [
+                'project_id' => app('ragbot.project')->id,
+                'metadata' => $metadata,
+            ]
+        );
     }
 }

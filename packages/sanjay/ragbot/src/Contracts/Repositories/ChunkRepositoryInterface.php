@@ -11,9 +11,6 @@ interface ChunkRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Find chunks by document.
-     *
-     * @param string $documentId
-     * @return Collection
      */
     public function findByDocument(string $documentId): Collection;
 }

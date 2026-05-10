@@ -11,9 +11,6 @@ interface MessageRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Find messages by conversation.
-     *
-     * @param string $conversationId
-     * @return Collection
      */
     public function findByConversation(string $conversationId): Collection;
 }

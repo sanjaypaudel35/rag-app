@@ -26,15 +26,15 @@ class ProjectSettingRepositoryTest extends TestCase
         $projectA = Project::factory()->create();
         $projectB = Project::factory()->create();
 
-        $settingsA = ProjectSetting::factory()->create(["project_id" => $projectA->id]);
-        $settingsB = ProjectSetting::factory()->create(["project_id" => $projectB->id]);
+        $settingsA = ProjectSetting::factory()->create(['project_id' => $projectA->id]);
+        $settingsB = ProjectSetting::factory()->create(['project_id' => $projectB->id]);
 
-        $this->app->instance("ragbot.project", $projectA);
+        $this->app->instance('ragbot.project', $projectA);
         $foundA = $this->repository->findByProject();
         $this->assertNotNull($foundA);
         $this->assertEquals($settingsA->id, $foundA->id);
 
-        $this->app->instance("ragbot.project", $projectB);
+        $this->app->instance('ragbot.project', $projectB);
         $foundB = $this->repository->findByProject();
         $this->assertNotNull($foundB);
         $this->assertEquals($settingsB->id, $foundB->id);

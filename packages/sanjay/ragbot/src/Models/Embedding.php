@@ -19,16 +19,16 @@ use Sanjay\Ragbot\Models\Traits\BelongsToProject;
  */
 class Embedding extends Model
 {
-    use HasUuids;
-    use HasFactory;
     use BelongsToProject;
+    use HasFactory;
+    use HasUuids;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "rag_embeddings";
+    protected $table = 'rag_embeddings';
 
     /**
      * The attributes that are mass assignable.
@@ -36,9 +36,9 @@ class Embedding extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "project_id",
-        "chunk_id",
-        "vector",
+        'project_id',
+        'chunk_id',
+        'vector',
     ];
 
     /**
@@ -47,7 +47,7 @@ class Embedding extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "vector" => "array",
+        'vector' => 'array',
     ];
 
     /**

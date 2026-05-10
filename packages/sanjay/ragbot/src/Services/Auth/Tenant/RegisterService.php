@@ -12,7 +12,7 @@ class RegisterService
     /**
      * Create a new service instance.
      *
-     * @param  FortifyCreateNewUser  $creator Contextual binding resolves this to Sanjay\Ragbot\Actions\Fortify\CreateNewUser.
+     * @param  FortifyCreateNewUser  $creator  Contextual binding resolves this to Sanjay\Ragbot\Actions\Fortify\CreateNewUser.
      */
     public function __construct(protected FortifyCreateNewUser $creator) {}
 

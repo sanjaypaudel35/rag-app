@@ -13,6 +13,7 @@ use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Models\Chatbot;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Services\Tenant\ApiKeyService;
+use Sanjay\Ragbot\Services\Tenant\ChatService;
 
 class ChatbotManager extends Component
 {
@@ -32,6 +33,10 @@ class ChatbotManager extends Component
 
     public bool $isInitialized = false;
 
+    public string $chatInput = '';
+
+    public array $messages = [];
+
     public function mount(): void
     {
         $this->project = app('ragbot.project');
@@ -41,13 +46,69 @@ class ChatbotManager extends Component
     {
         $this->testingChatbotId = $chatbotId;
         $this->isInitialized = false;
+        $this->messages = [];
+        $this->chatInput = '';
     }
 
     public function initializeChat(): void
     {
         $this->isInitialized = true;
-        // Logic for initializing chat with the selected chatbot's API key would go here.
+
+        $chatbot = $this->testingChatbot;
+        if ($chatbot) {
+            $conversation = $chatbot->conversations()
+                ->where('session_id', 'test-session-'.$chatbot->id)
+                ->first();
+
+            if ($conversation) {
+                $this->messages = $conversation->messages()
+                    ->orderBy('created_at', 'asc')
+                    ->get()
+                    ->map(fn ($m) => [
+                        'role' => $m->role->value,
+                        'content' => $m->content,
+                    ])
+                    ->toArray();
+            }
+        }
+
         session()->flash('info', 'Chat initialized with Chatbot API Key.');
+    }
+
+    public function sendMessage(ChatService $chatService): void
+    {
+        $this->validate([
+            'chatInput' => 'required|string|min:1',
+        ]);
+
+        $chatbot = $this->testingChatbot;
+        if (! $chatbot) {
+            return;
+        }
+
+        $userMessage = $this->chatInput;
+        $this->chatInput = '';
+
+        $this->messages[] = [
+            'role' => 'user',
+            'content' => $userMessage,
+        ];
+
+        try {
+            $sessionId = 'test-session-'.$chatbot->id;
+            $response = $chatService->chat($chatbot, $sessionId, $userMessage);
+
+            $this->messages[] = [
+                'role' => 'assistant',
+                'content' => $response,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Chat failed: '.$e->getMessage());
+            $this->messages[] = [
+                'role' => 'assistant',
+                'content' => 'Sorry, I encountered an error: '.$e->getMessage(),
+            ];
+        }
     }
 
     #[Computed]

@@ -32,12 +32,20 @@ class MysqlVectorStoreService implements VectorStoreInterface
      * Searches for chunks similar to the query vector using PHP-side cosine similarity.
      *
      * @param  array<float>  $queryVector
+     * @param  array<string>  $documentIds
      */
-    public function search(Project $project, array $queryVector, int $topK = 5): Collection
+    public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection
     {
-        return Embedding::where('project_id', $project->id)
-            ->with('chunk')
-            ->get()
+        $query = Embedding::where('project_id', $project->id)
+            ->with('chunk');
+
+        if (! empty($documentIds)) {
+            $query->whereHas('chunk', function ($q) use ($documentIds) {
+                $q->whereIn('document_id', $documentIds);
+            });
+        }
+
+        return $query->get()
             ->map(function ($embedding) use ($queryVector) {
                 $embedding->similarity = VectorHelper::cosineSimilarity($queryVector, $embedding->vector);
 

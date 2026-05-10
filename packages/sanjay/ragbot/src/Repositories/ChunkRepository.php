@@ -13,8 +13,6 @@ class ChunkRepository extends BaseRepository implements ChunkRepositoryInterface
 {
     /**
      * Create a new chunk repository instance.
-     *
-     * @param Chunk $model
      */
     public function __construct(Chunk $model)
     {
@@ -24,13 +22,12 @@ class ChunkRepository extends BaseRepository implements ChunkRepositoryInterface
     /**
      * Find chunks by document.
      *
-     * @param string $documentId
      * @return Collection<int, Chunk>
      */
     public function findByDocument(string $documentId): Collection
     {
         return $this->model
-            ->where("document_id", $documentId)
+            ->where('document_id', $documentId)
             ->get();
     }
 }

@@ -27,19 +27,19 @@ class ChunkRepositoryTest extends TestCase
         $projectA = Project::factory()->create();
         $projectB = Project::factory()->create();
 
-        $documentA = Document::factory()->create(["project_id" => $projectA->id]);
-        $documentB = Document::factory()->create(["project_id" => $projectB->id]);
+        $documentA = Document::factory()->create(['project_id' => $projectA->id]);
+        $documentB = Document::factory()->create(['project_id' => $projectB->id]);
 
         Chunk::factory()->count(3)->create([
-            "project_id" => $projectA->id,
-            "document_id" => $documentA->id
+            'project_id' => $projectA->id,
+            'document_id' => $documentA->id,
         ]);
         Chunk::factory()->count(2)->create([
-            "project_id" => $projectB->id,
-            "document_id" => $documentB->id
+            'project_id' => $projectB->id,
+            'document_id' => $documentB->id,
         ]);
 
-        $this->app->instance("ragbot.project", $projectA);
+        $this->app->instance('ragbot.project', $projectA);
         $chunksA = $this->repository->findByDocument($documentA->id);
         $this->assertCount(3, $chunksA);
 
@@ -47,7 +47,7 @@ class ChunkRepositoryTest extends TestCase
         $chunksAcross = $this->repository->findByDocument($documentB->id);
         $this->assertCount(0, $chunksAcross);
 
-        $this->app->instance("ragbot.project", $projectB);
+        $this->app->instance('ragbot.project', $projectB);
         $chunksB = $this->repository->findByDocument($documentB->id);
         $this->assertCount(2, $chunksB);
     }

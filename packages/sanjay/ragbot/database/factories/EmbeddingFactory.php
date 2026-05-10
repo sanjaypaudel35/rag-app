@@ -30,10 +30,10 @@ class EmbeddingFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "chunk_id" => Chunk::factory(),
-            "vector" => array_fill(0, 1536, 0.1),
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'chunk_id' => Chunk::factory(),
+            'vector' => array_fill(0, 1536, 0.1),
         ];
     }
 }

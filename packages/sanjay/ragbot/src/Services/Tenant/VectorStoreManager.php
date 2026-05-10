@@ -35,10 +35,11 @@ class VectorStoreManager implements VectorStoreInterface
      * Searches for chunks similar to the query vector using the project's configured driver.
      *
      * @param  array<float>  $queryVector
+     * @param  array<string>  $documentIds
      */
-    public function search(Project $project, array $queryVector, int $topK = 5): Collection
+    public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection
     {
-        return $this->resolve($project)->search($project, $queryVector, $topK);
+        return $this->resolve($project)->search($project, $queryVector, $topK, $documentIds);
     }
 
     /**

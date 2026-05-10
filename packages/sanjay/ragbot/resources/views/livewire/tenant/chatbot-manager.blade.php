@@ -57,22 +57,40 @@
                 </div>
             </div>
 
-            <div class="min-h-[400px] bg-zinc-50 dark:bg-zinc-900 rounded-xl flex flex-col items-center justify-center p-8 text-center border border-zinc-200 dark:border-zinc-800 border-dashed">
+            <div class="min-h-[400px] bg-zinc-50 dark:bg-zinc-900 rounded-xl flex flex-col p-4 border border-zinc-200 dark:border-zinc-800">
                 @if ($isInitialized)
-                    <flux:icon icon="cpu-chip" class="h-12 w-12 text-indigo-500 mb-4 animate-pulse" />
-                    <flux:heading size="lg">Chatbot Ready</flux:heading>
-                    <flux:text class="mt-2 max-w-md">The chatbot has been initialized with the knowledge base from: {{ $this->testingChatbot->documents->pluck('name')->implode(', ') }}.</flux:text>
-                    <div class="mt-8 p-4 bg-zinc-200 dark:bg-zinc-800 rounded-lg text-zinc-500 italic">
-                        Chatting functionality is coming soon...
+                    <div class="flex-1 overflow-y-auto mb-4 space-y-4 pr-2" id="chat-messages" x-init="$el.scrollTop = $el.scrollHeight" x-on:message-sent.window="$nextTick(() => { $el.scrollTop = $el.scrollHeight })">
+                        @forelse ($messages as $message)
+                            <div class="flex {{ $message['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
+                                <div class="max-w-[80%] rounded-lg p-3 {{ $message['role'] === 'user' ? 'bg-indigo-600 text-white' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200' }}">
+                                    <div class="text-xs font-bold mb-1 uppercase opacity-70">{{ $message['role'] }}</div>
+                                    <div class="whitespace-pre-wrap">{{ $message['content'] }}</div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="h-full flex flex-col items-center justify-center text-zinc-400">
+                                <flux:icon icon="chat-bubble-bottom-center-text" class="h-12 w-12 mb-2 opacity-20" />
+                                <p>No messages yet. Start a conversation!</p>
+                            </div>
+                        @endforelse
                     </div>
+
+                    <form wire:submit.prevent="sendMessage" class="flex gap-2">
+                        <flux:input wire:model="chatInput" placeholder="Type your message..." class="flex-1" />
+                        <flux:button type="submit" variant="primary" icon="paper-airplane" wire:loading.attr="disabled">
+                            <span wire:loading.remove>Send</span>
+                            <span wire:loading>Sending...</span>
+                        </flux:button>
+                    </form>
                 @else
-                    <flux:icon icon="rocket-launch" class="h-12 w-12 text-zinc-300 mb-4" />
-                    <flux:heading size="lg" class="text-zinc-400">Click initialize to begin</flux:heading>
-                    <flux:text class="mt-2">This will prepare the knowledge base and verify the API key.</flux:text>
-                    <flux:button variant="primary" class="mt-6" wire:click="initializeChat">Initialize Now</flux:button>
+                    <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
+                        <flux:icon icon="rocket-launch" class="h-12 w-12 text-zinc-300 mb-4" />
+                        <flux:heading size="lg" class="text-zinc-400">Click initialize to begin</flux:heading>
+                        <flux:text class="mt-2">This will prepare the knowledge base and verify the API key.</flux:text>
+                        <flux:button variant="primary" class="mt-6" wire:click="initializeChat">Initialize Now</flux:button>
+                    </div>
                 @endif
-            </div>
-        </flux:card>
+            </div>        </flux:card>
     @endif
 
     <div class="grid grid-cols-1 gap-6 mb-12">

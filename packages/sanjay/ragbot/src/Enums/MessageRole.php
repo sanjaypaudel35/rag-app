@@ -7,6 +7,6 @@ namespace Sanjay\Ragbot\Enums;
  */
 enum MessageRole: string
 {
-    case User = "user";
-    case Assistant = "assistant";
+    case User = 'user';
+    case Assistant = 'assistant';
 }

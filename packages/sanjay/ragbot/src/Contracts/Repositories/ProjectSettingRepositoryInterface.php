@@ -11,8 +11,6 @@ interface ProjectSettingRepositoryInterface extends BaseRepositoryInterface
 {
     /**
      * Find settings by project.
-     *
-     * @return Model|null
      */
     public function findByProject(): ?Model;
 }

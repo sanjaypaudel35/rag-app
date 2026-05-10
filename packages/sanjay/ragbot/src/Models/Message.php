@@ -21,16 +21,16 @@ use Sanjay\Ragbot\Models\Traits\BelongsToProject;
  */
 class Message extends Model
 {
-    use HasUuids;
-    use HasFactory;
     use BelongsToProject;
+    use HasFactory;
+    use HasUuids;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "rag_messages";
+    protected $table = 'rag_messages';
 
     /**
      * The attributes that are mass assignable.
@@ -38,10 +38,10 @@ class Message extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "project_id",
-        "conversation_id",
-        "role",
-        "content",
+        'project_id',
+        'conversation_id',
+        'role',
+        'content',
     ];
 
     /**
@@ -50,7 +50,7 @@ class Message extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "role" => MessageRole::class,
+        'role' => MessageRole::class,
     ];
 
     /**

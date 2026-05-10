@@ -36,14 +36,22 @@ class PgVectorStoreService implements VectorStoreInterface
      * Searches for chunks similar to the query vector using PGVector's cosine distance operator.
      *
      * @param  array<float>  $queryVector
+     * @param  array<string>  $documentIds
      */
-    public function search(Project $project, array $queryVector, int $topK = 5): Collection
+    public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection
     {
         $vectorString = '['.implode(',', $queryVector).']';
 
-        return Embedding::where('project_id', $project->id)
-            ->with('chunk')
-            ->orderByRaw('vector <=> ?::vector', [$vectorString])
+        $query = Embedding::where('project_id', $project->id)
+            ->with('chunk');
+
+        if (! empty($documentIds)) {
+            $query->whereHas('chunk', function ($q) use ($documentIds) {
+                $q->whereIn('document_id', $documentIds);
+            });
+        }
+
+        return $query->orderByRaw('vector <=> ?::vector', [$vectorString])
             ->take($topK)
             ->get()
             ->pluck('chunk');

@@ -18,6 +18,7 @@ interface VectorStoreInterface
      * Searches for chunks similar to the query vector.
      *
      * @param  array<float>  $queryVector
+     * @param  array<string>  $documentIds
      */
-    public function search(Project $project, array $queryVector, int $topK = 5): Collection;
+    public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection;
 }

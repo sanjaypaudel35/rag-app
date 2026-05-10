@@ -30,8 +30,8 @@ class OpenAILLMService extends BaseLlmService
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt],
                 ],
-                'temperature' => $options['temperature'] ?? 0.7,
-                'max_tokens' => $options['max_tokens'] ?? 1000,
+                'temperature' => $options['temperature'] ?? config('ragbot.llm.temperature'),
+                'max_tokens' => $options['max_tokens'] ?? config('ragbot.llm.max_tokens'),
             ]);
 
         if ($response->failed()) {

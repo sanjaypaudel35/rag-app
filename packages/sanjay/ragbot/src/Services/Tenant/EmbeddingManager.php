@@ -2,6 +2,8 @@
 
 namespace Sanjay\Ragbot\Services\Tenant;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Models\Project;
@@ -20,8 +22,22 @@ class EmbeddingManager implements EmbeddingInterface
     public function embed(string $text, ?Project $project = null): array
     {
         $project = $project ?? app('ragbot.project');
+        $service = $this->resolve($project);
+        $provider = class_basename($service);
 
-        return $this->resolve($project)->embed($text);
+        Log::info("Embedding Request [{$provider}]:", [
+            'project_id' => $project->id,
+            'text_preview' => Str::limit($text, 100),
+        ]);
+
+        $vector = $service->embed($text);
+
+        Log::info("Embedding Response [{$provider}]:", [
+            'project_id' => $project->id,
+            'vector_dimensions' => count($vector),
+        ]);
+
+        return $vector;
     }
 
     /**

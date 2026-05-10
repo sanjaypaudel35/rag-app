@@ -15,37 +15,33 @@ class ResolveProjectFromApiKey
     /**
      * Create a new middleware instance.
      */
-    public function __construct(protected ProjectRepositoryInterface $projectRepository)
-    {
-    }
+    public function __construct(protected ProjectRepositoryInterface $projectRepository) {}
 
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $apiKey = $request->header("X-Api-Key");
+        $apiKey = $request->header('X-Api-Key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json([
-                "error" => "Invalid or missing API key",
+                'error' => 'Invalid or missing API key',
             ], 401);
         }
 
         $project = $this->projectRepository->findByApiKey($apiKey);
 
-        if (!$project) {
+        if (! $project) {
             return response()->json([
-                "error" => "Invalid or missing API key",
+                'error' => 'Invalid or missing API key',
             ], 401);
         }
 
         // Bind the project to the container for downstream use.
-        app()->instance("ragbot.project", $project);
+        app()->instance('ragbot.project', $project);
 
         return $next($request);
     }

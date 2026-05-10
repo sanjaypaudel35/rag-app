@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Sanjay\Ragbot\Models\Project;
@@ -89,7 +90,7 @@ class AuthTest extends TestCase
             'email' => 'john@example.com',
             'project_id' => $project->id,
         ]);
-        
+
         $this->assertGuest('ragbot');
     }
 
@@ -155,7 +156,7 @@ class AuthTest extends TestCase
     /** @test */
     public function test_it_can_login_as_platform_user_and_is_redirected_to_platform_dashboard(): void
     {
-        $user = \App\Models\User::factory()->create([
+        $user = User::factory()->create([
             'password' => bcrypt('password123'),
         ]);
 
@@ -198,7 +199,7 @@ class AuthTest extends TestCase
     /** @test */
     public function test_logged_in_platform_user_is_redirected_from_login_to_dashboard(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = User::factory()->create();
 
         $this->actingAs($user);
 

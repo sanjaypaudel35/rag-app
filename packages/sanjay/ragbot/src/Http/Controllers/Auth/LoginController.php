@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Http\Controllers\Auth;
 
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Laravel\Fortify\Contracts\LoginResponse;
@@ -19,10 +20,10 @@ class LoginController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  LoginService  $service Resolved as platform LoginService via DI.
-     * @param  LoginResponse  $loginResponse Contextual binding resolves this to the application's default LoginResponse.
-     * @param  LogoutResponse  $logoutResponse Contextual binding resolves this to the application's default LogoutResponse.
-     * @param  StatefulGuard  $guard Contextual binding resolves this to the application's default guard.
+     * @param  LoginService  $service  Resolved as platform LoginService via DI.
+     * @param  LoginResponse  $loginResponse  Contextual binding resolves this to the application's default LoginResponse.
+     * @param  LogoutResponse  $logoutResponse  Contextual binding resolves this to the application's default LogoutResponse.
+     * @param  StatefulGuard  $guard  Contextual binding resolves this to the application's default guard.
      */
     public function __construct(
         protected LoginService $service,
@@ -33,20 +34,14 @@ class LoginController extends Controller
 
     /**
      * Show the login view.
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Contracts\View\View
      */
-    public function create(Request $request): \Illuminate\Contracts\View\View
+    public function create(Request $request): View
     {
         return view('ragbot::auth.platform.login');
     }
 
     /**
      * Attempt to authenticate a new session.
-     *
-     * @param  Request  $request
-     * @return Response
      */
     public function store(Request $request): Response
     {
@@ -62,9 +57,6 @@ class LoginController extends Controller
 
     /**
      * Destroy an authenticated session.
-     *
-     * @param  Request  $request
-     * @return Response
      */
     public function destroy(Request $request): Response
     {

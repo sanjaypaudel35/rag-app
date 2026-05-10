@@ -1,7 +1,11 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\FortifyServiceProvider;
+use Sanjay\Ragbot\RagbotServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
-    Sanjay\Ragbot\RagbotServiceProvider::class,
+    AppServiceProvider::class,
+    FortifyServiceProvider::class,
+    RagbotServiceProvider::class,
 ];

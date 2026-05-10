@@ -119,7 +119,7 @@ class ProcessingQueue extends Component
         // 2. Query failed_jobs for any jobs related to this document ID in the payload
         // This covers ProcessDocumentJob, ChunkDocumentJob, and EmbedChunksJob
         $individualFailedJobs = DB::table('failed_jobs')
-            ->where('payload', 'like', '%' . $document->id . '%')
+            ->where('payload', 'like', '%'.$document->id.'%')
             ->get();
 
         $this->selectedFailedJobs = collect($failedJobUuids)

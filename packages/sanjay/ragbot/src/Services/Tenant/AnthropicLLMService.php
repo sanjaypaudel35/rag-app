@@ -34,7 +34,8 @@ class AnthropicLLMService extends BaseLlmService
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt],
                 ],
-                'max_tokens' => $options['max_tokens'] ?? 1024,
+                'temperature' => $options['temperature'] ?? config('ragbot.llm.temperature'),
+                'max_tokens' => $options['max_tokens'] ?? config('ragbot.llm.max_tokens'),
             ]);
 
         if ($response->failed()) {

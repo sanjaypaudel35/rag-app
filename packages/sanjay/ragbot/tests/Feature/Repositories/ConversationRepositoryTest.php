@@ -27,21 +27,21 @@ class ConversationRepositoryTest extends TestCase
         $projectB = Project::factory()->create();
 
         $convA = Conversation::factory()->create([
-            "project_id" => $projectA->id,
-            "session_id" => "session-123"
+            'project_id' => $projectA->id,
+            'session_id' => 'session-123',
         ]);
         $convB = Conversation::factory()->create([
-            "project_id" => $projectB->id,
-            "session_id" => "session-123" // Same session ID but different project
+            'project_id' => $projectB->id,
+            'session_id' => 'session-123', // Same session ID but different project
         ]);
 
-        $this->app->instance("ragbot.project", $projectA);
-        $foundA = $this->repository->findBySession("session-123");
+        $this->app->instance('ragbot.project', $projectA);
+        $foundA = $this->repository->findBySession('session-123');
         $this->assertNotNull($foundA);
         $this->assertEquals($convA->id, $foundA->id);
 
-        $this->app->instance("ragbot.project", $projectB);
-        $foundB = $this->repository->findBySession("session-123");
+        $this->app->instance('ragbot.project', $projectB);
+        $foundB = $this->repository->findBySession('session-123');
         $this->assertNotNull($foundB);
         $this->assertEquals($convB->id, $foundB->id);
     }

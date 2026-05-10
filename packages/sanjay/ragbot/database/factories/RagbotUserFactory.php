@@ -28,12 +28,12 @@ class RagbotUserFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "name" => $this->faker->name(),
-            "email" => $this->faker->unique()->safeEmail(),
-            "password" => Hash::make("password"),
-            "remember_token" => Str::random(10),
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'password' => Hash::make('password'),
+            'remember_token' => Str::random(10),
         ];
     }
 }

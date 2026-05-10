@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create("ragbot_users", function (Blueprint $table) {
-            $table->uuid("id")->primary()->comment("The unique identifier for the user");
-            $table->foreignUuid("project_id")->constrained("rag_projects")->cascadeOnDelete()->comment("The ID of the project the user belongs to");
-            $table->string("name")->comment("The name of the user");
-            $table->string("email")->comment("The email address of the user");
-            $table->string("password")->comment("The hashed password for the user");
+        Schema::create('ragbot_users', function (Blueprint $table) {
+            $table->uuid('id')->primary()->comment('The unique identifier for the user');
+            $table->foreignUuid('project_id')->constrained('rag_projects')->cascadeOnDelete()->comment('The ID of the project the user belongs to');
+            $table->string('name')->comment('The name of the user');
+            $table->string('email')->comment('The email address of the user');
+            $table->string('password')->comment('The hashed password for the user');
             $table->rememberToken();
             $table->timestamps();
 
-            $table->unique(["project_id", "email"]);
-            $table->comment("Table storing tenant-specific users (Authenticatable)");
+            $table->unique(['project_id', 'email']);
+            $table->comment('Table storing tenant-specific users (Authenticatable)');
         });
     }
 
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists("ragbot_users");
+        Schema::dropIfExists('ragbot_users');
     }
 };

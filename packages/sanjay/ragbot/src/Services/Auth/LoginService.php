@@ -13,7 +13,7 @@ class LoginService
     /**
      * Create a new service instance.
      *
-     * @param  StatefulGuard  $guard Contextual binding resolves this to the application's default guard.
+     * @param  StatefulGuard  $guard  Contextual binding resolves this to the application's default guard.
      */
     public function __construct(protected StatefulGuard $guard) {}
 
@@ -21,8 +21,6 @@ class LoginService
      * Attempt to authenticate the user.
      *
      * @param  array<string, string>  $credentials
-     * @param  bool  $remember
-     * @return void
      *
      * @throws ValidationException
      */
@@ -37,8 +35,6 @@ class LoginService
 
     /**
      * Log the user out of the application.
-     *
-     * @return void
      */
     public function logout(): void
     {

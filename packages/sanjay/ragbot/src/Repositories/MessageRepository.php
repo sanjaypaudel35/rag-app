@@ -13,8 +13,6 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
 {
     /**
      * Create a new message repository instance.
-     *
-     * @param Message $model
      */
     public function __construct(Message $model)
     {
@@ -24,13 +22,12 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
     /**
      * Find messages by conversation.
      *
-     * @param string $conversationId
      * @return Collection<int, Message>
      */
     public function findByConversation(string $conversationId): Collection
     {
         return $this->model
-            ->where("conversation_id", $conversationId)
+            ->where('conversation_id', $conversationId)
             ->get();
     }
 }

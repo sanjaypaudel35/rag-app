@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Services\Tenant;
 
+use Illuminate\Support\Facades\Log;
 use Sanjay\Ragbot\Contracts\Services\LlmInterface;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Models\Project;
@@ -20,8 +21,23 @@ class LlmManager implements LlmInterface
     public function complete(string $prompt, array $options = []): string
     {
         $project = app('ragbot.project');
+        $service = $this->resolve($project);
+        $provider = class_basename($service);
 
-        return $this->resolve($project)->complete($prompt, $options);
+        Log::info("LLM Request [{$provider}]:", [
+            'project_id' => $project->id,
+            'prompt' => $prompt,
+            'options' => $options,
+        ]);
+
+        $response = $service->complete($prompt, $options);
+
+        Log::info("LLM Response [{$provider}]:", [
+            'project_id' => $project->id,
+            'response' => $response,
+        ]);
+
+        return $response;
     }
 
     /**

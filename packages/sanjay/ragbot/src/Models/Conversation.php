@@ -5,6 +5,7 @@ namespace Sanjay\Ragbot\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Sanjay\Ragbot\Database\Factories\ConversationFactory;
 use Sanjay\Ragbot\Models\Traits\BelongsToProject;
@@ -19,16 +20,16 @@ use Sanjay\Ragbot\Models\Traits\BelongsToProject;
  */
 class Conversation extends Model
 {
-    use HasUuids;
-    use HasFactory;
     use BelongsToProject;
+    use HasFactory;
+    use HasUuids;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = "rag_conversations";
+    protected $table = 'rag_conversations';
 
     /**
      * The attributes that are mass assignable.
@@ -36,9 +37,10 @@ class Conversation extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "project_id",
-        "session_id",
-        "metadata",
+        'project_id',
+        'chatbot_id',
+        'session_id',
+        'metadata',
     ];
 
     /**
@@ -47,7 +49,7 @@ class Conversation extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "metadata" => "array",
+        'metadata' => 'array',
     ];
 
     /**
@@ -56,6 +58,16 @@ class Conversation extends Model
     protected static function newFactory()
     {
         return ConversationFactory::new();
+    }
+
+    /**
+     * Get the chatbot that owns the conversation.
+     *
+     * @return BelongsTo<Chatbot, $this>
+     */
+    public function chatbot(): BelongsTo
+    {
+        return $this->belongsTo(Chatbot::class);
     }
 
     /**

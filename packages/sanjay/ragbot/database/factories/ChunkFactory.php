@@ -30,12 +30,12 @@ class ChunkFactory extends Factory
     public function definition(): array
     {
         return [
-            "id" => (string) Str::uuid(),
-            "project_id" => Project::factory(),
-            "document_id" => Document::factory(),
-            "content" => $this->faker->paragraph(),
-            "chunk_index" => 0,
-            "token_count" => 100,
+            'id' => (string) Str::uuid(),
+            'project_id' => Project::factory(),
+            'document_id' => Document::factory(),
+            'content' => $this->faker->paragraph(),
+            'chunk_index' => 0,
+            'token_count' => 100,
         ];
     }
 }
