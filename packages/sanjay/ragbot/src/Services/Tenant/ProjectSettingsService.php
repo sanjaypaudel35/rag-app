@@ -29,6 +29,7 @@ class ProjectSettingsService
         // If vector_store is already set, don't allow it to be changed.
         if ($existing && $existing->vector_store) {
             unset($data['vector_store']);
+            unset($data['vector_store_custom_name']);
         }
 
         /** @var ProjectSetting $settings */
@@ -57,6 +58,7 @@ class ProjectSettingsService
                 'llm_api_endpoint' => config('ragbot.llm.providers.'.config('ragbot.llm.default').'.base_url'),
                 'embedding_api_endpoint' => config('ragbot.embedding.providers.'.config('ragbot.embedding.default').'.base_url'),
                 'vector_store' => config('ragbot.vector_store.default'),
+                'vector_store_custom_name' => null,
                 'widget_enabled' => config('ragbot.widget.enabled'),
             ]);
         }

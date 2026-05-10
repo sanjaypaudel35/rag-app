@@ -74,6 +74,32 @@ class StrategyResolutionTest extends TestCase
     }
 
     /** @test */
+    public function test_vector_store_manager_resolves_custom_driver()
+    {
+        $project = Project::factory()->create();
+        ProjectSetting::factory()->create([
+            'project_id' => $project->id,
+            'vector_store' => VectorStore::Custom,
+            'vector_store_custom_name' => 'pinecone',
+        ]);
+
+        $project->refresh();
+        app()->instance('ragbot.project', $project);
+
+        $manager = app(VectorStoreManager::class);
+
+        $customDriver = \Mockery::mock(\Sanjay\Ragbot\Contracts\Services\VectorStoreInterface::class);
+
+        $manager->extend('pinecone', function () use ($customDriver) {
+            return $customDriver;
+        });
+
+        $resolved = $manager->resolve($project);
+
+        $this->assertSame($customDriver, $resolved);
+    }
+
+    /** @test */
     public function test_embedding_manager_resolves_correct_provider()
     {
         $project = Project::factory()->create();

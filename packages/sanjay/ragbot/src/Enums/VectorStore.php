@@ -9,4 +9,5 @@ enum VectorStore: string
 {
     case MySql = "mysql";
     case PgVector = "pgvector";
+    case Custom = "custom";
 }

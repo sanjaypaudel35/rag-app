@@ -26,6 +26,7 @@ class SettingsManager extends Component
         'settings.llm_api_endpoint' => 'nullable|url',
         'settings.embedding_api_endpoint' => 'nullable|url',
         'settings.vector_store' => 'required|string',
+        'settings.vector_store_custom_name' => 'nullable|string|required_if:settings.vector_store,custom',
         'settings.widget_enabled' => 'required|boolean',
     ];
 

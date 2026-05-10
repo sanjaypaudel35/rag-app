@@ -7,12 +7,27 @@ use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Models\ProjectSetting;
+use InvalidArgumentException;
 
 /**
  * Manager class to dynamically resolve and delegate to the correct vector store driver.
  */
 class VectorStoreManager implements VectorStoreInterface
 {
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array<string, \Closure>
+     */
+    protected array $customCreators = [];
+
+    /**
+     * The resolved driver instances.
+     *
+     * @var array<string, VectorStoreInterface>
+     */
+    protected array $drivers = [];
+
     /**
      * Create a new manager instance.
      */
@@ -49,13 +64,68 @@ class VectorStoreManager implements VectorStoreInterface
     {
         /** @var ProjectSetting|null $settings */
         $settings = $project->settings()->withoutGlobalScope('project')->first();
-        $driverValue = $settings ? $settings->vector_store->value : config('ragbot.vector_store.default');
 
-        return match ($driverValue) {
+        $driverName = $settings ? $settings->vector_store->value : config('ragbot.vector_store.default');
+
+        if ($driverName === VectorStore::Custom->value && $settings && $settings->vector_store_custom_name) {
+            return $this->driver($settings->vector_store_custom_name);
+        }
+
+        return $this->driver($driverName);
+    }
+
+    /**
+     * Get a driver instance by name.
+     */
+    public function driver(?string $driver = null): VectorStoreInterface
+    {
+        $driver = $driver ?: config('ragbot.vector_store.default');
+
+        if (! isset($this->drivers[$driver])) {
+            $this->drivers[$driver] = $this->createDriver($driver);
+        }
+
+        return $this->drivers[$driver];
+    }
+
+    /**
+     * Create a new driver instance.
+     */
+    protected function createDriver(string $driver): VectorStoreInterface
+    {
+        if (isset($this->customCreators[$driver])) {
+            return $this->callCustomCreator($driver);
+        }
+
+        if (class_exists($driver) && is_subclass_of($driver, VectorStoreInterface::class)) {
+            return app($driver);
+        }
+
+        return match ($driver) {
             VectorStore::PgVector->value => $this->pgVectorStore,
             VectorStore::MySql->value => $this->mysqlVectorStore,
-            default => $this->pgVectorStore,
+            default => throw new InvalidArgumentException("Driver [{$driver}] not supported or class not found."),
         };
+    }
+
+    /**
+     * Call a custom driver creator.
+     */
+    protected function callCustomCreator(string $driver): VectorStoreInterface
+    {
+        return $this->customCreators[$driver]($this->app ?? app());
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @return $this
+     */
+    public function extend(string $driver, \Closure $callback): self
+    {
+        $this->customCreators[$driver] = $callback;
+
+        return $this;
     }
 
     /**

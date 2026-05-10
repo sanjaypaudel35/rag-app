@@ -87,23 +87,34 @@
                 </flux:field>
 
                 <!-- Vector Store -->
-                <flux:field>
-                    <flux:label>Vector Store</flux:label>
-                    <flux:select wire:model="settings.vector_store" :disabled="isset($project->settings->vector_store)">
-                        @foreach($vectorStores as $store)
-                            <flux:select.option value="{{ $store->value }}">{{ ucfirst($store->value) }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                    @if(isset($project->settings->vector_store))
-                        <flux:description variant="warning" class="flex items-center gap-2 mt-2">
-                            <flux:icon icon="exclamation-triangle" variant="mini" />
-                            Vector store cannot be changed once configured.
-                        </flux:description>
-                    @else
-                        <flux:description>Choose where to store your document embeddings. <strong>Note: This cannot be changed later.</strong></flux:description>
+                <div class="space-y-4">
+                    <flux:field>
+                        <flux:label>Vector Store</flux:label>
+                        <flux:select wire:model.live="settings.vector_store" :disabled="isset($project->settings->vector_store)">
+                            @foreach($vectorStores as $store)
+                                <flux:select.option value="{{ $store->value }}">{{ ucfirst($store->value) }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        @if(isset($project->settings->vector_store))
+                            <flux:description variant="warning" class="flex items-center gap-2 mt-2">
+                                <flux:icon icon="exclamation-triangle" variant="mini" />
+                                Vector store cannot be changed once configured.
+                            </flux:description>
+                        @else
+                            <flux:description>Choose where to store your document embeddings. <strong>Note: This cannot be changed later.</strong></flux:description>
+                        @endif
+                        <flux:error name="settings.vector_store" />
+                    </flux:field>
+
+                    @if($settings['vector_store'] === 'custom')
+                        <flux:field>
+                            <flux:label>Custom Vector Store Name</flux:label>
+                            <flux:input wire:model="settings.vector_store_custom_name" placeholder="e.g. pinecone, weaviate" :disabled="isset($project->settings->vector_store)" />
+                            <flux:description>Enter the name of your custom vector store driver.</flux:description>
+                            <flux:error name="settings.vector_store_custom_name" />
+                        </flux:field>
                     @endif
-                    <flux:error name="settings.vector_store" />
-                </flux:field>
+                </div>
 
                 <!-- Widget Enabled -->
                 <flux:field>

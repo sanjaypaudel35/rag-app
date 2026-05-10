@@ -52,6 +52,7 @@ class ProjectSetting extends Model
         'llm_api_endpoint',
         'embedding_api_endpoint',
         'vector_store',
+        'vector_store_custom_name',
         'widget_enabled',
         'total_tokens_used',
     ];
