@@ -4,6 +4,7 @@ namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Models\Project;
@@ -14,6 +15,20 @@ use Sanjay\Ragbot\Models\ProjectSetting;
  */
 class EmbeddingManager implements EmbeddingInterface
 {
+    /**
+     * The registered custom driver creators.
+     *
+     * @var array<string, \Closure>
+     */
+    protected array $customCreators = [];
+
+    /**
+     * The resolved driver instances.
+     *
+     * @var array<string, EmbeddingInterface>
+     */
+    protected array $drivers = [];
+
     /**
      * Generate a vector embedding for the given text using the given project's provider.
      *
@@ -47,11 +62,80 @@ class EmbeddingManager implements EmbeddingInterface
     {
         /** @var ProjectSetting|null $settings */
         $settings = $project->settings()->withoutGlobalScope('project')->first();
+
+        $modelOrClass = $settings?->llm_model_for_embedding;
+
+        // 1. Check if the model name is a registered custom slug or a class
+        if ($modelOrClass) {
+            if (isset($this->customCreators[$modelOrClass])) {
+                return $this->driver($modelOrClass, $project);
+            }
+
+            if (class_exists($modelOrClass) && is_subclass_of($modelOrClass, EmbeddingInterface::class)) {
+                return $this->driver($modelOrClass, $project);
+            }
+        }
+
+        // 2. Fall back to the LLM provider's default embedding service
         $provider = $settings ? $settings->llm_provider : LlmProvider::tryFrom(config('ragbot.embedding.default'));
 
-        return match ($provider) {
-            LlmProvider::OpenAI => new OpenAIEmbeddingService($project),
-            default => new StubEmbeddingService,
+        return $this->driver($provider->value, $project);
+    }
+
+    /**
+     * Get a driver instance by name.
+     */
+    public function driver(?string $driver = null, ?Project $project = null): EmbeddingInterface
+    {
+        $driver = $driver ?: config('ragbot.embedding.default');
+        $project = $project ?? app('ragbot.project');
+
+        $instanceKey = $driver.':'.($project?->id ?? 'default');
+
+        if (! isset($this->drivers[$instanceKey])) {
+            $this->drivers[$instanceKey] = $this->createDriver($driver, $project);
+        }
+
+        return $this->drivers[$instanceKey];
+    }
+
+    /**
+     * Create a new driver instance.
+     */
+    protected function createDriver(string $driver, Project $project): EmbeddingInterface
+    {
+        if (isset($this->customCreators[$driver])) {
+            return $this->callCustomCreator($driver, $project);
+        }
+
+        if (class_exists($driver) && is_subclass_of($driver, EmbeddingInterface::class)) {
+            return app($driver, ['project' => $project]);
+        }
+
+        return match ($driver) {
+            LlmProvider::OpenAI->value, 'openai' => new OpenAIEmbeddingService($project),
+            LlmProvider::Stub->value, 'stub' => new StubEmbeddingService,
+            default => throw new InvalidArgumentException("Embedding driver [{$driver}] not supported or class not found."),
         };
+    }
+
+    /**
+     * Call a custom driver creator.
+     */
+    protected function callCustomCreator(string $driver, Project $project): EmbeddingInterface
+    {
+        return $this->customCreators[$driver](app(), $project);
+    }
+
+    /**
+     * Register a custom driver creator Closure.
+     *
+     * @return $this
+     */
+    public function extend(string $driver, \Closure $callback): self
+    {
+        $this->customCreators[$driver] = $callback;
+
+        return $this;
     }
 }

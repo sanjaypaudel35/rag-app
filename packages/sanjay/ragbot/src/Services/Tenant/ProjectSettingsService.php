@@ -57,6 +57,8 @@ class ProjectSettingsService
                 'llm_model_for_embedding' => config('ragbot.embedding.providers.'.config('ragbot.embedding.default').'.model'),
                 'llm_api_endpoint' => config('ragbot.llm.providers.'.config('ragbot.llm.default').'.base_url'),
                 'embedding_api_endpoint' => config('ragbot.embedding.providers.'.config('ragbot.embedding.default').'.base_url'),
+                'embedding_provider' => config('ragbot.embedding.default'),
+                'embedding_provider_custom_name' => null,
                 'vector_store' => config('ragbot.vector_store.default'),
                 'vector_store_custom_name' => null,
                 'widget_enabled' => config('ragbot.widget.enabled'),

@@ -63,10 +63,10 @@
                             <flux:select.option value="custom">Custom...</flux:select.option>
                         </flux:select>
                         @if($settings['llm_model_for_embedding'] === 'custom' || !array_key_exists($settings['llm_model_for_embedding'], $availableEmbeddingModels))
-                            <flux:input wire:model="settings.llm_model_for_embedding" placeholder="Enter custom model" class="flex-1" />
+                            <flux:input wire:model="settings.llm_model_for_embedding" placeholder="Enter custom model or class" class="flex-1" />
                         @endif
                     </div>
-                    <flux:description>The model used for generating vector embeddings.</flux:description>
+                    <flux:description>The model used for generating vector embeddings. Can be a model name or a custom class.</flux:description>
                     <flux:error name="settings.llm_model_for_embedding" />
                 </flux:field>
 

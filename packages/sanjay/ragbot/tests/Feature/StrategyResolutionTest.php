@@ -5,6 +5,8 @@ namespace Sanjay\Ragbot\Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Models\Project;
@@ -88,7 +90,7 @@ class StrategyResolutionTest extends TestCase
 
         $manager = app(VectorStoreManager::class);
 
-        $customDriver = \Mockery::mock(\Sanjay\Ragbot\Contracts\Services\VectorStoreInterface::class);
+        $customDriver = \Mockery::mock(VectorStoreInterface::class);
 
         $manager->extend('pinecone', function () use ($customDriver) {
             return $customDriver;
@@ -115,6 +117,31 @@ class StrategyResolutionTest extends TestCase
         $resolved = $manager->resolve($project);
 
         $this->assertInstanceOf(OpenAIEmbeddingService::class, $resolved);
+    }
+
+    /** @test */
+    public function test_embedding_manager_resolves_custom_driver()
+    {
+        $project = Project::factory()->create();
+        ProjectSetting::factory()->create([
+            'project_id' => $project->id,
+            'llm_model_for_embedding' => 'together',
+        ]);
+
+        $project->refresh();
+        app()->instance('ragbot.project', $project);
+
+        $manager = app(EmbeddingManager::class);
+
+        $customDriver = \Mockery::mock(\Sanjay\Ragbot\Contracts\Services\EmbeddingInterface::class);
+
+        $manager->extend('together', function () use ($customDriver) {
+            return $customDriver;
+        });
+
+        $resolved = $manager->resolve($project);
+
+        $this->assertSame($customDriver, $resolved);
     }
 
     /** @test */
