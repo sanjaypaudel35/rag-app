@@ -1,0 +1,34 @@
+<?php
+
+namespace Sanjay\Ragbot\Http\Requests;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Sanjay\Ragbot\Rules\ValidChatSession;
+
+/**
+ * Form request for the Chat API.
+ */
+class ChatFormRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'message' => ['required', 'string', 'min:1', 'max:500'],
+            'session_id' => ['nullable', 'string', 'min:1', 'max:255', new ValidChatSession],
+        ];
+    }
+}

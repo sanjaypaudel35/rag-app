@@ -46,6 +46,7 @@ use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
+use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
 use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
 use Sanjay\Ragbot\Models\RagbotUser;
 use Sanjay\Ragbot\Repositories\ChatbotRepository;
@@ -157,6 +158,7 @@ class RagbotServiceProvider extends ServiceProvider
         Livewire::component('ragbot.document-manager', DocumentManager::class);
         Livewire::component('ragbot.settings-manager', SettingsManager::class);
         Livewire::component('ragbot.chatbot-manager', ChatbotManager::class);
+        Livewire::component('ragbot.integration-guide', IntegrationGuide::class);
     }
 
     /**

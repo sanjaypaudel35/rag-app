@@ -10,6 +10,7 @@ use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
+use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
 use Sanjay\Ragbot\Livewire\Tenant\ProcessingQueue;
 use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
 
@@ -61,5 +62,6 @@ Route::group([
 
         Route::get('settings', SettingsManager::class)->name('settings');
         Route::get('settings/chatbots', ChatbotManager::class)->name('settings.chatbots');
+        Route::get('integration-guide', IntegrationGuide::class)->name('integration-guide');
     });
 });

@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Contracts\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -46,6 +47,14 @@ interface BaseRepositoryInterface
      * @return TModel|null
      */
     public function findOneBy(array $attributes): ?Model;
+
+    /**
+     * Find one model using a closure for custom query constraints.
+     *
+     * @param  callable(Builder): void  $callback
+     * @return TModel|null
+     */
+    public function findOne(callable $callback): ?Model;
 
     /**
      * Delete a model instance from the database.

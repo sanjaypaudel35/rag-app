@@ -21,20 +21,21 @@ class RetrievalService implements RetrievalServiceInterface
     ) {}
 
     /**
-     * Retrieve relevant chunks for a given query and chatbot.
+     * Retrieves the most relevant chunks for a given query using vector similarity.
      */
-    public function retrieve(Chatbot $chatbot, string $query, int $topK = 5): Collection
+    public function retrieve(Project $project, string $query, int $topK = 5): Collection
     {
-        /** @var Project $project */
-        $project = $chatbot->project;
-
         // 1. Generate embedding for the query
         $queryVector = $this->embeddingManager->embed($query, $project);
 
-        // 2. Get document IDs associated with the chatbot
-        $documentIds = $chatbot->documents()->pluck('rag_documents.id')->toArray();
+        // 2. Resolve document IDs. Prefer chatbot-scoped if a chatbot is bound.
+        $documentIds = [];
+        if (app()->bound('ragbot.chatbot')) {
+            $chatbot = app('ragbot.chatbot');
+            $documentIds = $chatbot->documents()->pluck('rag_documents.id')->toArray();
+        }
 
-        // 3. Search for similar chunks within those documents
+        // 3. Search for similar chunks
         return $this->vectorStoreManager->search($project, $queryVector, $topK, $documentIds);
     }
 }

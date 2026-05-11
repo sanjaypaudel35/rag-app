@@ -3,7 +3,7 @@
 namespace Sanjay\Ragbot\Contracts\Services;
 
 use Illuminate\Support\Collection;
-use Sanjay\Ragbot\Models\Chatbot;
+use Sanjay\Ragbot\Models\Project;
 
 /**
  * Interface for document retrieval service.
@@ -11,7 +11,7 @@ use Sanjay\Ragbot\Models\Chatbot;
 interface RetrievalServiceInterface
 {
     /**
-     * Retrieve relevant chunks for a given query and chatbot.
+     * Retrieves the most relevant chunks for a given query using vector similarity.
      */
-    public function retrieve(Chatbot $chatbot, string $query, int $topK = 5): Collection;
+    public function retrieve(Project $project, string $query, int $topK = 5): Collection;
 }

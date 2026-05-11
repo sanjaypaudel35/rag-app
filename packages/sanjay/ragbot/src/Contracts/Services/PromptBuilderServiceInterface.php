@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 interface PromptBuilderServiceInterface
 {
     /**
-     * Build a prompt for the LLM using retrieved context and user query.
+     * Constructs the LLM prompt from retrieved chunks and conversation history.
      */
-    public function build(string $query, Collection $context): string;
+    public function build(string $query, Collection $chunks, Collection $history): string;
 }

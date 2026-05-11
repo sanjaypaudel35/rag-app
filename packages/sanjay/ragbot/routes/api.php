@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Sanjay\Ragbot\Http\Controllers\Api\ChatController;
 
 /**
  * API routes for sanjay/ragbot.
@@ -18,4 +19,9 @@ Route::prefix('v1')->middleware(['ragbot.auth'])->group(function () {
             'project' => $project->name,
         ]);
     });
+
+    /**
+     * Chat API endpoint.
+     */
+    Route::post('/chat', ChatController::class)->name('chat');
 });

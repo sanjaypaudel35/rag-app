@@ -96,7 +96,11 @@ class ChatbotManager extends Component
 
         try {
             $sessionId = 'test-session-'.$chatbot->id;
-            $response = $chatService->chat($chatbot, $sessionId, $userMessage);
+
+            // Bind the chatbot to the container so RetrievalService can use its scope
+            app()->instance('ragbot.chatbot', $chatbot);
+
+            $response = $chatService->chat($this->project, $sessionId, $userMessage);
 
             $this->messages[] = [
                 'role' => 'assistant',

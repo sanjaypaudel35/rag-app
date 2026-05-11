@@ -4,7 +4,6 @@ namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Collection;
 use Sanjay\Ragbot\Contracts\Services\PromptBuilderServiceInterface;
-use Sanjay\Ragbot\Models\Chunk;
 
 /**
  * Service for building LLM prompts with context.
@@ -12,25 +11,28 @@ use Sanjay\Ragbot\Models\Chunk;
 class PromptBuilderService implements PromptBuilderServiceInterface
 {
     /**
-     * Build a prompt for the LLM using retrieved context and user query.
-     *
-     * @param  Collection<int, Chunk>  $context
+     * Constructs the LLM prompt from retrieved chunks and conversation history.
      */
-    public function build(string $query, Collection $context): string
+    public function build(string $query, Collection $chunks, Collection $history): string
     {
-        $contextString = $context->map(fn (Chunk $chunk) => $chunk->content)->implode("\n\n---\n\n");
+        $context = $chunks->map(fn ($chunk) => $chunk->content)->implode("\n\n");
 
-        return <<<PROMPT
-You are a helpful assistant. Use the following pieces of retrieved context to answer the user's question. Use the simple language to give the answer and alwasy
-give the answer in friendly way, act like real customer support agent.
+        $prompt = "You are a helpful AI assistant. Use the following pieces of context to answer the user's question.\n";
+        $prompt .= "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n";
+        $prompt .= "CONTEXT:\n{$context}\n\n";
 
+        if ($history->isNotEmpty()) {
+            $prompt .= "CONVERSATION HISTORY:\n";
+            foreach ($history as $message) {
+                $role = ucfirst($message->role->value);
+                $prompt .= "{$role}: {$message->content}\n";
+            }
+            $prompt .= "\n";
+        }
 
-Context:
-{$contextString}
+        $prompt .= "USER QUESTION: {$query}\n";
+        $prompt .= 'ASSISTANT RESPONSE:';
 
-Question: {$query}
-
-Answer:
-PROMPT;
+        return $prompt;
     }
 }

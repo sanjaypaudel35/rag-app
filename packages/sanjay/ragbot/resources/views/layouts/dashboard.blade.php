@@ -39,6 +39,13 @@
                 <flux:sidebar.item icon="chat-bubble-left-right" href="{{ app()->bound('ragbot.project') ? route('ragbot.settings.chatbots', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.settings.chatbots')">Chatbots</flux:sidebar.item>
                 <flux:sidebar.item icon="credit-card" href="#">Billing</flux:sidebar.item>
                 <flux:sidebar.item icon="list-bullet" href="#">Activity Logs</flux:sidebar.item>
+
+                <flux:separator class="my-4 mx-4" />
+
+                <div class="px-4 mb-2">
+                    <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Integration and Setup Guide</flux:text>
+                </div>
+                <flux:sidebar.item icon="code-bracket" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.integration-guide')">Integration Guide</flux:sidebar.item>
             </flux:sidebar.nav>
 
             <flux:sidebar.spacer />
@@ -89,9 +96,19 @@
                         <div class="flex items-center gap-2 text-xs text-zinc-400 mb-1">
                             <span>Dashboard</span>
                             <flux:icon icon="chevron-right" variant="mini" class="w-3 h-3" />
-                            <span class="text-zinc-900 dark:text-zinc-100 font-medium">{{ request()->routeIs('ragbot.documents') ? 'Documents' : 'Overview' }}</span>
+                            <span class="text-zinc-900 dark:text-zinc-100 font-medium">
+                                @if(request()->routeIs('ragbot.documents')) Documents 
+                                @elseif(request()->routeIs('ragbot.integration-guide')) Integration Guide
+                                @else Overview 
+                                @endif
+                            </span>
                         </div>
-                        <flux:heading size="xl" level="1">{{ request()->routeIs('ragbot.documents') ? 'Documents' : 'Overview' }}</flux:heading>
+                        <flux:heading size="xl" level="1">
+                            @if(request()->routeIs('ragbot.documents')) Documents 
+                            @elseif(request()->routeIs('ragbot.integration-guide')) Integration Guide
+                            @else Overview 
+                            @endif
+                        </flux:heading>
                     </div>
 
                     <!-- Header Actions -->

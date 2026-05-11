@@ -31,7 +31,7 @@ class ConversationRepository extends BaseRepository implements ConversationRepos
     /**
      * Find or create a conversation by chatbot and session.
      */
-    public function findOrCreate(string $chatbotId, string $sessionId, array $metadata = []): Conversation
+    public function findOrCreate(?string $chatbotId, string $sessionId, array $metadata = []): Conversation
     {
         return $this->model->firstOrCreate(
             [

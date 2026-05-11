@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -85,6 +86,20 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function findOneBy(array $attributes): ?Model
     {
         return $this->model->where($attributes)->first();
+    }
+
+    /**
+     * Find one model using a closure for custom query constraints.
+     *
+     * @param  callable(Builder): void  $callback
+     * @return TModel|null
+     */
+    public function findOne(callable $callback): ?Model
+    {
+        $query = $this->model->newQuery();
+        $callback($query);
+
+        return $query->first();
     }
 
     /**
