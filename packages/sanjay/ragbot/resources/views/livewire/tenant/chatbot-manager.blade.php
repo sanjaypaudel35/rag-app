@@ -293,6 +293,22 @@
                 </flux:text>
             </flux:field>
 
+            <div class="grid grid-cols-2 gap-4">
+                <flux:field>
+                    <flux:label>Global Rate Limit (RPM)</flux:label>
+                    <flux:description>Total requests per minute.</flux:description>
+                    <flux:input type="number" wire:model="rateLimitPerMinute" min="1" max="1000" />
+                    <flux:error name="rateLimitPerMinute" />
+                </flux:field>
+
+                <flux:field>
+                    <flux:label>Session Rate Limit (RPM)</flux:label>
+                    <flux:description>Per unique session ID.</flux:description>
+                    <flux:input type="number" wire:model="sessionRateLimitPerMinute" min="1" max="100" />
+                    <flux:error name="sessionRateLimitPerMinute" />
+                </flux:field>
+            </div>
+
             <div class="flex justify-end gap-3">
                 <flux:button variant="ghost" x-on:click="$wire.showingSettingsModal = false">Cancel</flux:button>
                 <flux:button variant="primary" wire:click="saveSettings">Save Settings</flux:button>

@@ -39,6 +39,7 @@ use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\LoginController as TenantLoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\RegisterController as TenantRegisterController;
+use Sanjay\Ragbot\Http\Middleware\EnforceChatbotRateLimits;
 use Sanjay\Ragbot\Http\Middleware\HandleChatbotCors;
 use Sanjay\Ragbot\Http\Middleware\RedirectIfNotRagbotAuthenticated;
 use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromApiKey;
@@ -248,6 +249,7 @@ class RagbotServiceProvider extends ServiceProvider
 
         $router->aliasMiddleware('ragbot.auth', ResolveProjectFromApiKey::class);
         $router->aliasMiddleware('ragbot.cors', HandleChatbotCors::class);
+        $router->aliasMiddleware('ragbot.ratelimit', EnforceChatbotRateLimits::class);
         $router->aliasMiddleware('ragbot.project', ResolveProjectFromSlug::class);
         $router->aliasMiddleware('ragbot.guard', SetRagbotAuthGuard::class);
         $router->aliasMiddleware('ragbot.authenticated', RedirectIfNotRagbotAuthenticated::class);
