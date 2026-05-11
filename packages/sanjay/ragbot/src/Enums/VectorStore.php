@@ -7,7 +7,7 @@ namespace Sanjay\Ragbot\Enums;
  */
 enum VectorStore: string
 {
-    case MySql = "mysql";
-    case PgVector = "pgvector";
-    case Custom = "custom";
+    case MySql = 'mysql';
+    case PgVector = 'pgvector';
+    case Custom = 'custom';
 }

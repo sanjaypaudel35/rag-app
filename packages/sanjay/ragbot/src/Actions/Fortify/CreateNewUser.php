@@ -18,24 +18,24 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): RagbotUser
     {
         Validator::make($input, [
-            "name" => ["required", "string", "max:255"],
-            "email" => [
-                "required",
-                "string",
-                "email",
-                "max:255",
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
             ],
-            "password" => ["required", "string", "min:8", "confirmed"],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ])->validate();
 
         /** @var Project $project */
-        $project = app("ragbot.project");
+        $project = app('ragbot.project');
 
         return RagbotUser::create([
-            "project_id" => $project->id,
-            "name" => $input["name"],
-            "email" => $input["email"],
-            "password" => Hash::make($input["password"]),
+            'project_id' => $project->id,
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
         ]);
     }
 }

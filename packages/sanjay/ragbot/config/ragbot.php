@@ -25,7 +25,7 @@ return [
     */
     'llm' => [
         'default' => env('RAGBOT_LLM_PROVIDER', 'openai'),
-        'temperature' => env('RAGBOT_LLM_TEMPERATURE', 0.5),
+        'temperature' => env('RAGBOT_LLM_TEMPERATURE', 0.7),
         'max_tokens' => env('RAGBOT_LLM_MAX_TOKENS', 500),
         'providers' => [
             'openai' => [

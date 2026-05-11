@@ -22,6 +22,21 @@ class DocumentManager extends Component
     use WithFileUploads;
 
     /**
+     * Manual document title.
+     */
+    public $manualTitle = '';
+
+    /**
+     * Manual document content.
+     */
+    public $manualContent = '';
+
+    /**
+     * Current active tab in upload modal.
+     */
+    public $activeTab = 'upload';
+
+    /**
      * The selected file for upload.
      */
     public $selectedFile;
@@ -164,6 +179,43 @@ class DocumentManager extends Component
     }
 
     /**
+     * Handle manual document submission.
+     */
+    public function handleManualSubmit(DocumentService $documentService): void
+    {
+        $this->validate([
+            'manualTitle' => ['required', 'string', 'max:255'],
+            'manualContent' => ['required', 'string', 'min:10'],
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Strip HTML tags for processing if needed, but for now we'll store as text/plain
+            // If we want to support full rich text indexing, we might need to handle HTML in TextExtractor
+            $content = strip_tags($this->manualContent);
+
+            $documentService->storeContent($this->manualTitle, $content);
+
+            DB::commit();
+            $this->reset(['manualTitle', 'manualContent']);
+            $this->showUploadModal = false;
+            $this->successMessage = 'Document created successfully and is being processed.';
+            $this->errorMessage = null;
+        } catch (DocumentProcessingException $e) {
+            DB::rollBack();
+            $this->errorMessage = $e->getMessage();
+            $this->successMessage = null;
+            Log::error('Manual document creation failed: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $this->errorMessage = 'An unexpected error occurred during document creation.';
+            $this->successMessage = null;
+            Log::error('Unexpected manual document error: '.$e->getMessage());
+        }
+    }
+
+    /**
      * Delete a document.
      */
     public function delete(DocumentService $documentService, string $documentId): void
@@ -190,5 +242,14 @@ class DocumentManager extends Component
     public function clearMessages(): void
     {
         $this->reset(['successMessage', 'errorMessage']);
+    }
+
+    /**
+     * Open the upload modal and reset state.
+     */
+    public function openUploadModal(): void
+    {
+        $this->reset(['manualTitle', 'manualContent', 'selectedFile', 'activeTab', 'errorMessage', 'successMessage']);
+        $this->showUploadModal = true;
     }
 }

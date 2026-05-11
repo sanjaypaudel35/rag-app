@@ -3,11 +3,11 @@
 namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Models\ProjectSetting;
-use InvalidArgumentException;
 
 /**
  * Manager class to dynamically resolve and delegate to the correct vector store driver.

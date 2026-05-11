@@ -133,7 +133,7 @@ class StrategyResolutionTest extends TestCase
 
         $manager = app(EmbeddingManager::class);
 
-        $customDriver = \Mockery::mock(\Sanjay\Ragbot\Contracts\Services\EmbeddingInterface::class);
+        $customDriver = \Mockery::mock(EmbeddingInterface::class);
 
         $manager->extend('together', function () use ($customDriver) {
             return $customDriver;

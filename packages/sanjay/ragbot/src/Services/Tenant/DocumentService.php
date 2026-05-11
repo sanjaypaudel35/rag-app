@@ -73,6 +73,52 @@ class DocumentService
     }
 
     /**
+     * Store a new document from manual content.
+     *
+     * @throws DocumentProcessingException
+     */
+    public function storeContent(string $name, string $content): Document
+    {
+        $project = app('ragbot.project');
+        $disk = config('ragbot.storage.disk', 'local');
+
+        try {
+            // Generate a filename if not provided
+            $filename = str_replace(['/', '\\'], '-', $name);
+            if (! str_ends_with($filename, '.txt')) {
+                $filename .= '.txt';
+            }
+
+            $path = "ragbot/{$project->slug}/documents/".now()->timestamp.'-'.$filename;
+
+            // Store content to storage/ragbot/{project_id}/documents/
+            if (! Storage::disk($disk)->put($path, $content)) {
+                throw new DocumentProcessingException('Failed to store document content.');
+            }
+
+            // Create Document record via DocumentRepository
+            /** @var Document $document */
+            $document = $this->documentRepository->create([
+                'project_id' => $project->id,
+                'name' => $name,
+                'file_path' => $path,
+                'mime_type' => 'text/plain',
+                'status' => DocumentStatus::Pending,
+            ]);
+
+            // Dispatch ProcessDocumentJob
+            ProcessDocumentJob::dispatch($document);
+
+            return $document;
+        } catch (Throwable $e) {
+            if (isset($path)) {
+                Storage::disk($disk)->delete($path);
+            }
+            throw new DocumentProcessingException('Document content processing failed: '.$e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
      * Delete a document.
      */
     public function delete(string $documentId): void

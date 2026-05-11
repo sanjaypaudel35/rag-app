@@ -115,7 +115,7 @@
                     <flux:select.option>Processing</flux:select.option>
                     <flux:select.option>Failed</flux:select.option>
                 </flux:select>
-                <flux:button icon="plus" variant="primary" size="sm" wire:click="$set('showUploadModal', true)">Upload</flux:button>
+                <flux:button icon="plus" variant="primary" size="sm" wire:click="openUploadModal">Upload</flux:button>
             </div>
         </div>
 
@@ -126,7 +126,7 @@
                 </div>
                 <flux:heading size="lg">No documents found</flux:heading>
                 <flux:text class="mt-2 max-w-xs mx-auto">Get started by uploading your first document to your knowledge base.</flux:text>
-                <flux:button variant="primary" class="mt-8" wire:click="$set('showUploadModal', true)">Upload your first file</flux:button>
+                <flux:button variant="primary" class="mt-8" wire:click="openUploadModal">Upload your first file</flux:button>
             </div>
         @else
             <flux:table>
@@ -250,34 +250,129 @@
     </flux:modal>
 
     <!-- Upload Modal (Refined) -->
-    <flux:modal name="upload-modal" wire:model="showUploadModal" class="md:min-w-[480px] p-0 overflow-hidden">
-        <div class="bg-white dark:bg-zinc-900">
-            <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800">
-                <flux:heading size="lg">Upload Document</flux:heading>
-                <flux:text class="mt-1">Add a new file to your project's knowledge base.</flux:text>
+    <flux:modal name="upload-modal" wire:model="showUploadModal" class="md:min-w-[700px] p-0 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900" x-data="{ tab: @entangle('activeTab') }">
+            <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <div>
+                    <flux:heading size="lg">Add Document</flux:heading>
+                    <flux:text class="mt-1">Add a new file or write manual content to your project's knowledge base.</flux:text>
+                </div>
+                <flux:button icon="x-mark" variant="ghost" size="sm" wire:click="$set('showUploadModal', false)" />
             </div>
 
-            <form wire:submit.prevent="handleUpload" class="px-8 py-8 space-y-8">
-                <flux:field>
-                    <flux:label>Source File</flux:label>
-                    <flux:input type="file" name="selectedFile" wire:model.live="selectedFile" class="file:bg-zinc-100 dark:file:bg-zinc-800 file:border-0 file:rounded-md file:px-3 file:py-1 file:text-xs file:font-semibold" />
-                    <flux:description>Support for PDF, DOCX, and TXT up to 10MB.</flux:description>
-                    <flux:error name="selectedFile" />
-                </flux:field>
+            <!-- Errors inside modal -->
+            @if ($errorMessage)
+                <div class="px-8 pt-4">
+                    <flux:callout variant="danger" icon="exclamation-circle" heading="Error" closable wire:click="clearMessages">
+                        {{ $errorMessage }}
+                    </flux:callout>
+                </div>
+            @endif
 
-                <div class="flex gap-3 justify-end pt-4">
-                    <flux:button variant="ghost" wire:click="$set('showUploadModal', false)">Cancel</flux:button>
-                    <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="handleUpload" class="px-8">
-                        <span wire:loading.remove wire:target="handleUpload">Upload & Process</span>
-                        <span wire:loading wire:target="handleUpload">Processing...</span>
-                    </flux:button>
+            <div class="px-8 pt-4">
+                <div class="flex border-b border-zinc-100 dark:border-zinc-800">
+                    <button 
+                        type="button" 
+                        @click="tab = 'upload'"
+                        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+                        :class="tab === 'upload' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-zinc-500 hover:text-zinc-700'"
+                    >
+                        File Upload
+                    </button>
+                    <button 
+                        type="button" 
+                        @click="tab = 'manual'"
+                        class="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+                        :class="tab === 'manual' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-zinc-500 hover:text-zinc-700'"
+                    >
+                        Manual Entry
+                    </button>
                 </div>
-                
-                <div wire:loading wire:target="selectedFile" class="flex items-center gap-2 text-xs text-indigo-600 justify-center font-medium bg-indigo-50 dark:bg-indigo-900/20 py-2 rounded-lg">
-                    <flux:icon icon="arrow-path" class="animate-spin w-3 h-3" />
-                    Securely preparing file for transmission...
-                </div>
-            </form>
+            </div>
+
+            <div x-show="tab === 'upload'" class="px-8 py-8">
+                <form wire:submit.prevent="handleUpload" class="space-y-8">
+                    <flux:field>
+                        <flux:label>Source File</flux:label>
+                        <flux:input type="file" name="selectedFile" wire:model.live="selectedFile" class="file:bg-zinc-100 dark:file:bg-zinc-800 file:border-0 file:rounded-md file:px-3 file:py-1 file:text-xs file:font-semibold" />
+                        <flux:description>Support for PDF, DOCX, and TXT up to 10MB.</flux:description>
+                        <flux:error name="selectedFile" />
+                    </flux:field>
+
+                    <div class="flex gap-3 justify-end pt-4">
+                        <flux:button variant="ghost" wire:click="$set('showUploadModal', false)">Cancel</flux:button>
+                        <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="handleUpload" class="px-8">
+                            <span wire:loading.remove wire:target="handleUpload">Upload & Process</span>
+                            <span wire:loading wire:target="handleUpload">Processing...</span>
+                        </flux:button>
+                    </div>
+                    
+                    <div wire:loading wire:target="selectedFile" class="flex items-center gap-2 text-xs text-indigo-600 justify-center font-medium bg-indigo-50 dark:bg-indigo-900/20 py-2 rounded-lg mt-4">
+                        <flux:icon icon="arrow-path" class="animate-spin w-3 h-3" />
+                        Securely preparing file for transmission...
+                    </div>
+                </form>
+            </div>
+
+            <div x-show="tab === 'manual'" class="px-8 py-8" x-cloak>
+                <form wire:submit.prevent="handleManualSubmit" class="space-y-6">
+                    <flux:field>
+                        <flux:label>Document Title</flux:label>
+                        <flux:input placeholder="e.g., Company Policy 2024" wire:model="manualTitle" />
+                        <flux:error name="manualTitle" />
+                    </flux:field>
+
+                    <flux:field>
+                        <flux:label>Content</flux:label>
+                        <div 
+                            class="mt-1" 
+                            wire:ignore 
+                            x-data="{ 
+                                content: @entangle('manualContent'),
+                                init() {
+                                    this.updateEditor();
+                                    
+                                    this.$refs.trix.addEventListener('trix-change', () => {
+                                        this.content = this.$refs.input.value;
+                                    });
+
+                                    // Watch for external content changes (like resets)
+                                    $watch('content', value => {
+                                        if (!value && this.$refs.trix.editor.getHTML() !== '') {
+                                            this.$refs.trix.editor.loadHTML('');
+                                        }
+                                    });
+                                },
+                                updateEditor() {
+                                    if (this.$refs.trix.editor) {
+                                        this.$refs.trix.editor.loadHTML(this.content || '');
+                                    } else {
+                                        this.$refs.trix.addEventListener('trix-initialize', () => {
+                                            this.$refs.trix.editor.loadHTML(this.content || '');
+                                        }, { once: true });
+                                    }
+                                }
+                            }"
+                        >
+                            <input id="manualContent" type="hidden" x-ref="input" :value="content">
+                            <trix-editor 
+                                input="manualContent" 
+                                x-ref="trix"
+                                class="trix-content min-h-[300px] border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none overflow-y-auto"
+                            ></trix-editor>
+                        </div>
+                        <flux:error name="manualContent" />
+                    </flux:field>
+
+                    <div class="flex gap-3 justify-end pt-4">
+                        <flux:button variant="ghost" wire:click="$set('showUploadModal', false)">Cancel</flux:button>
+                        <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="handleManualSubmit" class="px-8">
+                            <span wire:loading.remove wire:target="handleManualSubmit">Create Document</span>
+                            <span wire:loading wire:target="handleManualSubmit">Creating...</span>
+                        </flux:button>
+                    </div>
+                </form>
+            </div>
         </div>
     </flux:modal>
 </div>

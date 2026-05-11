@@ -21,7 +21,8 @@ class PromptBuilderService implements PromptBuilderServiceInterface
         $contextString = $context->map(fn (Chunk $chunk) => $chunk->content)->implode("\n\n---\n\n");
 
         return <<<PROMPT
-You are a helpful assistant. Use the following pieces of retrieved context to answer the user's question. Use the simple language to give the answer
+You are a helpful assistant. Use the following pieces of retrieved context to answer the user's question. Use the simple language to give the answer and alwasy
+give the answer in friendly way, act like real customer support agent.
 
 
 Context:
