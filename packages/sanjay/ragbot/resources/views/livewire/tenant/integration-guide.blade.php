@@ -110,6 +110,11 @@
                                     <flux:table.cell>Input validation failed (e.g. message too long).</flux:table.cell>
                                 </flux:table.row>
                                 <flux:table.row>
+                                    <flux:table.cell>429</flux:table.cell>
+                                    <flux:table.cell>RateLimitException</flux:table.cell>
+                                    <flux:table.cell>Too many requests. Check the <code class="px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono">type</code> field for <code class="px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono">ChatbotRateLimitException</code> or <code class="px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono">SessionRateLimitException</code>.</flux:table.cell>
+                                </flux:table.row>
+                                <flux:table.row>
                                     <flux:table.cell>502</flux:table.cell>
                                     <flux:table.cell>LlmResponseException</flux:table.cell>
                                     <flux:table.cell>The LLM provider (OpenAI/Anthropic) returned an error.</flux:table.cell>
@@ -149,6 +154,39 @@
                             <flux:text>Include the captured <code class="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-mono">session_id</code> in all subsequent requests for that user. The RAG engine will automatically retrieve the previous messages to maintain context.</flux:text>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <flux:separator />
+
+            <!-- Rate Limiting -->
+            <section>
+                <flux:heading size="lg" class="mb-4">Rate Limiting</flux:heading>
+                <flux:text class="mb-4">The API enforces two layers of rate limiting to ensure performance and prevent abuse:</flux:text>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <flux:card variant="subtle">
+                        <flux:heading size="sm" class="mb-1">Global Limit</flux:heading>
+                        <flux:text size="sm">The total number of requests this chatbot can process across all users per minute.</flux:text>
+                    </flux:card>
+                    <flux:card variant="subtle">
+                        <flux:heading size="sm" class="mb-1">Session Limit</flux:heading>
+                        <flux:text size="sm">The maximum number of requests allowed for a single <code class="px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono">session_id</code> per minute.</flux:text>
+                    </flux:card>
+                </div>
+
+                <flux:heading size="sm" class="mb-2">Handling Rate Limit Errors</flux:heading>
+                <flux:text class="mb-4">When a limit is reached, the API returns a <code class="px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono">429 Too Many Requests</code> status. We recommend handling this gracefully in your UI:</flux:text>
+
+                <div class="bg-zinc-900 text-zinc-300 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+<pre class="text-xs leading-relaxed"><code>const response = await fetch('/ragbot/api/v1/chat', { ... });
+
+if (response.status === 429) {
+    const errorData = await response.json();
+    // Example: Show a notification to the user
+    showToast("error", "You're sending messages too fast. Please wait a moment.");
+    return;
+}</code></pre>
                 </div>
             </section>
 

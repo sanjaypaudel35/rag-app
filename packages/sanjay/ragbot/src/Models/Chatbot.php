@@ -50,6 +50,8 @@ class Chatbot extends Model
         'name',
         'api_key',
         'allowed_origins',
+        'rate_limit_per_minute',
+        'session_rate_limit_per_minute',
         'total_tokens_used',
         'total_conversations',
     ];
@@ -61,6 +63,8 @@ class Chatbot extends Model
      */
     protected $casts = [
         'allowed_origins' => 'array',
+        'rate_limit_per_minute' => 'integer',
+        'session_rate_limit_per_minute' => 'integer',
         'total_tokens_used' => 'integer',
         'total_conversations' => 'integer',
     ];
