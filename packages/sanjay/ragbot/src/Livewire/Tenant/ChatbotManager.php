@@ -42,6 +42,38 @@ class ChatbotManager extends Component
         $this->project = app('ragbot.project');
     }
 
+    public ?Chatbot $editingChatbot = null;
+
+    public string $allowedOriginsInput = '';
+
+    public bool $showingSettingsModal = false;
+
+    public function openSettings(Chatbot $chatbot): void
+    {
+        $this->editingChatbot = $chatbot;
+        $this->allowedOriginsInput = implode("\n", $chatbot->allowed_origins ?? []);
+        $this->showingSettingsModal = true;
+    }
+
+    public function saveSettings(): void
+    {
+        $this->validate([
+            'allowedOriginsInput' => 'nullable|string',
+        ]);
+
+        $origins = array_filter(array_map('trim', explode("\n", $this->allowedOriginsInput)));
+
+        $this->editingChatbot->update([
+            'allowed_origins' => $origins,
+        ]);
+
+        $this->showingSettingsModal = false;
+        $this->editingChatbot = null;
+        $this->allowedOriginsInput = '';
+
+        session()->flash('success', 'Chatbot settings updated successfully.');
+    }
+
     public function startTesting(string $chatbotId): void
     {
         $this->testingChatbotId = $chatbotId;

@@ -49,6 +49,7 @@ class Chatbot extends Model
         'project_id',
         'name',
         'api_key',
+        'allowed_origins',
         'total_tokens_used',
         'total_conversations',
     ];
@@ -59,6 +60,7 @@ class Chatbot extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'allowed_origins' => 'array',
         'total_tokens_used' => 'integer',
         'total_conversations' => 'integer',
     ];

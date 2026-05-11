@@ -7,7 +7,7 @@ use Sanjay\Ragbot\Http\Controllers\Api\ChatController;
  * API routes for sanjay/ragbot.
  * All routes are prefixed by config("ragbot.prefix") . "/api" in the service provider.
  */
-Route::prefix('v1')->middleware(['ragbot.auth'])->group(function () {
+Route::prefix('v1')->middleware(['ragbot.auth', 'ragbot.cors'])->group(function () {
     /**
      * Test route to verify API key resolution and container binding.
      */
