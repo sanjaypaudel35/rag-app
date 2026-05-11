@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Sanjay\Ragbot\Models\Chatbot;
 use Sanjay\Ragbot\Models\Project;
 use Tests\TestCase;
 
@@ -48,12 +49,12 @@ class ApiKeyResolutionTest extends TestCase
     {
         $project = Project::factory()->create([
             'name' => 'Automated Test Project',
-            'api_key' => 'valid_test_key',
+            'api_key' => hash('sha256', 'rb_p_valid_test_key'),
             'is_active' => true,
         ]);
 
         $response = $this->withHeaders([
-            'X-Api-Key' => 'valid_test_key',
+            'X-Api-Key' => 'rb_p_valid_test_key',
         ])->getJson('/ragbot/api/v1/ping');
 
         $response->assertStatus(200)
@@ -64,5 +65,32 @@ class ApiKeyResolutionTest extends TestCase
 
         // Verify that the project is bound to the container
         $this->assertEquals($project->id, app('ragbot.project')->id);
+    }
+
+    /**
+     * Test that the API resolves both project and chatbot when a valid chatbot API key is provided.
+     */
+    public function test_api_resolves_chatbot_and_project_with_valid_chatbot_key(): void
+    {
+        $project = Project::factory()->create(['name' => 'Parent Project']);
+        $chatbot = Chatbot::factory()->create([
+            'project_id' => $project->id,
+            'name' => 'Scoped Bot',
+            'api_key' => hash('sha256', 'rb_c_scoped_key'),
+        ]);
+
+        $response = $this->withHeaders([
+            'X-Api-Key' => 'rb_c_scoped_key',
+        ])->getJson('/ragbot/api/v1/ping');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'ok',
+                'project' => 'Parent Project',
+            ]);
+
+        // Verify that both are bound to the container
+        $this->assertEquals($project->id, app('ragbot.project')->id);
+        $this->assertEquals($chatbot->id, app('ragbot.chatbot')->id);
     }
 }

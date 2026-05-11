@@ -47,7 +47,7 @@ class ChatbotManagerTest extends TestCase
             'name' => 'Knowledge Doc',
         ]);
 
-        Livewire::actingAs($this->user, 'ragbot')
+        $test = Livewire::actingAs($this->user, 'ragbot')
             ->test('ragbot.chatbot-manager')
             ->set('name', 'My New Chatbot')
             ->set('selectedDocuments', [$document->id])
@@ -55,14 +55,17 @@ class ChatbotManagerTest extends TestCase
             ->assertHasNoErrors()
             ->assertSee('Chatbot created successfully');
 
+        $rawKey = $test->get('newlyGeneratedKey');
+        $this->assertStringStartsWith('rb_c_', $rawKey);
+
         $this->assertDatabaseHas('rag_chatbots', [
             'name' => 'My New Chatbot',
             'project_id' => $this->project->id,
+            'api_key' => hash('sha256', $rawKey),
         ]);
 
         $chatbot = Chatbot::where('name', 'My New Chatbot')->first();
         $this->assertTrue($chatbot->documents->contains($document));
-        $this->assertStringStartsWith('rb_', $chatbot->api_key);
     }
 
     /** @test */
@@ -70,17 +73,21 @@ class ChatbotManagerTest extends TestCase
     {
         $chatbot = Chatbot::factory()->create([
             'project_id' => $this->project->id,
-            'api_key' => 'old_key',
+            'api_key' => hash('sha256', 'old_key'),
         ]);
 
-        Livewire::actingAs($this->user, 'ragbot')
+        $test = Livewire::actingAs($this->user, 'ragbot')
             ->test('ragbot.chatbot-manager')
             ->call('regenerateKey', $chatbot->id)
-            ->assertHasNoErrors();
+            ->assertHasNoErrors()
+            ->assertSet('newlyGeneratedKey', function ($key) {
+                return str_starts_with($key, 'rb_c_');
+            });
 
+        $rawKey = $test->get('newlyGeneratedKey');
         $chatbot->refresh();
-        $this->assertNotEquals('old_key', $chatbot->api_key);
-        $this->assertStringStartsWith('rb_', $chatbot->api_key);
+        $this->assertEquals(hash('sha256', $rawKey), $chatbot->api_key);
+        $this->assertEquals(64, strlen($chatbot->api_key));
     }
 
     /** @test */
@@ -108,19 +115,25 @@ class ChatbotManagerTest extends TestCase
             ->assertSee('Testing: Test Bot')
             ->call('initializeChat')
             ->assertSet('isInitialized', true)
-            ->assertSee('Chatbot Ready');
+            ->assertSee('Chat initialized with Chatbot API Key.');
     }
 
     /** @test */
     public function test_it_can_regenerate_project_master_key(): void
     {
-        $oldKey = $this->project->api_key;
+        $oldHash = $this->project->api_key;
 
-        Livewire::actingAs($this->user, 'ragbot')
+        $test = Livewire::actingAs($this->user, 'ragbot')
             ->test('ragbot.chatbot-manager')
             ->call('regenerateProjectKey')
             ->assertSee('Project API key regenerated successfully.');
 
-        $this->assertNotEquals($oldKey, $this->project->refresh()->api_key);
+        $this->project->refresh();
+        $this->assertNotEquals($oldHash, $this->project->api_key);
+        $this->assertEquals(64, strlen($this->project->api_key));
+
+        $rawKey = $test->get('newProjectKey');
+        $this->assertStringStartsWith('rb_p_', $rawKey);
+        $this->assertEquals(hash('sha256', $rawKey), $this->project->api_key);
     }
 }

@@ -24,7 +24,7 @@ class ProjectRepository extends BaseRepository implements ProjectRepositoryInter
     public function findByApiKey(string $apiKey): ?Project
     {
         return $this->model
-            ->where('api_key', $apiKey)
+            ->where('api_key', hash('sha256', $apiKey))
             ->where('is_active', true)
             ->first();
     }

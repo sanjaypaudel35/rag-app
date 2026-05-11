@@ -162,12 +162,12 @@ class ChatbotManager extends Component
         DB::beginTransaction();
 
         try {
-            $apiKey = 'rb_'.Str::random(40);
+            $apiKey = 'rb_c_'.Str::random(60);
 
             /** @var Chatbot $chatbot */
             $chatbot = $this->project->chatbots()->create([
                 'name' => $this->name,
-                'api_key' => $apiKey,
+                'api_key' => hash('sha256', $apiKey),
             ]);
 
             $chatbot->documents()->sync($this->selectedDocuments);
@@ -190,8 +190,10 @@ class ChatbotManager extends Component
         DB::beginTransaction();
 
         try {
-            $newKey = 'rb_'.Str::random(40);
-            $chatbot->update(['api_key' => $newKey]);
+            $newKey = 'rb_c_'.Str::random(60);
+            $chatbot->update(['api_key' => hash('sha256', $newKey)]);
+
+            $this->newlyGeneratedKey = $newKey;
 
             DB::commit();
             session()->flash('success', "API key for {$chatbot->name} regenerated.");

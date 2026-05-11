@@ -252,7 +252,7 @@
                 </div>
                 
                 <div>
-                    <flux:heading size="lg">Chatbot Created Successfully!</flux:heading>
+                    <flux:heading size="lg">New API Key Generated</flux:heading>
                     <flux:text class="mt-2">Here is your chatbot's API key. Copy it now, as you won't be able to see it again.</flux:text>
                 </div>
 

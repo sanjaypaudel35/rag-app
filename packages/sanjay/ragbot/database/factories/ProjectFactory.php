@@ -33,7 +33,7 @@ class ProjectFactory extends Factory
             'id' => (string) Str::uuid(),
             'name' => $name,
             'slug' => Str::slug($name),
-            'api_key' => 'rb_'.Str::random(32),
+            'api_key' => hash('sha256', 'rb_p_'.Str::random(60)),
             'is_active' => true,
             'settings' => null,
         ];
@@ -46,7 +46,7 @@ class ProjectFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'name' => 'Test Project',
-            'api_key' => 'test_api_key_123',
+            'api_key' => hash('sha256', 'rb_p_test_key'),
         ]);
     }
 }

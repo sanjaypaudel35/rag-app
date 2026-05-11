@@ -21,6 +21,7 @@ use Sanjay\Ragbot\Actions\Fortify\CreateNewUser as TenantCreateNewUser;
 use Sanjay\Ragbot\Actions\Fortify\LoginResponse as TenantLoginResponse;
 use Sanjay\Ragbot\Actions\Fortify\LogoutResponse as TenantLogoutResponse;
 use Sanjay\Ragbot\Actions\Fortify\RegisterResponse as TenantRegisterResponse;
+use Sanjay\Ragbot\Contracts\Repositories\ChatbotRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ChunkRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ConversationRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
@@ -47,6 +48,7 @@ use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
 use Sanjay\Ragbot\Models\RagbotUser;
+use Sanjay\Ragbot\Repositories\ChatbotRepository;
 use Sanjay\Ragbot\Repositories\ChunkRepository;
 use Sanjay\Ragbot\Repositories\ConversationRepository;
 use Sanjay\Ragbot\Repositories\DocumentRepository;
@@ -82,6 +84,7 @@ class RagbotServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(ProjectRepositoryInterface::class, ProjectRepository::class);
+        $this->app->bind(ChatbotRepositoryInterface::class, ChatbotRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(DocumentRepositoryInterface::class, DocumentRepository::class);
         $this->app->bind(ChunkRepositoryInterface::class, ChunkRepository::class);

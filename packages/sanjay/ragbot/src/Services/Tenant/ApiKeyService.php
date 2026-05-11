@@ -23,10 +23,10 @@ class ApiKeyService
      */
     public function regenerate(Project $project): string
     {
-        $newKey = Str::random(64);
+        $newKey = 'rb_p_'.Str::random(60);
 
         $this->repository->update($project->id, [
-            'api_key' => $newKey,
+            'api_key' => hash('sha256', $newKey),
         ]);
 
         return $newKey;

@@ -4,6 +4,7 @@ namespace Sanjay\Ragbot\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Sanjay\Ragbot\Contracts\Repositories\ChatbotRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,7 +16,10 @@ class ResolveProjectFromApiKey
     /**
      * Create a new middleware instance.
      */
-    public function __construct(protected ProjectRepositoryInterface $projectRepository) {}
+    public function __construct(
+        protected ProjectRepositoryInterface $projectRepository,
+        protected ChatbotRepositoryInterface $chatbotRepository
+    ) {}
 
     /**
      * Handle an incoming request.
@@ -32,6 +36,19 @@ class ResolveProjectFromApiKey
             ], 401);
         }
 
+        // 1. Try resolving as a Chatbot Key first
+        if (str_starts_with($apiKey, 'rb_c_')) {
+            $chatbot = $this->chatbotRepository->findByApiKey($apiKey);
+
+            if ($chatbot) {
+                app()->instance('ragbot.chatbot', $chatbot);
+                app()->instance('ragbot.project', $chatbot->project);
+
+                return $next($request);
+            }
+        }
+
+        // 2. Fallback to Project Master Key
         $project = $this->projectRepository->findByApiKey($apiKey);
 
         if (! $project) {

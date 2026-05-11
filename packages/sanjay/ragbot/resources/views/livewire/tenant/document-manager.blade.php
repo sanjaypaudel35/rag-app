@@ -224,34 +224,36 @@
     </flux:card>
 
     <!-- Document Preview Modal -->
-    <flux:modal name="preview-modal" wire:model="showPreviewModal" class="md:min-w-[800px] h-[80vh] p-0 overflow-hidden flex flex-col">
-        <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
-            <div>
-                <flux:heading size="lg">{{ $previewName }}</flux:heading>
-                <flux:text size="xs" class="mt-0.5">Document Preview</flux:text>
-            </div>
-            <flux:button icon="x-mark" variant="ghost" size="sm" wire:click="$set('showPreviewModal', false)" />
-        </div>
-
-        <div class="flex-1 bg-zinc-100 dark:bg-zinc-950 p-4">
-            @if($showPreviewModal && $previewUrl)
-                <iframe src="{{ $previewUrl }}" class="w-full h-full rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-inner bg-white" frameborder="0"></iframe>
-            @elseif($showPreviewModal)
-                <div class="w-full h-full flex flex-col items-center justify-center text-zinc-400">
-                    <flux:icon icon="document-text" class="w-12 h-12 mb-4 opacity-20" />
-                    <flux:text>No document selected for preview</flux:text>
+    <flux:modal name="preview-modal" wire:model="showPreviewModal" class="md:min-w-[800px]">
+        <div class="h-[80vh] flex flex-col -m-6 overflow-hidden">
+            <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
+                <div>
+                    <flux:heading size="lg">{{ $previewName }}</flux:heading>
+                    <flux:text size="xs" class="mt-0.5">Document Preview</flux:text>
                 </div>
-            @endif
-        </div>
-        
-        <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end bg-zinc-50 dark:bg-zinc-900/50">
-            <flux:button variant="primary" size="sm" wire:click="$set('showPreviewModal', false)">Close Preview</flux:button>
+                <flux:button icon="x-mark" variant="ghost" size="sm" wire:click="$set('showPreviewModal', false)" />
+            </div>
+
+            <div class="flex-1 bg-zinc-100 dark:bg-zinc-950 p-4">
+                @if($showPreviewModal && $previewUrl)
+                    <iframe src="{{ $previewUrl }}" class="w-full h-full rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-inner bg-white" frameborder="0"></iframe>
+                @elseif($showPreviewModal)
+                    <div class="w-full h-full flex flex-col items-center justify-center text-zinc-400">
+                        <flux:icon icon="document-text" class="w-12 h-12 mb-4 opacity-20" />
+                        <flux:text>No document selected for preview</flux:text>
+                    </div>
+                @endif
+            </div>
+            
+            <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end bg-zinc-50 dark:bg-zinc-900/50">
+                <flux:button variant="primary" size="sm" wire:click="$set('showPreviewModal', false)">Close Preview</flux:button>
+            </div>
         </div>
     </flux:modal>
 
     <!-- Upload Modal (Refined) -->
-    <flux:modal name="upload-modal" wire:model="showUploadModal" class="md:min-w-[700px] p-0 overflow-hidden">
-        <div class="bg-white dark:bg-zinc-900" x-data="{ tab: @entangle('activeTab') }">
+    <flux:modal name="upload-modal" wire:model="showUploadModal" class="md:min-w-[700px]">
+        <div class="bg-white dark:bg-zinc-900 -m-6" x-data="{ tab: @entangle('activeTab') }">
             <div class="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                 <div>
                     <flux:heading size="lg">Add Document</flux:heading>
