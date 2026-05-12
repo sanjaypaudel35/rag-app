@@ -90,7 +90,8 @@
                         <flux:button variant="primary" class="mt-6" wire:click="initializeChat">Initialize Now</flux:button>
                     </div>
                 @endif
-            </div>        </flux:card>
+            </div>
+        </flux:card>
     @endif
 
     <div class="grid grid-cols-1 gap-6 mb-12">
@@ -149,7 +150,6 @@
                         </div>
 
                         <div class="flex gap-2">
-                            <flux:button variant="ghost" size="sm" icon="cog-6-tooth" wire:click="openSettings('{{ $chatbot->id }}')" />
                             <flux:button variant="primary" icon="chat-bubble-left-right" class="flex-1" wire:click="startTesting('{{ $chatbot->id }}')">Test Chat</flux:button>
                             <flux:button variant="danger" icon="trash" wire:click="deleteChatbot('{{ $chatbot->id }}')" wire:confirm="Are you sure you want to delete this chatbot?" />
                         </div>
@@ -266,53 +266,4 @@
             </div>
         </flux:modal>
     @endif
-
-    <!-- Settings Modal -->
-    <flux:modal wire:model="showingSettingsModal" class="max-w-lg">
-        <div class="space-y-6">
-            <div>
-                <flux:heading size="lg">Chatbot Settings</flux:heading>
-                <flux:text>Configure advanced security and integration settings for <span class="font-bold text-zinc-900 dark:text-white">{{ $editingChatbot?->name }}</span>.</flux:text>
-            </div>
-
-            <flux:field>
-                <flux:label>Allowed Origin URLs</flux:label>
-                <flux:description>Enter the URLs that are allowed to make cross-origin requests to this chatbot API (one per line).</flux:description>
-                
-                <flux:textarea 
-                    wire:model="allowedOriginsInput" 
-                    placeholder="https://example.com&#10;https://app.another.com" 
-                    rows="5"
-                    class="mt-4 font-mono text-sm"
-                />
-                
-                <flux:error name="allowedOriginsInput" />
-                
-                <flux:text size="xs" class="mt-2 text-zinc-500">
-                    Use <code class="px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono">*</code> to allow all origins (not recommended for production).
-                </flux:text>
-            </flux:field>
-
-            <div class="grid grid-cols-2 gap-4">
-                <flux:field>
-                    <flux:label>Global Rate Limit (RPM)</flux:label>
-                    <flux:description>Total requests per minute.</flux:description>
-                    <flux:input type="number" wire:model="rateLimitPerMinute" min="1" max="1000" />
-                    <flux:error name="rateLimitPerMinute" />
-                </flux:field>
-
-                <flux:field>
-                    <flux:label>Session Rate Limit (RPM)</flux:label>
-                    <flux:description>Per unique session ID.</flux:description>
-                    <flux:input type="number" wire:model="sessionRateLimitPerMinute" min="1" max="100" />
-                    <flux:error name="sessionRateLimitPerMinute" />
-                </flux:field>
-            </div>
-
-            <div class="flex justify-end gap-3">
-                <flux:button variant="ghost" x-on:click="$wire.showingSettingsModal = false">Cancel</flux:button>
-                <flux:button variant="primary" wire:click="saveSettings">Save Settings</flux:button>
-            </div>
-        </div>
-    </flux:modal>
 </div>

@@ -52,7 +52,10 @@ class SettingsAndApiKeyTest extends TestCase
         $service = app(ProjectSettingsService::class);
 
         // Initial set to MySql
-        $service->update($project, ['vector_store' => VectorStore::MySql->value]);
+        $service->update($project, [
+            'vector_store' => VectorStore::MySql->value,
+            'llm_provider' => LlmProvider::OpenAI->value,
+        ]);
 
         $settings = ProjectSetting::withoutGlobalScope('project')
             ->where('project_id', $project->id)
@@ -62,7 +65,10 @@ class SettingsAndApiKeyTest extends TestCase
         $this->assertEquals(VectorStore::MySql, $settings->vector_store);
 
         // Attempt to change to PgVector
-        $service->update($project, ['vector_store' => VectorStore::PgVector->value]);
+        $service->update($project, [
+            'vector_store' => VectorStore::PgVector->value,
+            'llm_provider' => LlmProvider::OpenAI->value,
+        ]);
 
         // Should still be MySql
         $settings->refresh();
@@ -78,7 +84,7 @@ class SettingsAndApiKeyTest extends TestCase
         $newKey = $service->regenerate($project);
 
         $this->assertNotEquals('old-key', $newKey);
-        $this->assertEquals($newKey, $project->refresh()->api_key);
+        $this->assertEquals(hash('sha256', $newKey), $project->refresh()->api_key);
     }
 
     /** @test */

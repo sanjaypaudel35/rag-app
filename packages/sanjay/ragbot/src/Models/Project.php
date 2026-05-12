@@ -37,6 +37,7 @@ class Project extends Model
      */
     protected $fillable = [
         'name',
+        'logo',
         'slug',
         'api_key',
         'is_active',

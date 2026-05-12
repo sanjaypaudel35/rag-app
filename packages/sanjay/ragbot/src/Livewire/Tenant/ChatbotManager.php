@@ -42,48 +42,6 @@ class ChatbotManager extends Component
         $this->project = app('ragbot.project');
     }
 
-    public ?Chatbot $editingChatbot = null;
-
-    public string $allowedOriginsInput = '';
-
-    public int $rateLimitPerMinute = 60;
-
-    public int $sessionRateLimitPerMinute = 10;
-
-    public bool $showingSettingsModal = false;
-
-    public function openSettings(Chatbot $chatbot): void
-    {
-        $this->editingChatbot = $chatbot;
-        $this->allowedOriginsInput = implode("\n", $chatbot->allowed_origins ?? []);
-        $this->rateLimitPerMinute = $chatbot->rate_limit_per_minute ?? 60;
-        $this->sessionRateLimitPerMinute = $chatbot->session_rate_limit_per_minute ?? 10;
-        $this->showingSettingsModal = true;
-    }
-
-    public function saveSettings(): void
-    {
-        $this->validate([
-            'allowedOriginsInput' => 'nullable|string',
-            'rateLimitPerMinute' => 'required|integer|min:1|max:1000',
-            'sessionRateLimitPerMinute' => 'required|integer|min:1|max:100',
-        ]);
-
-        $origins = array_filter(array_map('trim', explode("\n", $this->allowedOriginsInput)));
-
-        $this->editingChatbot->update([
-            'allowed_origins' => $origins,
-            'rate_limit_per_minute' => $this->rateLimitPerMinute,
-            'session_rate_limit_per_minute' => $this->sessionRateLimitPerMinute,
-        ]);
-
-        $this->showingSettingsModal = false;
-        $this->editingChatbot = null;
-        $this->allowedOriginsInput = '';
-
-        session()->flash('success', 'Chatbot settings updated successfully.');
-    }
-
     public function startTesting(string $chatbotId): void
     {
         $this->testingChatbotId = $chatbotId;

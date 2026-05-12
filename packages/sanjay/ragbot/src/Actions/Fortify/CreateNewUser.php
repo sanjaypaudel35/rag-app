@@ -18,7 +18,8 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): RagbotUser
     {
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+            'firstname' => ['required', 'string', 'max:255'],
+            'lastname' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
@@ -33,7 +34,9 @@ class CreateNewUser implements CreatesNewUsers
 
         return RagbotUser::create([
             'project_id' => $project->id,
-            'name' => $input['name'],
+            'firstname' => $input['firstname'],
+            'lastname' => $input['lastname'],
+            'name' => $input['firstname'].' '.$input['lastname'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
         ]);

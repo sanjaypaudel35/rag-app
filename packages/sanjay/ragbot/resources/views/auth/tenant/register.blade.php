@@ -8,12 +8,22 @@
     <form method="POST" action="{{ route("ragbot.tenant.register.store", ["project_slug" => request()->route("project_slug")]) }}">
         @csrf
 
-        <div>
-            <label for="name" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Name</label>
-            <input id="name" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 rounded-md shadow-sm" type="text" name="name" value="{{ old("name") }}" required autofocus autocomplete="name" />
-            @error("name")
-                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-            @enderror
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label for="firstname" class="block font-medium text-sm text-gray-700 dark:text-gray-300">First Name</label>
+                <input id="firstname" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 rounded-md shadow-sm" type="text" name="firstname" value="{{ old("firstname") }}" required autofocus autocomplete="given-name" />
+                @error("firstname")
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="lastname" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Last Name</label>
+                <input id="lastname" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-blue-500 dark:focus:border-blue-600 focus:ring-blue-500 dark:focus:ring-blue-600 rounded-md shadow-sm" type="text" name="lastname" value="{{ old("lastname") }}" required autocomplete="family-name" />
+                @error("lastname")
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <div class="mt-4">

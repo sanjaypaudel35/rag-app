@@ -35,7 +35,7 @@
                 <flux:separator class="my-4 mx-4" />
                 
                 <flux:sidebar.item icon="cog-8-tooth" href="{{ app()->bound('ragbot.project') ? route('ragbot.settings', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.settings')">Settings</flux:sidebar.item>
-                <flux:sidebar.item icon="users" href="#">Team</flux:sidebar.item>
+                <flux:sidebar.item icon="users" href="{{ app()->bound('ragbot.project') ? route('ragbot.team', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.team')">Team</flux:sidebar.item>
                 <flux:sidebar.item icon="chat-bubble-left-right" href="{{ app()->bound('ragbot.project') ? route('ragbot.settings.chatbots', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.settings.chatbots')">Chatbots</flux:sidebar.item>
                 <flux:sidebar.item icon="credit-card" href="#">Billing</flux:sidebar.item>
                 <flux:sidebar.item icon="list-bullet" href="#">Activity Logs</flux:sidebar.item>
@@ -57,25 +57,29 @@
                         <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Current Project</flux:text>
                         <flux:badge size="sm" variant="success" inset="top bottom" class="text-[10px] px-1.5 py-0">Pro Plan</flux:badge>
                     </div>
-                    <flux:heading size="sm" class="truncate">{{ app('ragbot.project')->name }}</flux:heading>
-                    <div class="flex items-center gap-2 mt-2">
-                        <div class="flex -space-x-2">
-                            <div class="w-5 h-5 rounded-full border border-white dark:border-zinc-800 bg-zinc-200 dark:bg-zinc-700"></div>
-                            <div class="w-5 h-5 rounded-full border border-white dark:border-zinc-800 bg-zinc-300 dark:bg-zinc-600"></div>
-                        </div>
-                        <flux:text size="xs" class="text-zinc-500">3 Members</flux:text>
+                    <div class="flex items-center gap-2">
+                        @if(app('ragbot.project')->logo)
+                            <img src="{{ asset('storage/'.app('ragbot.project')->logo) }}" class="h-6 w-6 rounded border border-zinc-200 dark:border-zinc-700">
+                        @else
+                            <div class="h-6 w-6 bg-indigo-100 dark:bg-indigo-900/30 rounded flex items-center justify-center">
+                                <flux:icon icon="squares-2x2" variant="mini" class="text-indigo-600 dark:text-indigo-400 h-3 w-3" />
+                            </div>
+                        @endif
+                        <flux:heading size="sm" class="truncate">{{ app('ragbot.project')->name }}</flux:heading>
                     </div>
-                    <flux:button variant="subtle" size="sm" class="mt-3 px-0 text-indigo-600 dark:text-indigo-400 font-medium">Upgrade Plan</flux:button>
+                    <div class="flex items-center gap-2 mt-2">
+                        <flux:text size="xs" class="text-zinc-500">{{ app('ragbot.project')->users()->count() }} Members</flux:text>
+                    </div>
                 </div>
             @endif
 
             <flux:dropdown position="top" align="start" class="max-lg:hidden">
                 <flux:sidebar.profile 
-                    name="{{ Auth::guard('ragbot')->user()->name ?? 'Sanjay Paudel' }}" 
-                    initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->name ?? 'S', 0, 1)) }}"
+                    name="{{ Auth::guard('ragbot')->user()->name ?? 'User' }}" 
+                    initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}"
                 />
                 <flux:menu>
-                    <flux:menu.item icon="user-circle">Profile Settings</flux:menu.item>
+                    <flux:menu.item icon="user-circle" href="{{ route('ragbot.profile', ['project_slug' => app('ragbot.project')->slug]) }}">Profile Settings</flux:menu.item>
                     <flux:menu.separator />
                     <flux:menu.item icon="arrow-right-start-on-rectangle" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</flux:menu.item>
                 </flux:menu>
@@ -124,13 +128,13 @@
 
                         <div class="flex items-center gap-3">
                             <div class="hidden sm:block text-right">
-                                <flux:text size="sm" class="font-semibold text-zinc-900 dark:text-zinc-100">{{ Auth::guard('ragbot')->user()->name ?? 'Sanjay Paudel' }}</flux:text>
-                                <flux:text size="xs" class="text-zinc-500">Owner</flux:text>
+                                <flux:text size="sm" class="font-semibold text-zinc-900 dark:text-zinc-100">{{ Auth::guard('ragbot')->user()->name ?? 'User' }}</flux:text>
+                                <flux:text size="xs" class="text-zinc-500">Member</flux:text>
                             </div>
                             <flux:dropdown align="end">
-                                <flux:avatar size="sm" initials="SP" class="cursor-pointer" />
+                                <flux:avatar size="sm" initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}" class="cursor-pointer" />
                                 <flux:menu>
-                                    <flux:menu.item icon="user">Account Settings</flux:menu.item>
+                                    <flux:menu.item icon="user" href="{{ route('ragbot.profile', ['project_slug' => app('ragbot.project')->slug]) }}">Account Settings</flux:menu.item>
                                     <flux:menu.item icon="cog-8-tooth">Preferences</flux:menu.item>
                                     <flux:menu.separator />
                                     <flux:menu.item icon="arrow-right-start-on-rectangle" variant="danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</flux:menu.item>

@@ -160,7 +160,10 @@ class RagbotServiceProvider extends ServiceProvider
         Livewire::component('ragbot.document-manager', DocumentManager::class);
         Livewire::component('ragbot.settings-manager', SettingsManager::class);
         Livewire::component('ragbot.chatbot-manager', ChatbotManager::class);
+        Livewire::component('ragbot.team-manager', TeamManager::class);
         Livewire::component('ragbot.integration-guide', IntegrationGuide::class);
+        Livewire::component('ragbot.processing-queue', ProcessingQueue::class);
+        Livewire::component('ragbot.profile-settings', ProfileSettings::class);
     }
 
     /**
@@ -176,6 +179,13 @@ class RagbotServiceProvider extends ServiceProvider
         config(['auth.providers.ragbot_users' => [
             'driver' => 'eloquent',
             'model' => RagbotUser::class,
+        ]]);
+
+        config(['auth.passwords.ragbot_users' => [
+            'provider' => 'ragbot_users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
         ]]);
     }
 

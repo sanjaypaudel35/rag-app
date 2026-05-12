@@ -4,6 +4,7 @@ namespace Sanjay\Ragbot\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
@@ -15,6 +16,7 @@ use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Models\Embedding;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Services\Tenant\ChunkingService;
+use Sanjay\Ragbot\Services\Tenant\ProjectSettingsService;
 use Sanjay\Ragbot\Services\Tenant\VectorStoreManager;
 use Sanjay\Ragbot\Tests\TestCase;
 
@@ -26,6 +28,16 @@ class DocumentProcessingTest extends TestCase
     {
         parent::setUp();
         Storage::fake('local');
+
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'data' => [
+                    [
+                        'embedding' => array_fill(0, 1536, 0.1),
+                    ],
+                ],
+            ], 200),
+        ]);
     }
 
     /** @test */
@@ -102,6 +114,13 @@ class DocumentProcessingTest extends TestCase
         config(['queue.default' => 'sync']);
 
         $project = Project::factory()->create();
+        app(ProjectSettingsService::class)->update($project, [
+            'llm_api_key' => 'test-key',
+            'llm_provider' => 'openai',
+            'vector_store' => 'mysql',
+            'widget_enabled' => true,
+        ]);
+
         $document = Document::factory()->for($project)->create([
             'status' => DocumentStatus::Pending,
             'file_path' => 'test.txt',
@@ -127,6 +146,13 @@ class DocumentProcessingTest extends TestCase
         config(['queue.default' => 'sync']);
 
         $project = Project::factory()->create();
+        app(ProjectSettingsService::class)->update($project, [
+            'llm_api_key' => 'test-key',
+            'llm_provider' => 'openai',
+            'vector_store' => 'mysql',
+            'widget_enabled' => true,
+        ]);
+
         $document = Document::factory()->for($project)->create([
             'status' => DocumentStatus::Pending,
             'file_path' => 'test.txt',

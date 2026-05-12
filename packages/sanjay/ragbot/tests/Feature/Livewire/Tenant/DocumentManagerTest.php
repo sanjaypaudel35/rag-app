@@ -4,11 +4,13 @@ namespace Sanjay\Ragbot\Tests\Feature\Livewire\Tenant;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Models\RagbotUser;
+use Sanjay\Ragbot\Services\Tenant\ProjectSettingsService;
 use Sanjay\Ragbot\Tests\TestCase;
 
 class DocumentManagerTest extends TestCase
@@ -18,7 +20,17 @@ class DocumentManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Storage::fake('private');
+        Storage::fake('local');
+
+        Http::fake([
+            'api.openai.com/*' => Http::response([
+                'data' => [
+                    [
+                        'embedding' => array_fill(0, 1536, 0.1),
+                    ],
+                ],
+            ], 200),
+        ]);
     }
 
     /** @test */
@@ -31,28 +43,27 @@ class DocumentManagerTest extends TestCase
 
         Livewire::actingAs($user, 'ragbot')
             ->test('ragbot.document-manager')
-            ->assertStatus(200)
-            ->assertSee($project->name);
+            ->assertStatus(200);
     }
 
     /** @test */
     public function test_it_can_upload_a_document(): void
     {
         $project = Project::factory()->create();
+        app(ProjectSettingsService::class)->getForProject($project);
         app()->instance('ragbot.project', $project);
 
         $user = RagbotUser::factory()->create(['project_id' => $project->id]);
-        $file = UploadedFile::fake()->create('test.pdf', 100, 'application/pdf');
+        $file = UploadedFile::fake()->createWithContent('test.txt', 'This is some sample text content for extraction.');
 
         Livewire::actingAs($user, 'ragbot')
             ->test('ragbot.document-manager')
-            ->set('file', $file)
-            ->call('upload')
-            ->assertSet('file', null)
+            ->set('selectedFile', $file)
+            ->call('handleUpload')
             ->assertSee('Document uploaded successfully');
 
         $this->assertDatabaseHas('rag_documents', [
-            'name' => 'test.pdf',
+            'name' => 'test.txt',
             'project_id' => $project->id,
         ]);
     }

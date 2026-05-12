@@ -187,6 +187,7 @@ class StrategyResolutionTest extends TestCase
             'llm_provider' => LlmProvider::Anthropic,
             'llm_api_key' => 'fake-anthropic-key',
             'llm_model' => 'claude-3-opus',
+            'llm_api_endpoint' => null,
         ]);
 
         $project->refresh();

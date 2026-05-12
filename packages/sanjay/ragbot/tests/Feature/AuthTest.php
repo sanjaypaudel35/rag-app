@@ -77,7 +77,8 @@ class AuthTest extends TestCase
         $project = Project::factory()->create(['slug' => 'test-project']);
 
         $response = $this->post(route('ragbot.tenant.register.store', ['project_slug' => 'test-project']), [
-            'name' => 'John Doe',
+            'firstname' => 'John',
+            'lastname' => 'Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
@@ -89,6 +90,8 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas('ragbot_users', [
             'email' => 'john@example.com',
             'project_id' => $project->id,
+            'firstname' => 'John',
+            'lastname' => 'Doe',
         ]);
 
         $this->assertGuest('ragbot');

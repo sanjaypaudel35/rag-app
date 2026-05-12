@@ -3,8 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Sanjay\Ragbot\Http\Controllers\Auth\LoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\RegisterController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\EmailVerificationController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\ForgotPasswordController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\LoginController as TenantLoginController;
 use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\RegisterController as TenantRegisterController;
+use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\ResetPasswordController;
 use Sanjay\Ragbot\Http\Controllers\Tenant\DocumentPreviewController;
 use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
@@ -12,7 +15,9 @@ use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
 use Sanjay\Ragbot\Livewire\Tenant\ProcessingQueue;
+use Sanjay\Ragbot\Livewire\Tenant\ProfileSettings;
 use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
+use Sanjay\Ragbot\Livewire\Tenant\TeamManager;
 
 Route::get('health', function () {
     return response()->json([
@@ -50,6 +55,17 @@ Route::group([
         Route::post('register', [TenantRegisterController::class, 'store'])->name('tenant.register.store');
         Route::get('login', [TenantLoginController::class, 'create'])->name('tenant.login');
         Route::post('login', [TenantLoginController::class, 'store'])->name('tenant.login.store');
+
+        // Verification
+        Route::get('verify-email/{id}/{hash}', EmailVerificationController::class)
+            ->middleware(['signed'])
+            ->name('tenant.verification.verify');
+
+        // Password Reset
+        Route::get('forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
+        Route::post('forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email');
+        Route::get('reset-password/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
+        Route::post('reset-password', [ResetPasswordController::class, 'store'])->name('password.update');
     });
 
     Route::post('logout', [TenantLoginController::class, 'destroy'])->name('tenant.logout');
@@ -62,6 +78,8 @@ Route::group([
 
         Route::get('settings', SettingsManager::class)->name('settings');
         Route::get('settings/chatbots', ChatbotManager::class)->name('settings.chatbots');
+        Route::get('team', TeamManager::class)->name('team');
+        Route::get('profile', ProfileSettings::class)->name('profile');
         Route::get('integration-guide', IntegrationGuide::class)->name('integration-guide');
     });
 });
