@@ -186,7 +186,12 @@
                             </flux:table.cell>
                             <flux:table.cell>
                                 <div class="flex items-center gap-2">
-                                    <flux:avatar size="xs" initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->name ?? 'S', 0, 1)) }}" class="bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400" />
+                                    <flux:avatar 
+                                        src="{{ Auth::guard('ragbot')->user()->profile_photo_path ? asset('storage/'.Auth::guard('ragbot')->user()->profile_photo_path) : '' }}"
+                                        size="xs" 
+                                        initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}" 
+                                        class="bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400" 
+                                    />
                                     <flux:text size="sm" class="font-medium">{{ explode(' ', Auth::guard('ragbot')->user()->name ?? 'User')[0] }}</flux:text>
                                 </div>
                             </flux:table.cell>

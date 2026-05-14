@@ -20,8 +20,8 @@
             <flux:sidebar.header class="mb-6">
                 <flux:sidebar.brand
                     href="{{ app()->bound('ragbot.project') ? route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) : '#' }}"
-                    name="Ragbot"
-                    logo="https://fluxui.dev/img/demo/logo.png"
+                    name="{{ app()->bound('ragbot.project') ? app('ragbot.project')->name : 'Ragbot' }}"
+                    logo="{{ (app()->bound('ragbot.project') && app('ragbot.project')->logo) ? asset('storage/'.app('ragbot.project')->logo) : 'https://fluxui.dev/img/demo/logo.png' }}"
                 />
                 <flux:sidebar.collapse class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2" />
             </flux:sidebar.header>
@@ -75,6 +75,7 @@
 
             <flux:dropdown position="top" align="start" class="max-lg:hidden">
                 <flux:sidebar.profile 
+                    avatar="{{ Auth::guard('ragbot')->user()->profile_photo_path ? asset('storage/'.Auth::guard('ragbot')->user()->profile_photo_path) : '' }}"
                     name="{{ Auth::guard('ragbot')->user()->name ?? 'User' }}" 
                     initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}"
                 />
@@ -92,7 +93,10 @@
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-4 lg:hidden">
                         <flux:sidebar.toggle icon="bars-2" inset="left" />
-                        <flux:brand name="Ragbot" logo="https://fluxui.dev/img/demo/logo.png" />
+                        <flux:brand 
+                            name="{{ app()->bound('ragbot.project') ? app('ragbot.project')->name : 'Ragbot' }}" 
+                            logo="{{ (app()->bound('ragbot.project') && app('ragbot.project')->logo) ? asset('storage/'.app('ragbot.project')->logo) : 'https://fluxui.dev/img/demo/logo.png' }}" 
+                        />
                     </div>
 
                     <!-- Breadcrumbs & Titles -->
@@ -132,7 +136,12 @@
                                 <flux:text size="xs" class="text-zinc-500">Member</flux:text>
                             </div>
                             <flux:dropdown align="end">
-                                <flux:avatar size="sm" initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}" class="cursor-pointer" />
+                                <flux:avatar 
+                                    src="{{ Auth::guard('ragbot')->user()->profile_photo_path ? asset('storage/'.Auth::guard('ragbot')->user()->profile_photo_path) : '' }}"
+                                    size="sm" 
+                                    initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}" 
+                                    class="cursor-pointer" 
+                                />
                                 <flux:menu>
                                     <flux:menu.item icon="user" href="{{ route('ragbot.profile', ['project_slug' => app('ragbot.project')->slug]) }}">Account Settings</flux:menu.item>
                                     <flux:menu.item icon="cog-8-tooth">Preferences</flux:menu.item>

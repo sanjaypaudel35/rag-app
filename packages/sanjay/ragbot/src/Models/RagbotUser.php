@@ -50,6 +50,7 @@ class RagbotUser extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'profile_photo_path',
     ];
 
     /**

@@ -17,8 +17,13 @@
 <body class="font-sans text-gray-900 antialiased bg-gray-100 dark:bg-gray-900">
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
         <div>
-            <a href="/" class="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                {{ app()->bound("ragbot.project") ? app("ragbot.project")->name : "Ragbot" }}
+            <a href="/" class="flex flex-col items-center gap-4">
+                @if(app()->bound('ragbot.project') && app('ragbot.project')->logo)
+                    <img src="{{ asset('storage/'.app('ragbot.project')->logo) }}" class="h-16 w-auto">
+                @endif
+                <span class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    {{ app()->bound("ragbot.project") ? app("ragbot.project")->name : "Ragbot" }}
+                </span>
             </a>
         </div>
 

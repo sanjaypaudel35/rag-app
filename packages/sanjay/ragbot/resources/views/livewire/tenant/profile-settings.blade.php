@@ -20,6 +20,27 @@
 
             <form wire:submit.prevent="updateProfile" class="space-y-6 max-w-xl">
                 <flux:field>
+                    <flux:label>Profile Photo</flux:label>
+                    <div class="mt-2 flex items-center gap-6">
+                        @if($photo)
+                            <img src="{{ $photo->temporaryUrl() }}" class="h-20 w-20 object-cover rounded-full border-2 border-indigo-500 shadow-sm">
+                        @elseif($current_photo)
+                            <img src="{{ asset('storage/'.$current_photo) }}" class="h-20 w-20 object-cover rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                        @else
+                            <div class="h-20 w-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+                                <flux:icon icon="user" class="text-zinc-400 h-8 w-8" />
+                            </div>
+                        @endif
+
+                        <div class="flex-1">
+                            <flux:input type="file" wire:model="photo" />
+                            <flux:description>JPG, PNG up to 512KB</flux:description>
+                            <flux:error name="photo" />
+                        </div>
+                    </div>
+                </flux:field>
+
+                <flux:field>
                     <flux:label>Display Name</flux:label>
                     <flux:input wire:model="name" />
                     <flux:error name="name" />

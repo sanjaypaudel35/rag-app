@@ -1,8 +1,20 @@
 <div>
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
             <flux:heading size="xl" level="1">Overview</flux:heading>
             <flux:text class="mt-1">Insights and management for <span class="font-medium text-zinc-900 dark:text-white">{{ $project->name }}</span></flux:text>
+        </div>
+
+        <div class="flex items-center gap-3 bg-white dark:bg-zinc-900 p-2 pr-4 rounded-full border border-zinc-200 dark:border-zinc-800 shadow-sm">
+            <flux:avatar 
+                src="{{ Auth::guard('ragbot')->user()->profile_photo_path ? asset('storage/'.Auth::guard('ragbot')->user()->profile_photo_path) : '' }}"
+                size="sm" 
+                initials="{{ strtoupper(substr(Auth::guard('ragbot')->user()->firstname ?? Auth::guard('ragbot')->user()->name ?? 'U', 0, 1)) }}{{ strtoupper(substr(Auth::guard('ragbot')->user()->lastname ?? '', 0, 1)) }}" 
+            />
+            <div>
+                <flux:text size="xs" class="text-zinc-500 leading-none">Welcome back,</flux:text>
+                <flux:text size="sm" class="font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">{{ Auth::guard('ragbot')->user()->name }}</flux:text>
+            </div>
         </div>
     </div>
 
