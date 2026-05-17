@@ -25,14 +25,14 @@ class HandleChatbotCors
         // 2. Extract Origin/Referer
         $origin = $request->header('Origin');
         $referer = $request->header('Referer');
-        
+
         // If no Origin (e.g. non-browser), use Referer domain as fallback for validation
         $effectiveOrigin = $origin;
         if (! $effectiveOrigin && $referer) {
             $urlParts = parse_url($referer);
-            $effectiveOrigin = ($urlParts['scheme'] ?? 'https') . '://' . ($urlParts['host'] ?? '');
+            $effectiveOrigin = ($urlParts['scheme'] ?? 'https').'://'.($urlParts['host'] ?? '');
             if (isset($urlParts['port'])) {
-                $effectiveOrigin .= ':' . $urlParts['port'];
+                $effectiveOrigin .= ':'.$urlParts['port'];
             }
         }
 
@@ -49,7 +49,7 @@ class HandleChatbotCors
                     $allowed = true;
                     break;
                 }
-                
+
                 // Exact match or wildcard subdomain match (standard security practice)
                 if ($effectiveOrigin === $pattern || (str_starts_with($pattern, '*.') && str_ends_with($effectiveOrigin, substr($pattern, 1)))) {
                     $allowed = true;
@@ -61,7 +61,7 @@ class HandleChatbotCors
                 return response()->json([
                     'error' => 'Unauthorized Origin: The API key used is restricted to specific domains.',
                     'type' => 'UnauthorizedOriginException',
-                    'hint' => 'Add ' . ($effectiveOrigin ?: 'your domain') . ' to the allowed_origins in your chatbot settings.',
+                    'hint' => 'Add '.($effectiveOrigin ?: 'your domain').' to the allowed_origins in your chatbot settings.',
                 ], 403);
             }
         }
