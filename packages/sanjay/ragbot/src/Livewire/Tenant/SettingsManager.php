@@ -4,15 +4,16 @@ namespace Sanjay\Ragbot\Livewire\Tenant;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Sanjay\Ragbot\Enums\LlmModel;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Models\Chatbot;
 use Sanjay\Ragbot\Models\Project;
+use Sanjay\Ragbot\Rules\ValidLlmModel;
 use Sanjay\Ragbot\Services\Tenant\ProjectSettingsService;
 
 class SettingsManager extends Component
@@ -35,24 +36,35 @@ class SettingsManager extends Component
     // Properties for inline chatbot settings
     public array $chatbotSettings = [];
 
-    protected $rules = [
-        'projectName' => 'required|string|max:255',
-        'projectLogo' => 'nullable|image|max:1024', // 1MB Max
+    protected function rules(): array
+    {
+        return [
+            'projectName' => ['required', 'string', 'max:255'],
+            'projectLogo' => ['nullable', 'image', 'max:1024'], // 1MB Max
 
-        'settings.llm_provider' => 'required|string',
-        'settings.llm_api_key' => 'nullable|string',
-        'settings.llm_model' => 'nullable|string',
-        'settings.llm_model_for_embedding' => 'nullable|string',
-        'settings.llm_api_endpoint' => 'nullable|url',
-        'settings.embedding_api_endpoint' => 'nullable|url',
-        'settings.vector_store' => 'required|string',
-        'settings.vector_store_custom_name' => 'nullable|string|required_if:settings.vector_store,custom',
-        'settings.widget_enabled' => 'required|boolean',
+            'settings.llm_provider' => ['required', Rule::enum(LlmProvider::class)],
+            'settings.llm_api_key' => ['nullable', 'string'],
+            'settings.llm_model' => [
+                'nullable',
+                'string',
+                new ValidLlmModel($this->settings['llm_provider'] ?? null),
+            ],
+            'settings.llm_model_for_embedding' => [
+                'nullable',
+                'string',
+                new ValidLlmModel($this->settings['llm_provider'] ?? null, true),
+            ],
+            'settings.llm_api_endpoint' => ['nullable', 'url'],
+            'settings.embedding_api_endpoint' => ['nullable', 'url'],
+            'settings.vector_store' => ['required', Rule::enum(VectorStore::class)],
+            'settings.vector_store_custom_name' => ['nullable', 'string', 'required_if:settings.vector_store,custom'],
+            'settings.widget_enabled' => ['required', 'boolean'],
 
-        'chatbotSettings.*.allowed_origins' => 'nullable|string',
-        'chatbotSettings.*.rate_limit_per_minute' => 'required|integer|min:1|max:1000',
-        'chatbotSettings.*.session_rate_limit_per_minute' => 'required|integer|min:1|max:100',
-    ];
+            'chatbotSettings.*.allowed_origins' => ['nullable', 'string'],
+            'chatbotSettings.*.rate_limit_per_minute' => ['required', 'integer', 'min:1', 'max:1000'],
+            'chatbotSettings.*.session_rate_limit_per_minute' => ['required', 'integer', 'min:1', 'max:100'],
+        ];
+    }
 
     public function mount(ProjectSettingsService $service): void
     {
@@ -151,8 +163,8 @@ class SettingsManager extends Component
         return view('ragbot::livewire.tenant.settings-manager', [
             'llmProviders' => LlmProvider::cases(),
             'vectorStores' => VectorStore::cases(),
-            'availableModels' => LlmModel::forProvider($provider),
-            'availableEmbeddingModels' => LlmModel::embeddingsForProvider($provider),
+            'availableModels' => $provider->models(),
+            'availableEmbeddingModels' => $provider->embeddingModels(),
         ])->layout('ragbot::layouts.dashboard');
     }
 }
