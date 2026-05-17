@@ -118,4 +118,13 @@ return [
         'chat_api' => env('RAGBOT_RATE_LIMIT', 60), // requests per minute per project
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Features
+    |--------------------------------------------------------------------------
+    */
+    'features' => [
+        'platform_auth' => env('RAGBOT_PLATFORM_AUTH', true),
+    ],
+
 ];
