@@ -7,12 +7,19 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Models\RagbotUser;
 
 class TeamManager extends Component
 {
+    use WithPagination;
+
     public Project $project;
+
+    public $search = '';
+
+    public $status = '';
 
     // Team Management
     public array $newMember = [
@@ -21,6 +28,16 @@ class TeamManager extends Component
         'email' => '',
         'password' => '',
     ];
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatus(): void
+    {
+        $this->resetPage();
+    }
 
     public function mount(): void
     {
@@ -61,7 +78,23 @@ class TeamManager extends Component
     #[Computed]
     public function teamMembers()
     {
-        return $this->project->users()->latest()->get();
+        return $this->project->users()
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('firstname', 'like', '%'.$this->search.'%')
+                        ->orWhere('lastname', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%');
+                });
+            })
+            ->when($this->status !== '', function ($query) {
+                if ($this->status === 'verified') {
+                    $query->whereNotNull('email_verified_at');
+                } elseif ($this->status === 'pending') {
+                    $query->whereNull('email_verified_at');
+                }
+            })
+            ->latest()
+            ->paginate(10);
     }
 
     public function render(): View

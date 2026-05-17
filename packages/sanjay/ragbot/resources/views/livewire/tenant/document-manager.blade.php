@@ -18,7 +18,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Total Documents</flux:text>
-                    <flux:heading size="xl" class="mt-2">{{ $documents->count() }}</flux:heading>
+                    <flux:heading size="xl" class="mt-2">{{ $stats['total'] }}</flux:heading>
                 </div>
                 <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
                     <flux:icon icon="document-text" variant="mini" class="text-blue-600 dark:text-blue-400" />
@@ -38,7 +38,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Processing</flux:text>
-                    <flux:heading size="xl" class="mt-2">{{ $documents->where('status', \Sanjay\Ragbot\Enums\DocumentStatus::Processing)->count() }}</flux:heading>
+                    <flux:heading size="xl" class="mt-2">{{ $stats['processing'] }}</flux:heading>
                 </div>
                 <div class="p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg group-hover:bg-yellow-100 dark:group-hover:bg-yellow-900/40 transition-colors">
                     <flux:icon icon="arrow-path" variant="mini" class="text-yellow-600 dark:text-yellow-400" />
@@ -56,7 +56,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Completed</flux:text>
-                    <flux:heading size="xl" class="mt-2">{{ $documents->where('status', \Sanjay\Ragbot\Enums\DocumentStatus::Completed)->count() }}</flux:heading>
+                    <flux:heading size="xl" class="mt-2">{{ $stats['completed'] }}</flux:heading>
                 </div>
                 <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg group-hover:bg-green-100 dark:group-hover:bg-green-900/40 transition-colors">
                     <flux:icon icon="check-circle" variant="mini" class="text-green-600 dark:text-green-400" />
@@ -74,7 +74,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Failed</flux:text>
-                    <flux:heading size="xl" class="mt-2">{{ $documents->where('status', \Sanjay\Ragbot\Enums\DocumentStatus::Failed)->count() }}</flux:heading>
+                    <flux:heading size="xl" class="mt-2">{{ $stats['failed'] }}</flux:heading>
                 </div>
                 <div class="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
                     <flux:icon icon="x-circle" variant="mini" class="text-red-600 dark:text-red-400" />
@@ -108,12 +108,12 @@
             <flux:heading size="md">All Documents</flux:heading>
             
             <div class="flex items-center gap-3">
-                <flux:input icon="magnifying-glass" placeholder="Search..." size="sm" class="w-full lg:w-44" />
-                <flux:select size="sm" placeholder="Filter" class="w-full lg:w-32">
-                    <flux:select.option>All Status</flux:select.option>
-                    <flux:select.option>Completed</flux:select.option>
-                    <flux:select.option>Processing</flux:select.option>
-                    <flux:select.option>Failed</flux:select.option>
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Search..." size="sm" class="w-full lg:w-44" />
+                <flux:select wire:model.live="statusFilter" size="sm" placeholder="Filter" class="w-full lg:w-32">
+                    <flux:select.option value="">All Status</flux:select.option>
+                    @foreach(\Sanjay\Ragbot\Enums\DocumentStatus::cases() as $status)
+                        <flux:select.option value="{{ $status->value }}">{{ ucfirst($status->value) }}</flux:select.option>
+                    @endforeach
                 </flux:select>
                 <flux:button icon="plus" variant="primary" size="sm" wire:click="openUploadModal">Upload</flux:button>
             </div>
@@ -218,13 +218,11 @@
                 </flux:table.rows>
             </flux:table>
 
-            <div class="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/30 dark:bg-zinc-900/30">
-                <flux:text size="xs" class="text-zinc-500">Showing 1 to {{ $documents->count() }} of {{ $documents->count() }} documents</flux:text>
-                <div class="flex gap-2">
-                    <flux:button size="sm" variant="ghost" class="text-zinc-400 cursor-not-allowed">Previous</flux:button>
-                    <flux:button size="sm" variant="ghost" class="text-zinc-400 cursor-not-allowed">Next</flux:button>
+            @if($documents->hasPages())
+                <div class="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/30">
+                    {{ $documents->links() }}
                 </div>
-            </div>
+            @endif
         @endif
     </flux:card>
 

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
+use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Exceptions\DocumentProcessingException;
 use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Models\Project;
@@ -20,6 +22,7 @@ use Sanjay\Ragbot\Services\Tenant\DocumentService;
 class DocumentManager extends Component
 {
     use WithFileUploads;
+    use WithPagination;
 
     /**
      * Manual document title.
@@ -72,6 +75,32 @@ class DocumentManager extends Component
     public bool $showPreviewModal = false;
 
     /**
+     * Search query for documents.
+     */
+    public $search = '';
+
+    /**
+     * Status filter for documents.
+     */
+    public $statusFilter = '';
+
+    /**
+     * Reset pagination when search changes.
+     */
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Reset pagination when status filter changes.
+     */
+    public function updatedStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
      * Render the component.
      */
     public function render(DocumentService $documentService): View
@@ -86,7 +115,27 @@ class DocumentManager extends Component
         }
 
         $project = app('ragbot.project');
-        $documents = $documentService->listForProject();
+
+        $baseQuery = Document::where('project_id', $project->id);
+
+        // Fetch stats for all documents in project
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'processing' => (clone $baseQuery)->where('status', DocumentStatus::Processing)->count(),
+            'completed' => (clone $baseQuery)->where('status', DocumentStatus::Completed)->count(),
+            'failed' => (clone $baseQuery)->where('status', DocumentStatus::Failed)->count(),
+        ];
+
+        $documents = (clone $baseQuery)
+            ->withCount('chunks')
+            ->when($this->search, function ($query) {
+                $query->where('name', 'like', '%'.$this->search.'%');
+            })
+            ->when($this->statusFilter, function ($query) {
+                $query->where('status', $this->statusFilter);
+            })
+            ->latest()
+            ->paginate(10);
 
         // Calculate file sizes and fetch batch info for display
         $documents->each(function ($doc) {
@@ -112,6 +161,7 @@ class DocumentManager extends Component
         return view('ragbot::livewire.tenant.document-manager', [
             'documents' => $documents,
             'project' => $project,
+            'stats' => $stats,
         ])->layout('ragbot::layouts.dashboard');
     }
 
