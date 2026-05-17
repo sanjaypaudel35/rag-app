@@ -4,6 +4,7 @@ namespace Sanjay\Ragbot\Tests\Feature\Services;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Sanjay\Ragbot\Exceptions\ChatbotInactiveException;
 use Sanjay\Ragbot\Models\Chatbot;
 use Sanjay\Ragbot\Models\Conversation;
 use Sanjay\Ragbot\Models\Project;
@@ -96,7 +97,7 @@ class ChatServiceTest extends TestCase
     {
         $this->chatbot->update(['is_active' => false]);
 
-        $this->expectException(\Sanjay\Ragbot\Exceptions\ChatbotInactiveException::class);
+        $this->expectException(ChatbotInactiveException::class);
         $this->expectExceptionMessage('This chatbot is currently inactive and cannot respond to messages.');
 
         $this->chatService->chat($this->project, 'session-abc', 'Hello AI');
