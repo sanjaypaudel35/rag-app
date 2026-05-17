@@ -141,7 +141,7 @@ class ChatbotManager extends Component
     #[Computed]
     public function chatbots(): Collection
     {
-        return $this->project->chatbots()->with('documents')->latest()->get();
+        return $this->project->chatbots()->with(['documents', 'modelUsage'])->latest()->get();
     }
 
     #[Computed]

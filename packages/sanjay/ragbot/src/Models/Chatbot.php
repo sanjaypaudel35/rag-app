@@ -53,6 +53,9 @@ class Chatbot extends Model
         'rate_limit_per_minute',
         'session_rate_limit_per_minute',
         'total_tokens_used',
+        'total_input_tokens',
+        'total_output_tokens',
+        'total_cost',
         'total_conversations',
     ];
 
@@ -66,6 +69,9 @@ class Chatbot extends Model
         'rate_limit_per_minute' => 'integer',
         'session_rate_limit_per_minute' => 'integer',
         'total_tokens_used' => 'integer',
+        'total_input_tokens' => 'integer',
+        'total_output_tokens' => 'integer',
+        'total_cost' => 'decimal:6',
         'total_conversations' => 'integer',
     ];
 
@@ -98,5 +104,15 @@ class Chatbot extends Model
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    /**
+     * Get the model usage breakdown for the chatbot.
+     *
+     * @return HasMany<ChatbotModelUsage, $this>
+     */
+    public function modelUsage(): HasMany
+    {
+        return $this->hasMany(ChatbotModelUsage::class);
     }
 }

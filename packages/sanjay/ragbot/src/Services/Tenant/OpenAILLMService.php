@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Facades\Http;
+use Sanjay\Ragbot\DTOs\LlmResponse;
 use Sanjay\Ragbot\Exceptions\LlmResponseException;
 
 /**
@@ -17,7 +18,7 @@ class OpenAILLMService extends BaseLlmService
      *
      * @throws LlmResponseException
      */
-    public function complete(string $prompt, array $options = []): string
+    public function complete(string $prompt, array $options = []): LlmResponse
     {
         $apiKey = $this->settings->llm_api_key;
         $baseUrl = $this->settings->llm_api_endpoint ?? 'https://api.openai.com/v1';
@@ -38,6 +39,11 @@ class OpenAILLMService extends BaseLlmService
             throw new LlmResponseException('OpenAI API error: '.$response->body());
         }
 
-        return $response->json('choices.0.message.content') ?? '';
+        return new LlmResponse(
+            content: $response->json('choices.0.message.content') ?? '',
+            inputTokens: $response->json('usage.prompt_tokens') ?? 0,
+            outputTokens: $response->json('usage.completion_tokens') ?? 0,
+            model: $model
+        );
     }
 }

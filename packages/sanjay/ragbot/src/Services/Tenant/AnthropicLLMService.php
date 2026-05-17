@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Facades\Http;
+use Sanjay\Ragbot\DTOs\LlmResponse;
 use Sanjay\Ragbot\Exceptions\LlmResponseException;
 
 /**
@@ -17,7 +18,7 @@ class AnthropicLLMService extends BaseLlmService
      *
      * @throws LlmResponseException
      */
-    public function complete(string $prompt, array $options = []): string
+    public function complete(string $prompt, array $options = []): LlmResponse
     {
         $apiKey = $this->settings->llm_api_key;
         $baseUrl = $this->settings->llm_api_endpoint ?? 'https://api.anthropic.com';
@@ -42,6 +43,11 @@ class AnthropicLLMService extends BaseLlmService
             throw new LlmResponseException('Anthropic API error: '.$response->body());
         }
 
-        return $response->json('content.0.text') ?? '';
+        return new LlmResponse(
+            content: $response->json('content.0.text') ?? '',
+            inputTokens: $response->json('usage.input_tokens') ?? 0,
+            outputTokens: $response->json('usage.output_tokens') ?? 0,
+            model: $model
+        );
     }
 }

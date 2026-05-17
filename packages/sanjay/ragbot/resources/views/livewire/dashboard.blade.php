@@ -33,11 +33,11 @@
         <flux:card class="flex flex-col gap-1">
             <div class="flex items-center gap-2 mb-2">
                 <flux:icon icon="chat-bubble-left-right" variant="mini" class="text-zinc-400" />
-                <flux:text size="sm" class="font-medium text-zinc-500 uppercase tracking-wider">Total Chatbots</flux:text>
+                <flux:text size="sm" class="font-medium text-zinc-500 uppercase tracking-wider">Engagement</flux:text>
             </div>
             <div class="flex items-baseline gap-2">
-                <flux:heading size="xl">{{ $this->chatbots->count() }}</flux:heading>
-                <flux:text size="xs" class="text-zinc-400 font-medium">Configured</flux:text>
+                <flux:heading size="xl">{{ number_format($settings->total_conversations) }}</flux:heading>
+                <flux:text size="xs" class="text-zinc-400 font-medium">Conversations</flux:text>
             </div>
         </flux:card>
 
@@ -48,18 +48,20 @@
             </div>
             <div class="flex items-baseline gap-2">
                 <flux:heading size="xl">{{ Number::abbreviate($settings->total_tokens_used) }}</flux:heading>
-                <flux:text size="xs" class="text-zinc-400 font-medium">Lifetime</flux:text>
+                <flux:text size="xs" class="text-zinc-400 font-medium">
+                    In: {{ Number::abbreviate($settings->total_input_tokens) }} / Out: {{ Number::abbreviate($settings->total_output_tokens) }}
+                </flux:text>
             </div>
         </flux:card>
 
         <flux:card class="flex flex-col gap-1">
             <div class="flex items-center gap-2 mb-2">
                 <flux:icon icon="currency-dollar" variant="mini" class="text-zinc-400" />
-                <flux:text size="sm" class="font-medium text-zinc-500 uppercase tracking-wider">Estimated Cost</flux:text>
+                <flux:text size="sm" class="font-medium text-zinc-500 uppercase tracking-wider">Total Cost</flux:text>
             </div>
             <div class="flex items-baseline gap-2">
-                <flux:heading size="xl">{{ Number::currency($this->totalCost) }}</flux:heading>
-                <flux:text size="xs" class="text-zinc-400 font-medium">Avg. Rate</flux:text>
+                <flux:heading size="xl">${{ number_format($this->totalCost, 2) }}</flux:heading>
+                <flux:text size="xs" class="text-zinc-400 font-medium">Actual Usage</flux:text>
             </div>
         </flux:card>
     </div>
@@ -85,18 +87,48 @@
                     <flux:table>
                         <flux:table.columns>
                             <flux:table.column>Name</flux:table.column>
-                            <flux:table.column>Tokens Used</flux:table.column>
+                            <flux:table.column>Input Tokens</flux:table.column>
+                            <flux:table.column>Output Tokens</flux:table.column>
                             <flux:table.column>Conversations</flux:table.column>
-                            <flux:table.column>Est. Cost</flux:table.column>
+                            <flux:table.column>Actual Cost</flux:table.column>
                         </flux:table.columns>
 
                         <flux:table.rows>
                             @foreach($this->chatbots as $chatbot)
                                 <flux:table.row :key="$chatbot->id">
-                                    <flux:table.cell class="font-medium text-zinc-900 dark:text-white">{{ $chatbot->name }}</flux:table.cell>
-                                    <flux:table.cell>{{ number_format($chatbot->total_tokens_used) }}</flux:table.cell>
+                                    <flux:table.cell>
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-zinc-900 dark:text-white">{{ $chatbot->name }}</span>
+                                            @foreach($chatbot->modelUsage as $usage)
+                                                <span class="text-[10px] text-zinc-400 font-mono">{{ $usage->model }}</span>
+                                            @endforeach
+                                        </div>
+                                    </flux:table.cell>
+                                    <flux:table.cell>
+                                        <div class="flex flex-col">
+                                            <span>{{ number_format($chatbot->total_input_tokens) }}</span>
+                                            @foreach($chatbot->modelUsage as $usage)
+                                                <span class="text-[10px] text-zinc-400">{{ number_format($usage->input_tokens) }}</span>
+                                            @endforeach
+                                        </div>
+                                    </flux:table.cell>
+                                    <flux:table.cell>
+                                        <div class="flex flex-col">
+                                            <span>{{ number_format($chatbot->total_output_tokens) }}</span>
+                                            @foreach($chatbot->modelUsage as $usage)
+                                                <span class="text-[10px] text-zinc-400">{{ number_format($usage->output_tokens) }}</span>
+                                            @endforeach
+                                        </div>
+                                    </flux:table.cell>
                                     <flux:table.cell>{{ number_format($chatbot->total_conversations) }}</flux:table.cell>
-                                    <flux:table.cell variant="strong">{{ Number::currency(($chatbot->total_tokens_used / 1000000) * 0.50) }}</flux:table.cell>
+                                    <flux:table.cell variant="strong">
+                                        <div class="flex flex-col">
+                                            <span class="text-green-600 dark:text-green-400">${{ number_format($chatbot->total_cost, 4) }}</span>
+                                            @foreach($chatbot->modelUsage as $usage)
+                                                <span class="text-[10px] text-zinc-400">${{ number_format($usage->cost, 4) }}</span>
+                                            @endforeach
+                                        </div>
+                                    </flux:table.cell>
                                 </flux:table.row>
                             @endforeach
                         </flux:table.rows>

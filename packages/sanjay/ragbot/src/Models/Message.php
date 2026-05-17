@@ -42,6 +42,9 @@ class Message extends Model
         'conversation_id',
         'role',
         'content',
+        'model',
+        'input_tokens',
+        'output_tokens',
     ];
 
     /**
@@ -51,6 +54,8 @@ class Message extends Model
      */
     protected $casts = [
         'role' => MessageRole::class,
+        'input_tokens' => 'integer',
+        'output_tokens' => 'integer',
     ];
 
     /**

@@ -137,17 +137,39 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-4 min-w-[220px]">
+                    <div class="flex flex-col gap-4 min-w-[280px]">
                         <div class="grid grid-cols-2 gap-2">
                             <div class="bg-zinc-50 dark:bg-zinc-900/50 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-center">
-                                <flux:text size="xs" class="block text-zinc-500">Tokens</flux:text>
-                                <flux:text size="sm" class="font-bold">{{ number_format($chatbot->total_tokens_used) }}</flux:text>
+                                <flux:text size="xs" class="block text-zinc-500">In Tokens</flux:text>
+                                <flux:text size="sm" class="font-bold">{{ number_format($chatbot->total_input_tokens) }}</flux:text>
                             </div>
                             <div class="bg-zinc-50 dark:bg-zinc-900/50 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-center">
-                                <flux:text size="xs" class="block text-zinc-500">Convs</flux:text>
+                                <flux:text size="xs" class="block text-zinc-500">Out Tokens</flux:text>
+                                <flux:text size="sm" class="font-bold">{{ number_format($chatbot->total_output_tokens) }}</flux:text>
+                            </div>
+                            <div class="bg-zinc-50 dark:bg-zinc-900/50 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-center">
+                                <flux:text size="xs" class="block text-zinc-500">Total Cost</flux:text>
+                                <flux:text size="sm" class="font-bold text-green-600 dark:text-green-400">${{ number_format($chatbot->total_cost, 4) }}</flux:text>
+                            </div>
+                            <div class="bg-zinc-50 dark:bg-zinc-900/50 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-center">
+                                <flux:text size="xs" class="block text-zinc-500">Conversations</flux:text>
                                 <flux:text size="sm" class="font-bold">{{ number_format($chatbot->total_conversations) }}</flux:text>
                             </div>
                         </div>
+
+                        @if($chatbot->modelUsage->isNotEmpty())
+                            <div class="mt-2 space-y-2">
+                                <flux:text size="xs" class="font-bold uppercase tracking-wider text-zinc-400">Model Breakdown</flux:text>
+                                <div class="space-y-1">
+                                    @foreach($chatbot->modelUsage as $usage)
+                                        <div class="flex items-center justify-between text-[10px] leading-none bg-white dark:bg-zinc-800 p-1.5 rounded border border-zinc-100 dark:border-zinc-700">
+                                            <span class="font-mono text-indigo-500">{{ $usage->model }}</span>
+                                            <span class="font-bold">${{ number_format($usage->cost, 4) }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="flex gap-2">
                             <flux:button variant="primary" icon="chat-bubble-left-right" class="flex-1" wire:click="startTesting('{{ $chatbot->id }}')">Test Chat</flux:button>

@@ -165,7 +165,7 @@ class StrategyResolutionTest extends TestCase
         $service = new OpenAILLMService($project);
         $response = $service->complete('Hi');
 
-        $this->assertEquals('Hello!', $response);
+        $this->assertEquals('Hello!', $response->content);
 
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.openai.com/v1/chat/completions' &&
@@ -196,7 +196,7 @@ class StrategyResolutionTest extends TestCase
         $service = new AnthropicLLMService($project);
         $response = $service->complete('Hi Claude');
 
-        $this->assertEquals('Hello from Claude!', $response);
+        $this->assertEquals('Hello from Claude!', $response->content);
 
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.anthropic.com/v1/messages' &&

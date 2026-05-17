@@ -36,17 +36,16 @@ class Dashboard extends Component
     #[Computed]
     public function chatbots(): Collection
     {
-        return $this->project->chatbots()->latest()->get();
+        return $this->project->chatbots()->with('modelUsage')->latest()->get();
     }
 
     /**
      * Get the total cost for the project.
-     * Assuming an average cost of $0.50 per 1 million tokens.
      */
     #[Computed]
     public function totalCost(): float
     {
-        return ($this->settings->total_tokens_used / 1000000) * 0.50;
+        return (float) ($this->settings->total_cost ?? 0);
     }
 
     /**

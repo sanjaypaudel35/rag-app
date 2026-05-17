@@ -65,6 +65,7 @@ use Sanjay\Ragbot\Services\Auth\RegisterService;
 use Sanjay\Ragbot\Services\Auth\Tenant\LoginService as TenantLoginService;
 use Sanjay\Ragbot\Services\Auth\Tenant\RegisterService as TenantRegisterService;
 use Sanjay\Ragbot\Services\Tenant\ChatService;
+use Sanjay\Ragbot\Services\Tenant\CostCalculator;
 use Sanjay\Ragbot\Services\Tenant\DocumentService;
 use Sanjay\Ragbot\Services\Tenant\EmbeddingManager;
 use Sanjay\Ragbot\Services\Tenant\LlmManager;
@@ -104,6 +105,7 @@ class RagbotServiceProvider extends ServiceProvider
         $this->app->singleton(RetrievalServiceInterface::class, RetrievalService::class);
         $this->app->singleton(PromptBuilderServiceInterface::class, PromptBuilderService::class);
         $this->app->singleton(ChatService::class);
+        $this->app->singleton(CostCalculator::class);
 
         $this->app->singleton(DocumentService::class);
         $this->app->singleton(WidgetService::class);

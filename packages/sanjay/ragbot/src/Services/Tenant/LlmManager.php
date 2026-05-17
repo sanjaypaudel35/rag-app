@@ -4,6 +4,7 @@ namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Facades\Log;
 use Sanjay\Ragbot\Contracts\Services\LlmInterface;
+use Sanjay\Ragbot\DTOs\LlmResponse;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Models\ProjectSetting;
@@ -18,7 +19,7 @@ class LlmManager implements LlmInterface
      *
      * @param  array<string, mixed>  $options
      */
-    public function complete(string $prompt, array $options = []): string
+    public function complete(string $prompt, array $options = []): LlmResponse
     {
         $project = app('ragbot.project');
         $service = $this->resolve($project);
@@ -34,7 +35,11 @@ class LlmManager implements LlmInterface
 
         Log::info("LLM Response [{$provider}]:", [
             'project_id' => $project->id,
-            'response' => $response,
+            'content' => $response->content,
+            'tokens' => [
+                'input' => $response->inputTokens,
+                'output' => $response->outputTokens,
+            ],
         ]);
 
         return $response;

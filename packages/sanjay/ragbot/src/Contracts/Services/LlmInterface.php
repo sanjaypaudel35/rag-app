@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Contracts\Services;
 
+use Sanjay\Ragbot\DTOs\LlmResponse;
 use Sanjay\Ragbot\Exceptions\LlmResponseException;
 
 /**
@@ -16,5 +17,5 @@ interface LlmInterface
      *
      * @throws LlmResponseException
      */
-    public function complete(string $prompt, array $options = []): string;
+    public function complete(string $prompt, array $options = []): LlmResponse;
 }

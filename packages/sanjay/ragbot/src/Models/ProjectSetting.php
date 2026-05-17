@@ -60,6 +60,10 @@ class ProjectSetting extends Model
         'widget_position',
         'widget_full_page',
         'total_tokens_used',
+        'total_input_tokens',
+        'total_output_tokens',
+        'total_cost',
+        'total_conversations',
     ];
 
     /**
@@ -73,6 +77,10 @@ class ProjectSetting extends Model
         'widget_enabled' => 'boolean',
         'widget_full_page' => 'boolean',
         'total_tokens_used' => 'integer',
+        'total_input_tokens' => 'integer',
+        'total_output_tokens' => 'integer',
+        'total_cost' => 'decimal:6',
+        'total_conversations' => 'integer',
     ];
 
     /**
