@@ -71,6 +71,7 @@ use Sanjay\Ragbot\Services\Tenant\LlmManager;
 use Sanjay\Ragbot\Services\Tenant\PromptBuilderService;
 use Sanjay\Ragbot\Services\Tenant\RetrievalService;
 use Sanjay\Ragbot\Services\Tenant\VectorStoreManager;
+use Sanjay\Ragbot\Services\Tenant\WidgetService;
 
 /**
  * Service provider for the Sanjay\Ragbot package.
@@ -105,6 +106,7 @@ class RagbotServiceProvider extends ServiceProvider
         $this->app->singleton(ChatService::class);
 
         $this->app->singleton(DocumentService::class);
+        $this->app->singleton(WidgetService::class);
     }
 
     /**
@@ -291,7 +293,7 @@ class RagbotServiceProvider extends ServiceProvider
     {
         return [
             'prefix' => config('ragbot.prefix', 'ragbot').'/api',
-            'middleware' => array_merge(config('ragbot.api_middleware', ['api']), [ResolveProjectFromApiKey::class]),
+            'middleware' => config('ragbot.api_middleware', ['api']),
         ];
     }
 }

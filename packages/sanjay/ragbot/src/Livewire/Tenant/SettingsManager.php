@@ -59,6 +59,11 @@ class SettingsManager extends Component
             'settings.vector_store' => ['required', Rule::enum(VectorStore::class)],
             'settings.vector_store_custom_name' => ['nullable', 'string', 'required_if:settings.vector_store,custom'],
             'settings.widget_enabled' => ['required', 'boolean'],
+            'settings.widget_color' => ['required', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'settings.widget_title' => ['required', 'string', 'max:100'],
+            'settings.widget_logo' => ['nullable', 'string'],
+            'settings.widget_position' => ['required', Rule::in(['left', 'right'])],
+            'settings.widget_full_page' => ['required', 'boolean'],
 
             'chatbotSettings.*.allowed_origins' => ['nullable', 'string'],
             'chatbotSettings.*.rate_limit_per_minute' => ['required', 'integer', 'min:1', 'max:1000'],

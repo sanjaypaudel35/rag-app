@@ -54,6 +54,11 @@ class ProjectSetting extends Model
         'vector_store',
         'vector_store_custom_name',
         'widget_enabled',
+        'widget_color',
+        'widget_title',
+        'widget_logo',
+        'widget_position',
+        'widget_full_page',
         'total_tokens_used',
     ];
 
@@ -66,6 +71,7 @@ class ProjectSetting extends Model
         'llm_provider' => LlmProvider::class,
         'vector_store' => VectorStore::class,
         'widget_enabled' => 'boolean',
+        'widget_full_page' => 'boolean',
         'total_tokens_used' => 'integer',
     ];
 

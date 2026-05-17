@@ -46,6 +46,10 @@ class ProjectSettingFactory extends Factory
             'embedding_api_endpoint' => 'https://api.openai.com/v1',
             'vector_store' => $defaultVectorStore,
             'widget_enabled' => true,
+            'widget_color' => '#3b82f6',
+            'widget_title' => 'Chat with us',
+            'widget_position' => 'right',
+            'widget_full_page' => false,
             'total_tokens_used' => $this->faker->numberBetween(0, 100000),
         ];
     }

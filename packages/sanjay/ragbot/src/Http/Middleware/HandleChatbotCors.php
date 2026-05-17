@@ -18,14 +18,40 @@ class HandleChatbotCors
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $origin = $request->header('Origin');
+        // 1. Resolve Identity
         $chatbot = app()->bound('ragbot.chatbot') ? app('ragbot.chatbot') : null;
+        $project = app()->bound('ragbot.project') ? app('ragbot.project') : null;
 
-        // 1. Origin Check (Security)
-        if ($chatbot && $origin && ! empty($chatbot->allowed_origins)) {
+        // 2. Extract Origin/Referer
+        $origin = $request->header('Origin');
+        $referer = $request->header('Referer');
+        
+        // If no Origin (e.g. non-browser), use Referer domain as fallback for validation
+        $effectiveOrigin = $origin;
+        if (! $effectiveOrigin && $referer) {
+            $urlParts = parse_url($referer);
+            $effectiveOrigin = ($urlParts['scheme'] ?? 'https') . '://' . ($urlParts['host'] ?? '');
+            if (isset($urlParts['port'])) {
+                $effectiveOrigin .= ':' . $urlParts['port'];
+            }
+        }
+
+        // 3. Strict Origin Validation (Software Industry Standard: Domain Locking)
+        $allowedOrigins = [];
+        if ($chatbot && ! empty($chatbot->allowed_origins)) {
+            $allowedOrigins = $chatbot->allowed_origins;
+        }
+
+        if (! empty($allowedOrigins)) {
             $allowed = false;
-            foreach ($chatbot->allowed_origins as $pattern) {
-                if ($pattern === '*' || $pattern === $origin) {
+            foreach ($allowedOrigins as $pattern) {
+                if ($pattern === '*') {
+                    $allowed = true;
+                    break;
+                }
+                
+                // Exact match or wildcard subdomain match (standard security practice)
+                if ($effectiveOrigin === $pattern || (str_starts_with($pattern, '*.') && str_ends_with($effectiveOrigin, substr($pattern, 1)))) {
                     $allowed = true;
                     break;
                 }
@@ -33,19 +59,29 @@ class HandleChatbotCors
 
             if (! $allowed) {
                 return response()->json([
-                    'error' => 'Origin not allowed: '.$origin,
+                    'error' => 'Unauthorized Origin: The API key used is restricted to specific domains.',
                     'type' => 'UnauthorizedOriginException',
+                    'hint' => 'Add ' . ($effectiveOrigin ?: 'your domain') . ' to the allowed_origins in your chatbot settings.',
                 ], 403);
             }
         }
 
-        $response = $next($request);
+        // 4. Handle Preflight (OPTIONS)
+        if ($request->isMethod('OPTIONS')) {
+            $response = response('', 204);
+        } else {
+            $response = $next($request);
+        }
 
-        // 2. Add CORS Header to Response
+        // 5. Add Security Headers
         if ($origin) {
             $response->headers->set('Access-Control-Allow-Origin', $origin);
-        } else {
-            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Headers', 'X-Api-Key, Content-Type, Accept, Authorization');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        } elseif (! empty($allowedOrigins) && ! in_array('*', $allowedOrigins)) {
+            // For non-browser clients, still indicate the restriction
+            $response->headers->set('X-Allowed-Origins', implode(', ', $allowedOrigins));
         }
 
         return $response;

@@ -30,6 +30,12 @@
         >
             Chatbot Setting
         </button>
+        <button 
+            wire:click="$set('activeTab', 'widget')" 
+            class="px-4 py-2 text-sm font-medium transition-colors border-b-2 {{ $activeTab === 'widget' ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' }}"
+        >
+            Widget Setting
+        </button>
     </div>
 
     <!-- Project Settings Tab -->
@@ -197,20 +203,6 @@
                             </flux:field>
                         @endif
                     </div>
-
-                    <!-- Widget Enabled -->
-                    <flux:field>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <flux:label>Chat Widget Enabled</flux:label>
-                                <flux:description>Allow the chat widget to be displayed on your site.</flux:description>
-                            </div>
-                            <flux:checkbox.group>
-                                <flux:checkbox wire:model="settings.widget_enabled" />
-                            </flux:checkbox.group>
-                        </div>
-                        <flux:error name="settings.widget_enabled" />
-                    </flux:field>
                 </div>
 
                 <div class="flex justify-end pt-4 border-t border-zinc-100 dark:border-zinc-800">
@@ -327,5 +319,116 @@
                 </div>
             @endforelse
         </div>
+    @endif
+
+    <!-- Widget Settings Tab -->
+    @if($activeTab === 'widget')
+        <flux:card>
+            <form wire:submit.prevent="save" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <!-- Widget Enabled -->
+                        <flux:field>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <flux:label>Chat Widget Enabled</flux:label>
+                                    <flux:description>Allow the chat widget to be displayed on your site.</flux:description>
+                                </div>
+                                <flux:checkbox.group>
+                                    <flux:checkbox wire:model="settings.widget_enabled" />
+                                </flux:checkbox.group>
+                            </div>
+                            <flux:error name="settings.widget_enabled" />
+                        </flux:field>
+
+                        <!-- Widget Title -->
+                        <flux:field>
+                            <flux:label>Widget Title</flux:label>
+                            <flux:input wire:model="settings.widget_title" placeholder="Chat with us" />
+                            <flux:description>The title displayed in the widget header.</flux:description>
+                            <flux:error name="settings.widget_title" />
+                        </flux:field>
+
+                        <!-- Widget Color -->
+                        <flux:field>
+                            <flux:label>Brand Color</flux:label>
+                            <div class="flex items-center gap-3">
+                                <flux:input type="color" wire:model.live="settings.widget_color" class="w-12 h-10 p-1 rounded-lg" />
+                                <flux:input wire:model="settings.widget_color" placeholder="#3b82f6" class="flex-1" />
+                            </div>
+                            <flux:description>The primary color for your chat widget (button, header, user messages).</flux:description>
+                            <flux:error name="settings.widget_color" />
+                        </flux:field>
+
+                        <!-- Widget Position -->
+                        <flux:field>
+                            <flux:label>Widget Position</flux:label>
+                            <flux:select wire:model="settings.widget_position">
+                                <flux:select.option value="right">Right</flux:select.option>
+                                <flux:select.option value="left">Left</flux:select.option>
+                            </flux:select>
+                            <flux:description>Which side of the screen the widget button should appear.</flux:description>
+                            <flux:error name="settings.widget_position" />
+                        </flux:field>
+
+                        <!-- Full Page Toggle -->
+                        <flux:field>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <flux:label>Full Page Mode</flux:label>
+                                    <flux:description>Make the chat panel take up more screen space.</flux:description>
+                                </div>
+                                <flux:checkbox.group>
+                                    <flux:checkbox wire:model="settings.widget_full_page" />
+                                </flux:checkbox.group>
+                            </div>
+                            <flux:error name="settings.widget_full_page" />
+                        </flux:field>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Widget Preview (Mockup) -->
+                        <div class="bg-zinc-100 dark:bg-zinc-800 rounded-xl p-6 border border-zinc-200 dark:border-zinc-700 relative overflow-hidden min-h-[300px] flex flex-col items-center justify-center">
+                            <flux:heading size="sm" class="absolute top-4 left-4">Live Preview (Mockup)</flux:heading>
+                            
+                            <!-- Mock Widget Panel -->
+                            <div class="w-48 h-64 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-800 flex flex-col overflow-hidden transform scale-90">
+                                <div class="p-3 text-white font-bold text-[10px] flex justify-between" style="background-color: {{ $settings['widget_color'] }}">
+                                    <span>{{ $settings['widget_title'] ?: 'Chat' }}</span>
+                                    <span>&times;</span>
+                                </div>
+                                <div class="flex-1 p-2 space-y-2 bg-zinc-50 dark:bg-zinc-950">
+                                    <div class="w-2/3 h-2 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                                    <div class="w-3/4 h-2 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                                    <div class="w-1/2 h-4 rounded ml-auto" style="background-color: {{ $settings['widget_color'] }}"></div>
+                                </div>
+                                <div class="p-2 border-t border-zinc-200 dark:border-zinc-800 flex gap-1">
+                                    <div class="flex-1 h-4 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded"></div>
+                                    <div class="w-4 h-4 rounded" style="background-color: {{ $settings['widget_color'] }}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Mock Widget Button -->
+                            <div class="absolute bottom-4 {{ $settings['widget_position'] === 'left' ? 'left-4' : 'right-4' }} w-10 h-10 rounded-full shadow-lg flex items-center justify-center" style="background-color: {{ $settings['widget_color'] }}">
+                                <flux:icon icon="chat-bubble-left-right" variant="mini" class="text-white" />
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg">
+                            <flux:heading size="sm" class="text-indigo-900 dark:text-indigo-300">Widget Integration</flux:heading>
+                            <flux:text size="sm" class="mt-1 text-indigo-700 dark:text-indigo-400">After saving your settings, go to the <strong>Integration Guide</strong> to get your embed snippet.</flux:text>
+                            <flux:button variant="ghost" size="sm" class="mt-4" href="{{ route('ragbot.integration-guide', ['project_slug' => $project->slug]) }}">View Integration Guide</flux:button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                    <flux:button type="submit" variant="primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove>Save Widget Settings</span>
+                        <span wire:loading>Saving...</span>
+                    </flux:button>
+                </div>
+            </form>
+        </flux:card>
     @endif
 </div>

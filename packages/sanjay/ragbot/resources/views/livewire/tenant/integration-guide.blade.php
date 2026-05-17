@@ -207,27 +207,63 @@ if (response.status === 429) {
             </section>
         </div>
     @elseif($activeTab === 'widget')
-        <div class="flex flex-col items-center justify-center py-20 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 border-dashed">
-            <div class="h-16 w-16 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4">
-                <flux:icon icon="rocket-launch" class="text-indigo-600 dark:text-indigo-400 h-8 w-8" />
-            </div>
-            <flux:heading size="lg">Embeddable Widget: Coming Soon!</flux:heading>
-            <flux:text class="mt-2 text-center max-w-md">We're working on a drop-in chat widget that you can add to any website with a single line of code. Stay tuned!</flux:text>
-            
-            <div class="mt-8 flex gap-4 opacity-50 grayscale pointer-events-none text-zinc-400">
-                <div class="w-32 h-40 bg-zinc-200 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-300 dark:border-zinc-700 p-2 flex flex-col">
-                    <div class="w-full h-2 bg-zinc-300 dark:bg-zinc-700 rounded mb-2"></div>
-                    <div class="w-3/4 h-2 bg-zinc-300 dark:bg-zinc-700 rounded mb-2"></div>
-                    <div class="mt-auto flex justify-end">
-                        <div class="w-6 h-6 rounded-full bg-indigo-400/50"></div>
+        <div class="space-y-8 max-w-4xl">
+            <section>
+                <flux:heading size="lg" class="mb-2">Chat Widget Integration</flux:heading>
+                <flux:text>Add the following script tag to your website's <code class="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-mono">&lt;body&gt;</code> to embed the chat widget. You must use your Project Master Key or a Chatbot-specific API key.</flux:text>
+                
+                <div class="mt-6 space-y-4">
+                    <flux:heading size="sm" class="uppercase tracking-wider text-zinc-500">Embed Snippet</flux:heading>
+                    <div class="relative group">
+                        <div class="bg-zinc-900 text-zinc-300 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+<pre class="text-xs leading-relaxed"><code>&lt;script 
+    src="{{ url(config('ragbot.prefix', 'ragbot') . '/api/widget.js?api_key=') }}YOUR_API_KEY"
+    data-api-key="YOUR_API_KEY"
+    data-base-url="{{ url('/') }}"
+&gt;&lt;/script&gt;</code></pre>
+                        </div>
                     </div>
                 </div>
-                <div class="w-32 h-40 bg-zinc-200 dark:bg-zinc-800 rounded-lg shadow-sm border border-zinc-300 dark:border-zinc-700 p-2">
-                    <div class="w-full h-2 bg-zinc-300 dark:bg-zinc-700 rounded mb-2"></div>
-                    <div class="w-full h-2 bg-zinc-300 dark:bg-zinc-700 rounded mb-2"></div>
-                    <div class="w-1/2 h-2 bg-zinc-300 dark:bg-zinc-700 rounded mb-2"></div>
+
+                <div class="mt-8 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div class="flex gap-3">
+                        <flux:icon icon="exclamation-triangle" class="text-amber-600 dark:text-amber-400 shrink-0" />
+                        <div>
+                            <flux:heading size="sm" class="text-amber-800 dark:text-amber-300">Important: CORS Configuration</flux:heading>
+                            <flux:text size="sm" class="mt-1 text-amber-700 dark:text-amber-400">
+                                Ensure your website's origin (e.g., <code class="text-xs font-mono">https://example.com</code>) is added to the <strong>Allowed Origins</strong> in your Chatbot settings. If you use the Project Master Key, make sure the widget is enabled in your Project Settings.
+                            </flux:text>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <flux:separator />
+
+            <section>
+                <flux:heading size="lg" class="mb-4">Widget Configuration</flux:heading>
+                <flux:text class="mb-6">You can customize the look and feel of your widget directly from the <a href="{{ route('ragbot.settings', ['project_slug' => $project->slug]) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">Project Settings</a> page.</flux:text>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <flux:card variant="subtle" class="flex flex-col items-center text-center p-6">
+                        <flux:icon icon="swatch" class="mb-4 text-indigo-600 dark:text-indigo-400" />
+                        <flux:heading size="sm">Brand Color</flux:heading>
+                        <flux:text size="sm">Match the widget to your brand identity.</flux:text>
+                    </flux:card>
+
+                    <flux:card variant="subtle" class="flex flex-col items-center text-center p-6">
+                        <flux:icon icon="bars-3-bottom-left" class="mb-4 text-indigo-600 dark:text-indigo-400" />
+                        <flux:heading size="sm">Custom Title</flux:heading>
+                        <flux:text size="sm">Set a friendly greeting for your users.</flux:text>
+                    </flux:card>
+
+                    <flux:card variant="subtle" class="flex flex-col items-center text-center p-6">
+                        <flux:icon icon="arrows-right-left" class="mb-4 text-indigo-600 dark:text-indigo-400" />
+                        <flux:heading size="sm">Positioning</flux:heading>
+                        <flux:text size="sm">Choose between left or right placement.</flux:text>
+                    </flux:card>
+                </div>
+            </section>
         </div>
     @endif
 </div>

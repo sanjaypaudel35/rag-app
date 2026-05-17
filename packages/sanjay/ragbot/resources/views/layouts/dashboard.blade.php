@@ -161,7 +161,7 @@
     </div>
 
     @if (app()->bound('ragbot.project'))
-    <form id="logout-form" action="{{ route('ragbot.logout', ['project_slug' => app('ragbot.project')->slug]) }}" method="POST" class="hidden">
+    <form id="logout-form" action="{{ route('ragbot.tenant.logout', ['project_slug' => app('ragbot.project')->slug]) }}" method="POST" class="hidden">
         @csrf
     </form>
     @endif

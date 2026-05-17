@@ -16,6 +16,11 @@
     @fluxAppearance
 </head>
 <body class="min-h-screen bg-white dark:bg-zinc-950 antialiased font-sans text-zinc-900 dark:text-zinc-100">
+    <script 
+    src="http://127.0.0.1:8000/ragbot/api/widget.js?api_key=rb_c_eD6Tn4UHv229ExuhB3wiAtONIVKz1UpV4kv2e78XIqIiwUScPkPhjxfClyKP"
+    data-api-key="rb_c_eD6Tn4UHv229ExuhB3wiAtONIVKz1UpV4kv2e78XIqIiwUScPkPhjxfClyKP"
+    data-base-url="http://127.0.0.1:8000"
+></script>
     <!-- Navigation -->
     <header class="sticky top-0 z-50 w-full border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,18 +33,11 @@
                 <flux:navbar.item href="#how-it-works" class="max-sm:hidden">How it Works</flux:navbar.item>
                 
                 <div class="flex items-center gap-4 ml-4">
-                    @if (Route::has('ragbot.login'))
-                        @auth('ragbot')
-                            <flux:button href="{{ app()->bound('ragbot.project') ? route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) : route('ragbot.platform.dashboard') }}">Dashboard</flux:button>
-                        @elseauth('web')
-                            <flux:button href="{{ route('ragbot.platform.dashboard') }}">Dashboard</flux:button>
-                        @else
-                            <flux:navbar.item href="{{ route('ragbot.login') }}">Log in</flux:navbar.item>
-                            @if (Route::has('ragbot.register'))
-                                <flux:button href="{{ route('ragbot.register') }}">Get Started</flux:button>
-                            @endif
-                        @endauth
-                    @endif
+                    @auth('ragbot')
+                        <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/tenant/' . (app()->bound('ragbot.project') ? app('ragbot.project')->slug : 'test') . '/dashboard') }}">Dashboard</flux:button>
+                    @else
+                        <flux:navbar.item href="{{ url(config('ragbot.prefix', 'ragbot') . '/login') }}">Log in</flux:navbar.item>
+                    @endauth
                 </div>
             </flux:navbar>
         </div>
@@ -51,14 +49,14 @@
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="text-center max-w-4xl mx-auto">
                     <flux:badge size="sm" class="mb-6">Powered by Advanced RAG Technology</flux:badge>
-                    <flux:heading size="xl" level="1" class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
+                    <flux:heading size="xl" level="1" class="text-4xl sm:text-6xl font-extrabold tracking-tight mb:6">
                         Build Intelligent <span class="text-indigo-600 dark:text-indigo-400">Knowledge Assistants</span> in Minutes
                     </flux:heading>
-                    <flux:text size="lg" class="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-10 max-w-2xl mx-auto">
+                    <flux:text size="lg" class="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb:10 max-w-2xl mx-auto">
                         Connect your documents, automate your support, and empower your team with Ragbot's powerful RAG engine. The smartest way to talk to your data.
                     </flux:text>
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <flux:button href="{{ route('ragbot.register') }}" class="w-full sm:w-auto">Start Building for Free</flux:button>
+                        <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/login') }}" class="w-full sm:w-auto">Get Started for Free</flux:button>
                         <flux:button href="#features" class="w-full sm:w-auto">Explore Features</flux:button>
                     </div>
                 </div>
@@ -253,9 +251,8 @@
                 <flux:text size="lg" class="text-indigo-100 mb-10 max-w-2xl mx-auto">
                     Join hundreds of companies using Ragbot to transform their documents into intelligent, actionable knowledge.
                 </flux:text>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <flux:button href="{{ route('ragbot.register') }}" class="bg-white text-indigo-600 hover:bg-zinc-100 w-full sm:w-auto">Get Started for Free</flux:button>
-                    <flux:button href="{{ route('ragbot.login') }}" class="text-white hover:bg-white/10 w-full sm:w-auto">Already have an account?</flux:button>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/login') }}" class="bg-white text-indigo-600 hover:bg-zinc-100 w-full sm:w-auto">Get Started for Free</flux:button>
                 </div>
             </div>
         </section>
