@@ -3,6 +3,7 @@
 namespace Sanjay\Ragbot\Http\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Sanjay\Ragbot\Exceptions\ChatbotInactiveException;
 use Sanjay\Ragbot\Exceptions\DocumentProcessingException;
 use Sanjay\Ragbot\Exceptions\LlmResponseException;
 use Sanjay\Ragbot\Exceptions\RetrievalException;
@@ -20,6 +21,7 @@ trait HandlesApiExceptions
     {
         $status = match (true) {
             $e instanceof DocumentProcessingException => 422,
+            $e instanceof ChatbotInactiveException => 403,
             $e instanceof RetrievalException => 502,
             $e instanceof LlmResponseException => 502,
             default => 500,

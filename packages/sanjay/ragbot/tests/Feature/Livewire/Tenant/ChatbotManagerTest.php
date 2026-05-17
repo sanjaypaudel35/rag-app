@@ -100,7 +100,7 @@ class ChatbotManagerTest extends TestCase
             ->call('deleteChatbot', $chatbot->id)
             ->assertSee('Chatbot deleted successfully');
 
-        $this->assertDatabaseMissing('rag_chatbots', ['id' => $chatbot->id]);
+        $this->assertSoftDeleted('rag_chatbots', ['id' => $chatbot->id]);
     }
 
     /** @test */

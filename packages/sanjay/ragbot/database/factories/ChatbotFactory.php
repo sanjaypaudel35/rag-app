@@ -27,8 +27,12 @@ class ChatbotFactory extends Factory
             'project_id' => Project::factory(),
             'name' => $this->faker->words(2, true).' Bot',
             'api_key' => hash('sha256', 'rb_c_'.Str::random(60)),
-            'total_tokens_used' => $this->faker->numberBetween(0, 100000),
-            'total_conversations' => $this->faker->numberBetween(0, 500),
+            'is_active' => true,
+            'total_tokens_used' => 0,
+            'total_input_tokens' => 0,
+            'total_output_tokens' => 0,
+            'total_cost' => 0,
+            'total_conversations' => 0,
         ];
     }
 }

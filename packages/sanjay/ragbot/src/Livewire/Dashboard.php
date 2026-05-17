@@ -36,7 +36,7 @@ class Dashboard extends Component
     #[Computed]
     public function chatbots(): Collection
     {
-        return $this->project->chatbots()->with('modelUsage')->latest()->get();
+        return $this->project->chatbots()->withTrashed()->with('modelUsage')->latest()->get();
     }
 
     /**

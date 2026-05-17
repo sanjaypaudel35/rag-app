@@ -102,6 +102,11 @@
                         <div class="flex items-center gap-3 mb-2">
                             <flux:heading size="lg" class="truncate">{{ $chatbot->name }}</flux:heading>
                             <flux:badge size="sm" variant="neutral" inset="top bottom">ID: {{ substr($chatbot->id, 0, 8) }}</flux:badge>
+                            @if($chatbot->is_active)
+                                <flux:badge size="sm" variant="success" inset="top bottom">Active</flux:badge>
+                            @else
+                                <flux:badge size="sm" variant="neutral" inset="top bottom">Inactive</flux:badge>
+                            @endif
                         </div>
                         
                         <div class="flex flex-wrap gap-2 mb-4">
@@ -172,7 +177,10 @@
                         @endif
 
                         <div class="flex gap-2">
-                            <flux:button variant="primary" icon="chat-bubble-left-right" class="flex-1" wire:click="startTesting('{{ $chatbot->id }}')">Test Chat</flux:button>
+                            <flux:button variant="primary" icon="chat-bubble-left-right" class="flex-1" wire:click="startTesting('{{ $chatbot->id }}')" :disabled="!$chatbot->is_active">Test Chat</flux:button>
+                            <flux:button variant="subtle" icon="{{ $chatbot->is_active ? 'pause' : 'play' }}" wire:click="toggleActive('{{ $chatbot->id }}')">
+                                {{ $chatbot->is_active ? 'Deactivate' : 'Activate' }}
+                            </flux:button>
                             <flux:button variant="danger" icon="trash" wire:click="deleteChatbot('{{ $chatbot->id }}')" wire:confirm="Are you sure you want to delete this chatbot?" />
                         </div>
                     </div>

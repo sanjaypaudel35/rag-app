@@ -50,7 +50,11 @@ class ProjectSettingFactory extends Factory
             'widget_title' => 'Chat with us',
             'widget_position' => 'right',
             'widget_full_page' => false,
-            'total_tokens_used' => $this->faker->numberBetween(0, 100000),
+            'total_tokens_used' => 0,
+            'total_input_tokens' => 0,
+            'total_output_tokens' => 0,
+            'total_cost' => 0,
+            'total_conversations' => 0,
         ];
     }
 }

@@ -90,4 +90,15 @@ class ChatServiceTest extends TestCase
             'chatbot_id' => $this->chatbot->id,
         ]);
     }
+
+    /** @test */
+    public function test_it_throws_exception_if_chatbot_is_inactive(): void
+    {
+        $this->chatbot->update(['is_active' => false]);
+
+        $this->expectException(\Sanjay\Ragbot\Exceptions\ChatbotInactiveException::class);
+        $this->expectExceptionMessage('This chatbot is currently inactive and cannot respond to messages.');
+
+        $this->chatService->chat($this->project, 'session-abc', 'Hello AI');
+    }
 }

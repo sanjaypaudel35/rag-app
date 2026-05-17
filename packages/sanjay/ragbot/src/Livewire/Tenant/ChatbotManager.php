@@ -208,6 +208,18 @@ class ChatbotManager extends Component
         }
     }
 
+    public function toggleActive(Chatbot $chatbot): void
+    {
+        try {
+            $chatbot->update(['is_active' => ! $chatbot->is_active]);
+            $status = $chatbot->is_active ? 'activated' : 'deactivated';
+            session()->flash('success', "Chatbot {$chatbot->name} has been {$status}.");
+        } catch (\Throwable $e) {
+            Log::error('Failed to toggle chatbot status: '.$e->getMessage());
+            session()->flash('error', 'Failed to update chatbot status.');
+        }
+    }
+
     public function deleteChatbot(Chatbot $chatbot): void
     {
         DB::beginTransaction();

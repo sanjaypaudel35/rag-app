@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Sanjay\Ragbot\Database\Factories\ChatbotFactory;
 
 /**
@@ -24,6 +25,7 @@ class Chatbot extends Model
 {
     use HasFactory;
     use HasUuids;
+    use SoftDeletes;
 
     /**
      * Create a new factory instance for the model.
@@ -49,6 +51,7 @@ class Chatbot extends Model
         'project_id',
         'name',
         'api_key',
+        'is_active',
         'allowed_origins',
         'rate_limit_per_minute',
         'session_rate_limit_per_minute',
@@ -65,6 +68,7 @@ class Chatbot extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'is_active' => 'boolean',
         'allowed_origins' => 'array',
         'rate_limit_per_minute' => 'integer',
         'session_rate_limit_per_minute' => 'integer',

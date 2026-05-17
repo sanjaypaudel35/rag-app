@@ -7,6 +7,7 @@ use Sanjay\Ragbot\Contracts\Repositories\MessageRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\PromptBuilderServiceInterface;
 use Sanjay\Ragbot\Contracts\Services\RetrievalServiceInterface;
 use Sanjay\Ragbot\Enums\MessageRole;
+use Sanjay\Ragbot\Exceptions\ChatbotInactiveException;
 use Sanjay\Ragbot\Exceptions\LlmResponseException;
 use Sanjay\Ragbot\Exceptions\RetrievalException;
 use Sanjay\Ragbot\Models\Chatbot;
@@ -43,6 +44,10 @@ class ChatService
         /** @var Chatbot|null $chatbot */
         $chatbot = app()->bound('ragbot.chatbot') ? app('ragbot.chatbot') : null;
         $chatbotId = $chatbot?->id;
+
+        if ($chatbot && ! $chatbot->is_active) {
+            throw new ChatbotInactiveException('This chatbot is currently inactive and cannot respond to messages.');
+        }
 
         /** @var Conversation $conversation */
         $conversation = $this->conversationRepository->findOrCreate($chatbotId, $sessionId);

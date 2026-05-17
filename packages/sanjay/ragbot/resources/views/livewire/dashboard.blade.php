@@ -95,10 +95,17 @@
 
                         <flux:table.rows>
                             @foreach($this->chatbots as $chatbot)
-                                <flux:table.row :key="$chatbot->id">
+                                <flux:table.row :key="$chatbot->id" class="{{ $chatbot->trashed() ? 'opacity-50 grayscale bg-red-50/30 dark:bg-red-950/10' : '' }}">
                                     <flux:table.cell>
                                         <div class="flex flex-col">
-                                            <span class="font-medium text-zinc-900 dark:text-white">{{ $chatbot->name }}</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-medium {{ $chatbot->trashed() ? 'text-red-600 dark:text-red-400 line-through' : 'text-zinc-900 dark:text-white' }}">
+                                                    {{ $chatbot->name }}
+                                                </span>
+                                                @if($chatbot->trashed())
+                                                    <flux:badge size="sm" variant="danger" inset="top bottom">Deleted</flux:badge>
+                                                @endif
+                                            </div>
                                             @foreach($chatbot->modelUsage as $usage)
                                                 <span class="text-[10px] text-zinc-400 font-mono">{{ $usage->model }}</span>
                                             @endforeach
