@@ -4,70 +4,125 @@ RAGBot is a sophisticated **multi-tenant Retrieval-Augmented Generation (RAG)** 
 
 ---
 
-## 🚀 For Clients & Tenants: What RAGBot Does
+## 🌟 About RAGBot
 
 RAGBot doesn't just "chat." It understands your specific business data. By uploading your documents, RAGBot indexes them into a high-performance database, allowing the AI to use your files as a "knowledge base" when answering questions.
 
-### 📂 Secure Document Management
-- **Universal Support:** Upload PDF, Microsoft Word (DOCX), and Text (TXT) files.
-- **Automated Pipeline:** Documents are automatically processed, split into segments, and converted into searchable "AI vectors."
-- **In-Browser Preview:** View and manage your uploaded files directly from your dashboard.
+### How it Works
+1.  **Ingestion:** Upload your documents (PDF, DOCX, TXT). RAGBot segmentizes the text, converts it into mathematical vectors (embeddings), and stores them in a vector database.
+2.  **Retrieval:** When a user asks a question, RAGBot performs a semantic search to find the most relevant pieces of information from your documents.
+3.  **Generation:** The relevant context is sent to a Large Language Model (like GPT-4o), which generates a human-like response based *only* on the provided data.
 
-### 🤖 Custom AI Chatbots
-- **Selective Knowledge:** Choose exactly which documents each chatbot should "know." Have one bot for HR and another for Customer Support.
-- **Embeddable Widget:** Add your chatbot to any website with a single line of code.
-- **Real-time Diagnostics:** Monitor processing in real-time. If a task fails, we provide detailed logs and a one-click retry button.
-
-### 📊 Analytics & Transparency
-- **Usage Tracking:** Monitor token consumption and active conversations across all your bots.
-- **Data Privacy:** Your data and AI configurations are strictly isolated and encrypted.
+### Where it's Applicable
+-   **Customer Support:** Automated answers based on product manuals and FAQs.
+-   **Internal Knowledge:** An AI assistant for employee handbooks, policies, and internal documentation.
+-   **E-commerce:** Help customers find product information and compatibility details.
+-   **Enterprise Search:** Semantic retrieval across massive private document libraries.
 
 ---
 
-## 🛠️ For Developers: Technical Architecture
+## 🏢 Technical Architecture
 
 RAGBot is built using a clean, layered architecture following the **Service-Repository pattern**, ensuring the core RAG logic remains decoupled and highly testable.
 
-### ⚙️ The RAG Pipeline
+### The RAG Pipeline
 ```text
 Ingestion:   Document → Chunking → Embedding (API) → Vector Store
 Retrieval:   User Query → Embedding → Semantic Search → Context Retrieval
 Generation:  Context + Prompt → LLM (OpenAI/Anthropic) → Response
 ```
 
-### 🏢 Multi-Tenant Engine
-RAGBot is designed for **SaaS environments**. Tenant resolution is handled via unique API keys, with strict container-based context isolation:
+### Core Tech Stack
+-   **Framework:** Laravel 13
+-   **Frontend:** Livewire 4 + Flux UI
+-   **AI Engine:** Integrated with `laravel/ai` for pluggable LLM support (OpenAI, Anthropic).
+-   **Vector Storage:** Native support for PostgreSQL (`pgvector`) and MySQL.
+-   **Processing:** Asynchronous bus batching for high-volume document ingestion.
+-   **Isolation:** Strict multi-tenant data separation via `ragbot.project` context.
+
+---
+
+## 🛠️ Developer Extension Guide
+
+Ragbot is designed to be highly extensible. You can override core logic by implementing interfaces and extending managers.
+
+### Custom Embedding Logic
+Implement the `EmbeddingInterface` and register it in your `AppServiceProvider@boot`.
 ```php
-// Re-establishes tenant context in background jobs or web requests
-app()->instance('ragbot.project', $project);
+$this->app->make(EmbeddingManager::class)->extend('my-driver', function ($app, $project) {
+    return new MyLocalEmbedding();
+});
 ```
 
-### 🤖 AI SDK & Pluggable Drivers
-- **First-Party Integration:** Uses the **Laravel AI SDK (`laravel/ai`)** for native embedding and text generation.
-- **Flexible Providers:** Pluggable support for OpenAI, Anthropic, and local LLMs (via Ollama).
-- **Resilient Batching:** Large documents are processed in parallel batches with `allowFailures()` support to handle temporary API glitches without stopping the entire pipeline.
-
-### 📦 Core Tech Stack
-- **Framework:** Laravel 13
-- **Frontend:** Livewire 4 + Flux UI
-- **Database:** PostgreSQL (with `pgvector`) or MySQL
-- **Background Tasks:** Laravel Queues + Bus Batching
-- **Authentication:** Custom Tenant Guards & API Key Security
+### Custom Vector Store
+Implement the `VectorStoreInterface` and extend the `VectorStoreManager`.
+```php
+$this->app->make(VectorStoreManager::class)->extend('pinecone', function ($app) {
+    return new PineconeStore();
+});
+```
 
 ---
 
-## 🧩 Key Use Cases
-- **Customer Support:** Automated answers based on product manuals.
-- **Internal Knowledge:** An AI assistant for employee handbooks and policies.
-- **Enterprise Search:** Semantic retrieval across massive document libraries.
+## 🚀 Getting Started
 
----
+Follow this guide to get your RAGBot instance up and running for development or testing.
 
-## 🚀 Getting Started (Technical)
-1. **Clone & Setup:** Run `composer setup` to install dependencies and run migrations.
-2. **Configure AI:** Set your `OPENAI_API_KEY` in the Dashboard Settings.
-3. **Start Workers:** `php artisan queue:work` to process document embeddings.
-4. **Deploy Widget:** Access your chatbot's unique API key and embed the `widget.js` on your site.
+### 1. Prerequisites
+-   **PHP 8.3+**
+-   **PostgreSQL** (Recommended for `pgvector`) or **MySQL**
+-   **Composer**
+-   **Node.js & NPM**
+
+### 2. Installation & Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/ragbot.git
+cd ragbot
+
+# Install dependencies
+composer install
+npm install && npm run build
+
+# Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# Run migrations and seeders
+php artisan migrate --seed
+php artisan storage:link
+```
+
+### 3. Initial Access
+1.  Start the server: `php artisan serve`
+2.  Navigate to `http://127.0.0.1:8000`.
+3.  **Seeded Project:** A "Test Project" is automatically created during the seeder.
+    *   **Registration:** Register your account within the test project here: `http://127.0.0.1:8000/ragbot/tenant/test-project/register`
+    *   **Dashboard:** After registering, access your dashboard here: `http://127.0.0.1:8000/ragbot/tenant/test-project/dashboard`
+    *   **Customization:** Once logged in, you can update the project title and logo from the **Project Setting** tab in the dashboard.
+
+### 4. Configuration Workflow
+
+1.  **AI Engine Setup:** 
+    *   Navigate to **Settings > LLM Setting**.
+    *   Enter your **OpenAI** or **Anthropic** API Key.
+    *   Select your preferred Chat and Embedding models.
+2.  **Training the AI (Documents):** 
+    *   Upload your business documents (PDF, DOCX, TXT) in the **Documents** section.
+    *   Monitor the **Processing Queue** tab. Once the status changes to `Success`, your documents are fully indexed and searchable.
+3.  **Creating Chatbots & Knowledge Bases:**
+    *   Navigate to **Chatbots** to create your AI assistants.
+    *   **Selective Knowledge:** For each chatbot, you can select a specific "Knowledge Base" by picking which processed documents it should have access to.
+    *   **Multiple Bots:** You can create multiple chatbots (e.g., "HR Bot", "Technical Support"), each linked to a different set of documents.
+4.  **Security & Widget Configuration:**
+    *   Navigate to **Settings > Chatbot Setting**.
+    *   **Rate Limits:** Set a global rate limit for the chatbot and a specific limit per user session to prevent API abuse.
+    *   **Widget Customization:** Configure the brand color, title, and screen position (Left/Right) for the embeddable chat widget.
+5.  **Integration & Deployment:**
+    *   Each chatbot is assigned a unique **API Key**.
+    *   Visit the **Integration Guide** on your dashboard to see how to implement your bot via the **REST API** or by using the **1-line Widget Script**.
+
 
 ---
 

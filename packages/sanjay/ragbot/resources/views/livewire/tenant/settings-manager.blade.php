@@ -123,18 +123,12 @@
                     <!-- LLM Model -->
                     <flux:field>
                         <flux:label>LLM Model</flux:label>
-                        <div class="flex gap-2">
-                            <flux:select wire:model.live="settings.llm_model" class="flex-1">
-                                <flux:select.option value="">Choose a model...</flux:select.option>
-                                @foreach($availableModels as $value => $label)
-                                    <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
-                                @endforeach
-                                <flux:select.option value="custom">Custom...</flux:select.option>
-                            </flux:select>
-                            @if($settings['llm_model'] === 'custom' || !array_key_exists($settings['llm_model'], $availableModels))
-                                <flux:input wire:model="settings.llm_model" placeholder="Enter custom model" class="flex-1" />
-                            @endif
-                        </div>
+                        <flux:select wire:model.live="settings.llm_model">
+                            <flux:select.option value="">Choose a model...</flux:select.option>
+                            @foreach($availableModels as $value => $label)
+                                <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
                         <flux:description>The specific model to use for chat operations.</flux:description>
                         <flux:error name="settings.llm_model" />
                     </flux:field>
@@ -142,36 +136,14 @@
                     <!-- Embedding Model -->
                     <flux:field>
                         <flux:label>Embedding Model</flux:label>
-                        <div class="flex gap-2">
-                            <flux:select wire:model.live="settings.llm_model_for_embedding" class="flex-1">
-                                <flux:select.option value="">Choose a model...</flux:select.option>
-                                @foreach($availableEmbeddingModels as $value => $label)
-                                    <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
-                                @endforeach
-                                <flux:select.option value="custom">Custom...</flux:select.option>
-                            </flux:select>
-                            @if($settings['llm_model_for_embedding'] === 'custom' || !array_key_exists($settings['llm_model_for_embedding'], $availableEmbeddingModels))
-                                <flux:input wire:model="settings.llm_model_for_embedding" placeholder="Enter custom model or class" class="flex-1" />
-                            @endif
-                        </div>
-                        <flux:description>The model used for generating vector embeddings. Can be a model name or a custom class.</flux:description>
+                        <flux:select wire:model.live="settings.llm_model_for_embedding">
+                            <flux:select.option value="">Choose a model...</flux:select.option>
+                            @foreach($availableEmbeddingModels as $value => $label)
+                                <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        <flux:description>The model used for generating vector embeddings.</flux:description>
                         <flux:error name="settings.llm_model_for_embedding" />
-                    </flux:field>
-
-                    <!-- LLM API Endpoint -->
-                    <flux:field>
-                        <flux:label>LLM API Endpoint</flux:label>
-                        <flux:input wire:model="settings.llm_api_endpoint" placeholder="https://api.openai.com/v1" />
-                        <flux:description>Override the default API endpoint if needed (e.g., for local LLMs).</flux:description>
-                        <flux:error name="settings.llm_api_endpoint" />
-                    </flux:field>
-
-                    <!-- Embedding API Endpoint -->
-                    <flux:field>
-                        <flux:label>Embedding API Endpoint</flux:label>
-                        <flux:input wire:model="settings.embedding_api_endpoint" placeholder="https://api.openai.com/v1" />
-                        <flux:description>Override the default embedding API endpoint if needed.</flux:description>
-                        <flux:error name="settings.embedding_api_endpoint" />
                     </flux:field>
 
                     <!-- Vector Store -->

@@ -16,7 +16,6 @@ class IntegrationGuide extends Component
     {
         $this->project = app('ragbot.project');
     }
-
     public function render(): View
     {
         return view('ragbot::livewire.tenant.integration-guide')

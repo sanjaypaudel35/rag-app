@@ -46,6 +46,7 @@ use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromApiKey;
 use Sanjay\Ragbot\Http\Middleware\ResolveProjectFromSlug;
 use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
+use Sanjay\Ragbot\Livewire\Tenant\Billing;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
@@ -168,6 +169,7 @@ class RagbotServiceProvider extends ServiceProvider
         Livewire::component('ragbot.integration-guide', IntegrationGuide::class);
         Livewire::component('ragbot.processing-queue', ProcessingQueue::class);
         Livewire::component('ragbot.profile-settings', ProfileSettings::class);
+        Livewire::component('ragbot.billing', Billing::class);
     }
 
     /**

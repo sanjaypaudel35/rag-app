@@ -11,6 +11,7 @@ use Sanjay\Ragbot\Http\Controllers\Auth\Tenant\ResetPasswordController;
 use Sanjay\Ragbot\Http\Controllers\Tenant\DocumentPreviewController;
 use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
+use Sanjay\Ragbot\Livewire\Tenant\Billing;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
@@ -83,5 +84,6 @@ Route::group([
         Route::get('team', TeamManager::class)->name('team');
         Route::get('profile', ProfileSettings::class)->name('profile');
         Route::get('integration-guide', IntegrationGuide::class)->name('integration-guide');
+        Route::get('billing', Billing::class)->name('billing');
     });
 });

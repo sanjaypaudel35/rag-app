@@ -47,9 +47,9 @@
                 <flux:text size="sm" class="font-medium text-zinc-500 uppercase tracking-wider">Tokens Used</flux:text>
             </div>
             <div class="flex items-baseline gap-2">
-                <flux:heading size="xl">{{ Number::abbreviate($settings->total_tokens_used) }}</flux:heading>
+                <flux:heading size="xl">{{ Number::abbreviate($settings->total_tokens_used, precision: 1) }}</flux:heading>
                 <flux:text size="xs" class="text-zinc-400 font-medium">
-                    In: {{ Number::abbreviate($settings->total_input_tokens) }} / Out: {{ Number::abbreviate($settings->total_output_tokens) }}
+                    In: {{ Number::abbreviate($settings->total_input_tokens, precision: 1) }} / Out: {{ Number::abbreviate($settings->total_output_tokens, precision: 1) }}
                 </flux:text>
             </div>
         </flux:card>

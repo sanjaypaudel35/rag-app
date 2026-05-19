@@ -34,19 +34,13 @@ class SettingsManagerTest extends TestCase
     }
 
     /** @test */
-    public function test_it_validates_embedding_model_matches_provider()
+    public function test_it_allows_openai_embeddings_for_anthropic_provider()
     {
         $project = Project::factory()->create();
         app()->instance('ragbot.project', $project);
 
         Livewire::test(SettingsManager::class)
             ->set('settings.llm_provider', LlmProvider::Anthropic->value)
-            ->set('settings.llm_model_for_embedding', LlmModel::TextEmbedding3Small->value)
-            ->call('save')
-            ->assertHasErrors(['settings.llm_model_for_embedding']);
-
-        Livewire::test(SettingsManager::class)
-            ->set('settings.llm_provider', LlmProvider::OpenAI->value)
             ->set('settings.llm_model_for_embedding', LlmModel::TextEmbedding3Small->value)
             ->call('save')
             ->assertHasNoErrors(['settings.llm_model_for_embedding']);

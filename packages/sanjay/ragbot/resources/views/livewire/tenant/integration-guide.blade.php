@@ -24,6 +24,15 @@
                 Widget Integration
             </div>
         </button>
+        <button 
+            wire:click="$set('activeTab', 'developer')" 
+            class="px-4 py-2 text-sm font-medium transition-colors border-b-2 {{ $activeTab === 'developer' ? 'border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300' }}"
+        >
+            <div class="flex items-center gap-2">
+                <flux:icon icon="wrench-screwdriver" variant="mini" />
+                Developer Extension
+            </div>
+        </button>
     </div>
 
     @if($activeTab === 'api')
@@ -262,6 +271,99 @@ if (response.status === 429) {
                         <flux:heading size="sm">Positioning</flux:heading>
                         <flux:text size="sm">Choose between left or right placement.</flux:text>
                     </flux:card>
+                </div>
+            </section>
+        </div>
+    @endif
+</div>
+ustom extensions, you must register them in the <code class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-xs font-mono">boot</code> method of your <code class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-xs font-mono">AppServiceProvider</code>.
+                </flux:callout>
+            </section>
+
+            <flux:separator />
+
+            <!-- Custom Embedding -->
+            <section>
+                <flux:heading size="lg" class="mb-2">1. Custom Embedding Logic</flux:heading>
+                <flux:text class="mb-6">If you need to use a local embedding model, a specific private API, or custom pre-processing logic, you can implement the <code class="font-mono text-xs">EmbeddingInterface</code> and register it.</flux:text>
+
+                <div class="space-y-4">
+                    <flux:heading size="sm" class="uppercase tracking-wider text-zinc-500">Step A: Create your Implementation</flux:heading>
+                    <div class="bg-zinc-900 text-zinc-300 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+<pre class="text-xs leading-relaxed"><code>namespace App\Services;
+
+use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Sanjay\Ragbot\Models\Project;
+
+class LocalEmbeddingService implements EmbeddingInterface
+{
+    public function embed(string $text, ?Project $project = null): array
+    {
+        // Your custom logic to generate 1536-dimensional vector
+        return $this->callLocalModel($text);
+    }
+}</code></pre>
+                    </div>
+
+                    <flux:heading size="sm" class="uppercase tracking-wider text-zinc-500">Step B: Register via Manager</flux:heading>
+                    <div class="bg-zinc-900 text-zinc-300 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+<pre class="text-xs leading-relaxed"><code>use Sanjay\Ragbot\Services\Tenant\EmbeddingManager;
+
+public function boot()
+{
+    $this->app->make(EmbeddingManager::class)->extend('my-local-driver', function ($app, $project) {
+        return new \App\Services\LocalEmbeddingService();
+    });
+}</code></pre>
+                    </div>
+                    
+                    <flux:text size="sm" class="mt-4">Once registered, you can select <code class="font-mono text-xs">my-local-driver</code> as your embedding driver in the Project Settings.</flux:text>
+                </div>
+            </section>
+
+            <flux:separator />
+
+            <!-- Custom Vector Store -->
+            <section>
+                <flux:heading size="lg" class="mb-2">2. Custom Vector Store</flux:heading>
+                <flux:text class="mb-6">Need to use Pinecone, Weaviate, or a custom internal database? Implement the <code class="font-mono text-xs">VectorStoreInterface</code> and extend the manager.</flux:text>
+
+                <div class="space-y-4">
+                    <flux:heading size="sm" class="uppercase tracking-wider text-zinc-500">Step A: Implement Interface</flux:heading>
+                    <div class="bg-zinc-900 text-zinc-300 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+<pre class="text-xs leading-relaxed"><code>namespace App\Services;
+
+use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
+use Illuminate\Support\Collection;
+use Sanjay\Ragbot\Models\Project;
+
+class PineconeStore implements VectorStoreInterface
+{
+    public function store(Project $project, string $chunkId, array $vector): void 
+    {
+        // Logic to store in Pinecone
+    }
+
+    public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection
+    {
+        // Logic to search Pinecone and return Collection of chunk IDs
+    }
+}</code></pre>
+                    </div>
+
+                    <flux:heading size="sm" class="uppercase tracking-wider text-zinc-500">Step B: Register Extension</flux:heading>
+                    <div class="bg-zinc-900 text-zinc-300 p-4 rounded-lg font-mono text-xs overflow-x-auto">
+<pre class="text-xs leading-relaxed"><code>use Sanjay\Ragbot\Services\Tenant\VectorStoreManager;
+
+public function boot()
+{
+    $this->app->make(VectorStoreManager::class)->extend('pinecone', function ($app) {
+        return new \App\Services\PineconeStore();
+    });
+}</code></pre>
+                    </div>
+
+                    <flux:text size="sm" class="mt-4">In the LLM Settings tab, choose <strong>Custom</strong> for Vector Store and enter <code class="font-mono text-xs">pinecone</code> as the custom name.</flux:text>
                 </div>
             </section>
         </div>

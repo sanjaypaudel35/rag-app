@@ -54,8 +54,6 @@ class SettingsManager extends Component
                 'string',
                 new ValidLlmModel($this->settings['llm_provider'] ?? null, true),
             ],
-            'settings.llm_api_endpoint' => ['nullable', 'url'],
-            'settings.embedding_api_endpoint' => ['nullable', 'url'],
             'settings.vector_store' => ['required', Rule::enum(VectorStore::class)],
             'settings.vector_store_custom_name' => ['nullable', 'string', 'required_if:settings.vector_store,custom'],
             'settings.widget_enabled' => ['required', 'boolean'],
