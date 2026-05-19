@@ -36,9 +36,9 @@ Route::get('health', function () {
 //             Route::get('login', [LoginController::class, 'create'])->name('login');
 //             Route::post('login', [LoginController::class, 'store'])->name('login.store');
 //         });
-// 
+//
 //         Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
-// 
+//
 //         Route::middleware(['auth'])->get('dashboard', function () {
 //             return view('ragbot::auth.platform.dashboard');
 //         })->name('platform.dashboard');

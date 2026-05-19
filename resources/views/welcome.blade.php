@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Ragbot - Build Intelligent Knowledge Assistants</title>
+    <title>Ragbot — Intelligent AI assistant</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -14,228 +14,198 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @fluxAppearance
+
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        .glass-card {
+            background: rgba(24, 24, 27, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(63, 63, 70, 0.3);
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .image-glow {
+            box-shadow: 0 0 40px -10px rgba(79, 70, 229, 0.3);
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-white dark:bg-zinc-950 antialiased font-sans text-zinc-900 dark:text-zinc-100">
-    <script 
-    src="http://127.0.0.1:8000/ragbot/api/widget.js?api_key=rb_c_eD6Tn4UHv229ExuhB3wiAtONIVKz1UpV4kv2e78XIqIiwUScPkPhjxfClyKP"
-    data-api-key="rb_c_eD6Tn4UHv229ExuhB3wiAtONIVKz1UpV4kv2e78XIqIiwUScPkPhjxfClyKP"
-    data-base-url="http://127.0.0.1:8000"
-></script>
+<body class="min-h-screen bg-zinc-950 antialiased font-sans text-zinc-100 overflow-x-hidden selection:bg-indigo-500/30">
+    <!-- Background Decor -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] hero-gradient"></div>
+        <div class="absolute top-[10%] right-[10%] size-[400px] bg-purple-900/10 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[10%] left-[5%] size-[500px] bg-indigo-900/10 blur-[150px] rounded-full"></div>
+    </div>
+
     <!-- Navigation -->
-    <header class="sticky top-0 z-50 w-full border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <flux:navbar class="-mb-px">
-                <flux:brand href="/" logo="https://fluxui.dev/img/demo/logo.png" name="Ragbot" />
+    <header class="sticky top-0 z-50 w-full border-b border-zinc-800/50 bg-zinc-950/60 backdrop-blur-xl">
+        <div class="container mx-auto px-6 lg:px-12">
+            <nav class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-3">
+                    <div class="size-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                        <flux:icon icon="bolt" variant="mini" class="text-white h-5 w-5" />
+                    </div>
+                    <span class="font-bold text-xl tracking-tight uppercase italic">Ragbot</span>
+                </div>
 
-                <flux:spacer />
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+                    <a href="#product" class="hover:text-white transition-colors">Product</a>
+                    <a href="#features" class="hover:text-white transition-colors">Features</a>
+                    <a href="#showcase" class="hover:text-white transition-colors">Showcase</a>
+                </div>
 
-                <flux:navbar.item href="#features" class="max-sm:hidden">Features</flux:navbar.item>
-                <flux:navbar.item href="#how-it-works" class="max-sm:hidden">How it Works</flux:navbar.item>
-                
-                <div class="flex items-center gap-4 ml-4">
+                <div class="flex items-center gap-4">
                     @auth('ragbot')
-                        <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/tenant/' . (app()->bound('ragbot.project') ? app('ragbot.project')->slug : 'test-project') . '/dashboard') }}">Dashboard</flux:button>
+                        <flux:button variant="primary" href="{{ url(config('ragbot.prefix', 'ragbot') . '/tenant/' . (app()->bound('ragbot.project') ? app('ragbot.project')->slug : 'test-project') . '/dashboard') }}">Go to Dashboard</flux:button>
                     @else
-                        <flux:navbar.item href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}">Get Started</flux:navbar.item>
+                        <flux:button variant="ghost" href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}">Log in</flux:button>
+                        <flux:button variant="primary" href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}">Get Started</flux:button>
                     @endauth
                 </div>
-            </flux:navbar>
+            </nav>
         </div>
     </header>
 
-    <main>
+    <main class="relative z-10">
         <!-- Hero Section -->
-        <section class="relative overflow-hidden py-24 sm:py-32">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="text-center max-w-4xl mx-auto">
-                    <flux:badge size="sm" class="mb-6">Powered by Advanced RAG Technology</flux:badge>
-                    <flux:heading size="xl" level="1" class="text-4xl sm:text-6xl font-extrabold tracking-tight mb:6">
-                        Build Intelligent <span class="text-indigo-600 dark:text-indigo-400">Knowledge Assistants</span> in Minutes
-                    </flux:heading>
-                    <flux:text size="lg" class="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb:10 max-w-2xl mx-auto">
-                        Connect your documents, automate your support, and empower your team with Ragbot's powerful RAG engine. The smartest way to talk to your data.
-                    </flux:text>
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <flux:button href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}" class="w-full sm:w-auto">Get Started for Free</flux:button>
-                        <flux:button href="#features" class="w-full sm:w-auto">Explore Features</flux:button>
-                    </div>
+        <section id="product" class="pt-24 pb-20 lg:pt-32 lg:pb-32">
+            <div class="container mx-auto px-6 lg:px-12 text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 mb-8 animate-fade-in">
+                    <flux:badge size="sm" variant="success" class="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">v2.0 is live</flux:badge>
+                    <span class="text-xs font-medium text-zinc-400 px-2">Production-ready RAG for enterprise</span>
                 </div>
 
-                <!-- Hero Image/Mockup Placeholder -->
-                <div class="mt-16 relative">
-                    <div class="absolute inset-0 bg-gradient-to-t from-white dark:from-zinc-950 via-transparent to-transparent z-10"></div>
-                    <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 shadow-2xl overflow-hidden aspect-video max-w-5xl mx-auto flex items-center justify-center">
-                         <div class="text-zinc-400 dark:text-zinc-600 flex flex-col items-center gap-4">
-                             <flux:icon icon="squares-plus" class="size-16" />
-                             <flux:text>Interactive Dashboard Preview</flux:text>
-                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Background Shapes -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-0 opacity-20 pointer-events-none">
-                <div class="absolute top-[-10%] left-[-10%] size-[500px] bg-indigo-500/30 rounded-full blur-[120px]"></div>
-                <div class="absolute bottom-[-10%] right-[-10%] size-[500px] bg-purple-500/30 rounded-full blur-[120px]"></div>
-            </div>
-        </section>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 max-w-4xl mx-auto leading-[1.1]">
+                    The Intelligent <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">AI Assistant</span> for your Business Data
+                </h1>
+                
+                <p class="text-lg md:text-xl text-zinc-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+                    Transform your messy documents into a semantic knowledge base. Build, test, and deploy context-aware chatbots in minutes.
+                </p>
 
-        <!-- Features Section -->
-        <section id="features" class="py-24 bg-zinc-50 dark:bg-zinc-900/50">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <flux:heading size="lg" class="mb-4">Everything you need for RAG</flux:heading>
-                    <flux:text size="lg" class="text-zinc-600 dark:text-zinc-400">
-                        Powerful tools to help you build, manage, and deploy retrieval-augmented generation assistants.
-                    </flux:text>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+                    <flux:button variant="primary" href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}" class="w-full sm:w-auto h-14 px-8 text-base">Start Building for Free</flux:button>
+                    <flux:button variant="subtle" href="#showcase" class="w-full sm:w-auto h-14 px-8 text-base border-zinc-800 bg-zinc-900/50">View Showcase</flux:button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Feature 1 -->
-                    <div class="p-8 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="size-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400">
-                            <flux:icon icon="document-text" />
+                <!-- Showcase Carousel -->
+                <div id="showcase" x-data="{ 
+                    active: 0,
+                    images: [
+                        '/storage/systemimages/demo1.png',
+                        '/storage/systemimages/demo2.png',
+                        '/storage/systemimages/demo3.png',
+                        '/storage/systemimages/demo4.png',
+                        '/storage/systemimages/demo5.png',
+                        '/storage/systemimages/demo6.png',
+                        '/storage/systemimages/demo7.png',
+                        '/storage/systemimages/demo8.png',
+                        '/storage/systemimages/demo9.png'
+                    ],
+                    next() { this.active = (this.active + 1) % this.images.length },
+                    prev() { this.active = (this.active - 1 + this.images.length) % this.images.length },
+                    init() { setInterval(() => this.next(), 6000) }
+                }" class="relative max-w-6xl mx-auto group">
+                    
+                    <div class="relative aspect-[16/10] lg:aspect-[21/9] rounded-3xl overflow-hidden glass-card p-2 image-glow">
+                        <div class="w-full h-full rounded-2xl overflow-hidden relative">
+                            <template x-for="(img, index) in images" :key="index">
+                                <div x-show="active === index" 
+                                     x-transition:enter="transition ease-out duration-700"
+                                     x-transition:enter-start="opacity-0 scale-105"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-700"
+                                     x-transition:leave-start="opacity-100"
+                                     x-transition:leave-end="opacity-0"
+                                     class="absolute inset-0">
+                                    <img :src="img" class="w-full h-full object-cover" alt="Platform Demo">
+                                </div>
+                            </template>
                         </div>
-                        <flux:heading class="mb-3">Document Processing</flux:heading>
-                        <flux:text class="text-zinc-600 dark:text-zinc-400">
-                            Upload PDFs, Word docs, or link websites. Ragbot processes and indexes your knowledge automatically with high-fidelity parsing.
-                        </flux:text>
                     </div>
 
-                    <!-- Feature 2 -->
-                    <div class="p-8 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="size-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-6 text-purple-600 dark:text-purple-400">
-                            <flux:icon icon="magnifying-glass" />
-                        </div>
-                        <flux:heading class="mb-3">Smart Retrieval</flux:heading>
-                        <flux:text class="text-zinc-600 dark:text-zinc-400">
-                            Our advanced vector search ensures your AI always finds the most relevant information to provide accurate and grounded answers.
-                        </flux:text>
-                    </div>
+                    <!-- Navigation Controls -->
+                    <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 size-12 rounded-full glass-card flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10">
+                        <flux:icon icon="chevron-left" variant="mini" />
+                    </button>
+                    <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 size-12 rounded-full glass-card flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10">
+                        <flux:icon icon="chevron-right" variant="mini" />
+                    </button>
 
-                    <!-- Feature 3 -->
-                    <div class="p-8 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="size-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400">
-                            <flux:icon icon="code-bracket" />
-                        </div>
-                        <flux:heading class="mb-3">Easy Integration</flux:heading>
-                        <flux:text class="text-zinc-600 dark:text-zinc-400">
-                            Embed your chatbot on any website with a single line of code or use our robust API to build custom experiences.
-                        </flux:text>
-                    </div>
-
-                    <!-- Feature 4 -->
-                    <div class="p-8 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="size-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center mb-6 text-amber-600 dark:text-amber-400">
-                            <flux:icon icon="shield-check" />
-                        </div>
-                        <flux:heading class="mb-3">Secure & Private</flux:heading>
-                        <flux:text class="text-zinc-600 dark:text-zinc-400">
-                            Your data is encrypted and protected. You have full control over who can access your knowledge base and how it's used.
-                        </flux:text>
-                    </div>
-
-                    <!-- Feature 5 -->
-                    <div class="p-8 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="size-12 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center mb-6 text-rose-600 dark:text-rose-400">
-                            <flux:icon icon="chart-bar" />
-                        </div>
-                        <flux:heading class="mb-3">Analytics & Insights</flux:heading>
-                        <flux:text class="text-zinc-600 dark:text-zinc-400">
-                            Track how users interact with your assistants and gain insights into what they're asking and how your bots are performing.
-                        </flux:text>
-                    </div>
-
-                    <!-- Feature 6 -->
-                    <div class="p-8 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="size-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-xl flex items-center justify-center mb-6 text-cyan-600 dark:text-cyan-400">
-                            <flux:icon icon="cpu-chip" />
-                        </div>
-                        <flux:heading class="mb-3">Custom LLM Support</flux:heading>
-                        <flux:text class="text-zinc-600 dark:text-zinc-400">
-                            Choose from various LLM providers or use your own models. Ragbot is flexible and works with the best AI models available.
-                        </flux:text>
+                    <!-- Indicators -->
+                    <div class="mt-8 flex justify-center gap-2">
+                        <template x-for="(img, index) in images" :key="index">
+                            <button @click="active = index" 
+                                    :class="active === index ? 'w-8 bg-indigo-500' : 'w-2 bg-zinc-800'"
+                                    class="h-2 rounded-full transition-all duration-300"></button>
+                        </template>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- How it Works Section -->
-        <section id="how-it-works" class="py-24">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <flux:heading size="lg" class="mb-4">How it works</flux:heading>
-                    <flux:text size="lg" class="text-zinc-600 dark:text-zinc-400">
-                        Get your assistant up and running in three simple steps.
-                    </flux:text>
+        <!-- Features Bento Grid -->
+        <section id="features" class="py-24 bg-zinc-950">
+            <div class="container mx-auto px-6 lg:px-12">
+                <div class="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
+                    <div class="max-w-2xl">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4 italic uppercase tracking-wider">Engineered for quality.</h2>
+                        <p class="text-zinc-400 text-lg">We've built the most robust RAG pipeline so you don't have to worry about the math.</p>
+                    </div>
                 </div>
 
-                <div class="flex flex-col lg:flex-row gap-12 items-start">
-                    <div class="lg:w-1/2 space-y-12">
-                        <!-- Step 1 -->
-                        <div class="flex gap-6">
-                            <div class="flex-none size-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">1</div>
-                            <div>
-                                <flux:heading class="mb-2">Upload your knowledge</flux:heading>
-                                <flux:text class="text-zinc-600 dark:text-zinc-400">
-                                    Simply upload your documents or provide URLs. Ragbot will parse, chunk, and embed your content automatically.
-                                </flux:text>
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 glass-card p-10 rounded-3xl group hover:border-indigo-500/50 transition-colors">
+                        <div class="size-12 bg-indigo-600/20 rounded-xl flex items-center justify-center mb-8 border border-indigo-500/20">
+                            <flux:icon icon="document-text" class="text-indigo-400" />
                         </div>
-
-                        <!-- Step 2 -->
-                        <div class="flex gap-6">
-                            <div class="flex-none size-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">2</div>
-                            <div>
-                                <flux:heading class="mb-2">Configure your assistant</flux:heading>
-                                <flux:text class="text-zinc-600 dark:text-zinc-400">
-                                    Customize the look and feel, set system prompts, and define the behavior of your AI assistant to match your brand.
-                                </flux:text>
-                            </div>
-                        </div>
-
-                        <!-- Step 3 -->
-                        <div class="flex gap-6">
-                            <div class="flex-none size-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">3</div>
-                            <div>
-                                <flux:heading class="mb-2">Deploy and interact</flux:heading>
-                                <flux:text class="text-zinc-600 dark:text-zinc-400">
-                                    Embed the widget on your site or use the API. Start getting accurate, grounded answers from your own knowledge base.
-                                </flux:text>
-                            </div>
+                        <h3 class="text-2xl font-bold mb-4">Deep Document Parsing</h3>
+                        <p class="text-zinc-400 leading-relaxed mb-6">Our system handles PDF, DOCX, and TXT with advanced layout detection. We chunk your data logically to preserve context and maximize LLM accuracy.</p>
+                        <div class="flex gap-2">
+                            <flux:badge variant="neutral" class="bg-zinc-800 text-zinc-300 border-zinc-700">OCR Support</flux:badge>
+                            <flux:badge variant="neutral" class="bg-zinc-800 text-zinc-300 border-zinc-700">Metadata Ingestion</flux:badge>
                         </div>
                     </div>
 
-                    <div class="lg:w-1/2 bg-zinc-100 dark:bg-zinc-900 rounded-3xl p-12 border border-zinc-200 dark:border-zinc-800 aspect-square flex items-center justify-center overflow-hidden relative group">
-                        <!-- Decorative elements -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="absolute top-1/4 left-1/4 size-32 bg-indigo-500/10 blur-3xl rounded-full"></div>
-                        <div class="absolute bottom-1/4 right-1/4 size-32 bg-purple-500/10 blur-3xl rounded-full"></div>
-                        
-                        <!-- Illustration content -->
-                        <div class="relative w-full h-full flex items-center justify-center">
-                            <div class="p-8 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-700 transform group-hover:scale-105 transition-transform duration-500">
-                                <div class="flex items-center gap-4 mb-6">
-                                    <div class="size-8 rounded-full bg-zinc-100 dark:bg-zinc-700"></div>
-                                    <div class="h-2 w-24 bg-zinc-100 dark:bg-zinc-700 rounded"></div>
-                                </div>
-                                <div class="space-y-3">
-                                    <div class="h-2 w-full bg-zinc-100 dark:bg-zinc-700 rounded"></div>
-                                    <div class="h-2 w-5/6 bg-zinc-100 dark:bg-zinc-700 rounded"></div>
-                                    <div class="h-2 w-4/6 bg-zinc-100 dark:bg-zinc-700 rounded"></div>
-                                </div>
-                                <div class="mt-8 flex justify-end">
-                                    <div class="px-4 py-2 bg-indigo-600 rounded-lg text-[10px] text-white font-bold">Ragbot is processing...</div>
-                                </div>
+                    <div class="glass-card p-10 rounded-3xl group hover:border-purple-500/50 transition-colors">
+                        <div class="size-12 bg-purple-600/20 rounded-xl flex items-center justify-center mb-8 border border-purple-500/20">
+                            <flux:icon icon="magnifying-glass" class="text-purple-400" />
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Semantic Search</h3>
+                        <p class="text-zinc-400 leading-relaxed">Stop relying on keywords. Our vector-based retrieval finds the underlying meaning in user queries.</p>
+                    </div>
+
+                    <div class="glass-card p-10 rounded-3xl group hover:border-emerald-500/50 transition-colors">
+                        <div class="size-12 bg-emerald-600/20 rounded-xl flex items-center justify-center mb-8 border border-emerald-500/20">
+                            <flux:icon icon="code-bracket" class="text-emerald-400" />
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Universal API</h3>
+                        <p class="text-zinc-400 leading-relaxed">Integrate with any stack. Our REST API and 1-line script widget make deployment a breeze.</p>
+                    </div>
+
+                    <div class="md:col-span-2 glass-card p-10 rounded-3xl group hover:border-amber-500/50 transition-colors flex flex-col md:flex-row gap-10 items-center">
+                        <div class="flex-1">
+                            <div class="size-12 bg-amber-600/20 rounded-xl flex items-center justify-center mb-8 border border-amber-500/20">
+                                <flux:icon icon="chart-bar" class="text-amber-400" />
                             </div>
-                            
-                            <!-- Floating icons -->
-                            <div class="absolute top-10 right-10 p-4 bg-white dark:bg-zinc-800 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-700 animate-bounce" style="animation-duration: 3s;">
-                                <flux:icon icon="document-text" variant="mini" class="text-indigo-600 dark:text-indigo-400" />
-                            </div>
-                            <div class="absolute bottom-10 left-10 p-4 bg-white dark:bg-zinc-800 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-700 animate-bounce" style="animation-duration: 4s;">
-                                <flux:icon icon="chat-bubble-left-right" variant="mini" class="text-purple-600 dark:text-purple-400" />
-                            </div>
+                            <h3 class="text-2xl font-bold mb-4">Billing & Token Insights</h3>
+                            <p class="text-zinc-400 leading-relaxed">Monitor your LLM costs and token usage in real-time. Breakdown by model and chatbot to optimize your spend.</p>
+                        </div>
+                        <div class="flex-1 w-full p-6 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+                             <div class="space-y-4">
+                                 <div class="h-2 w-3/4 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-amber-500 w-2/3"></div></div>
+                                 <div class="h-2 w-1/2 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 w-1/2"></div></div>
+                                 <div class="h-2 w-2/3 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-purple-500 w-1/3"></div></div>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -243,41 +213,50 @@
         </section>
 
         <!-- CTA Section -->
-        <section class="py-24 bg-indigo-600 dark:bg-indigo-700">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <flux:heading size="xl" level="2" class="text-white mb-6">
-                    Ready to build your AI assistant?
-                </flux:heading>
-                <flux:text size="lg" class="text-indigo-100 mb-10 max-w-2xl mx-auto">
-                    Join hundreds of companies using Ragbot to transform their documents into intelligent, actionable knowledge.
-                </flux:text>
-                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                    <flux:button href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}" class="bg-white text-indigo-600 hover:bg-zinc-100 w-full sm:w-auto">Get Started for Free</flux:button>
-                </div>
+        <section class="py-32 relative overflow-hidden">
+            <div class="absolute inset-0 bg-indigo-600"></div>
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            
+            <div class="container mx-auto px-6 lg:px-12 relative z-10 text-center">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-8">
+                    Ready to build your knowledge engine?
+                </h2>
+                <p class="text-indigo-100 text-lg mb-12 max-w-2xl mx-auto">
+                    Join forward-thinking developers and businesses transforming their private data into intelligent assistants.
+                </p>
+                <flux:button href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}" class="bg-white text-indigo-600 hover:bg-zinc-100 h-16 px-12 text-lg shadow-2xl shadow-black/20">Get Started for Free</flux:button>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="py-12 border-t border-zinc-200 dark:border-zinc-800">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
-                <div class="flex items-center gap-2">
-                    <img src="https://fluxui.dev/img/demo/logo.png" alt="Ragbot" class="size-6">
-                    <span class="font-bold text-lg">Ragbot</span>
+    <footer class="py-20 border-t border-zinc-800 bg-zinc-950 relative z-10">
+        <div class="container mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-12">
+                <div class="flex flex-col items-center md:items-start gap-4">
+                    <div class="flex items-center gap-2">
+                        <div class="size-6 bg-indigo-600 rounded flex items-center justify-center">
+                            <flux:icon icon="bolt" variant="mini" class="text-white h-3 w-3" />
+                        </div>
+                        <span class="font-bold text-lg italic uppercase tracking-tighter">Ragbot</span>
+                    </div>
+                    <p class="text-zinc-500 text-sm max-w-xs text-center md:text-left">Building the future of Retrieval-Augmented Generation for everyone.</p>
                 </div>
                 
-                <nav class="flex gap-8 text-sm text-zinc-600 dark:text-zinc-400">
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400">Privacy Policy</a>
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400">Terms of Service</a>
-                    <a href="#" class="hover:text-indigo-600 dark:hover:text-indigo-400">Contact Us</a>
+                <nav class="flex flex-wrap justify-center gap-x-12 gap-y-4 text-sm font-medium text-zinc-400">
+                    <a href="#" class="hover:text-white transition-colors">Documentation</a>
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Contact</a>
                 </nav>
 
-                <div class="text-sm text-zinc-500">
-                    &copy; {{ date('Y') }} Ragbot. All rights reserved.
+                <div class="text-zinc-500 text-sm">
+                    &copy; {{ date('Y') }} Ragbot. Developed by Sanjay.
                 </div>
             </div>
         </div>
     </footer>
+
+    @fluxScripts
 </body>
 </html>
