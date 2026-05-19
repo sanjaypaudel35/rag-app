@@ -274,9 +274,14 @@ if (response.status === 429) {
                 </div>
             </section>
         </div>
-    @endif
-</div>
-ustom extensions, you must register them in the <code class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-xs font-mono">boot</code> method of your <code class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-xs font-mono">AppServiceProvider</code>.
+    @elseif($activeTab === 'developer')
+        <div class="space-y-8 max-w-4xl">
+            <section>
+                <flux:heading size="xl" class="mb-4">Developer Extension Guide</flux:heading>
+                <flux:text class="mb-6">Ragbot is designed to be extensible. You can easily override the default embedding logic or implement your own vector store while maintaining full compatibility with the RAG pipeline.</flux:text>
+                
+                <flux:callout variant="info" icon="information-circle" class="mb-8">
+                    To use custom extensions, you must register them in the <code class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-xs font-mono">boot</code> method of your <code class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-xs font-mono">AppServiceProvider</code>.
                 </flux:callout>
             </section>
 

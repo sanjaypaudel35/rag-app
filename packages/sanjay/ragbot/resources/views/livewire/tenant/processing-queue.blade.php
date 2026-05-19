@@ -107,18 +107,20 @@
             </flux:table>
         @endif
     </flux:card>
+</div>
 
-    <flux:modal name="failed-jobs-modal" wire:model="showFailedJobsModal" class="md:min-w-[800px] h-[80vh] p-0 overflow-hidden flex flex-col">
-        <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
-            <div>
-                <flux:heading size="lg">Failed Jobs Log for {{ $selectedDocumentName }} ({{ $failedBatchJobs }} of {{ $totalBatchJobs }} jobs failed)</flux:heading>
-                <flux:text size="xs" class="mt-0.5">Log stack and job details for failed processing tasks</flux:text>
+@if($showFailedJobsModal)
+    <flux:modal wire:model="showFailedJobsModal" class="md:min-w-[800px]">
+        <div class="h-[80vh] flex flex-col -m-6 overflow-hidden">
+            <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900">
+                <div>
+                    <flux:heading size="lg">Failed Jobs Log for {{ $selectedDocumentName }} ({{ $failedBatchJobs }} of {{ $totalBatchJobs }} jobs failed)</flux:heading>
+                    <flux:text size="xs" class="mt-0.5">Log stack and job details for failed processing tasks</flux:text>
+                </div>
+                <flux:button icon="x-mark" variant="ghost" size="sm" wire:click="$set('showFailedJobsModal', false)" />
             </div>
-            <flux:button icon="x-mark" variant="ghost" size="sm" wire:click="$set('showFailedJobsModal', false)" />
-        </div>
 
-        <div class="flex-1 overflow-y-auto bg-zinc-50 dark:bg-zinc-950 p-6">
-            @if($showFailedJobsModal)
+            <div class="flex-1 overflow-y-auto bg-zinc-50 dark:bg-zinc-950 p-6">
                 @if(empty($selectedFailedJobs))
                     <div class="h-full flex flex-col items-center justify-center text-zinc-400">
                         <flux:icon icon="check-circle" class="w-12 h-12 mb-4 opacity-20 text-green-500" />
@@ -171,14 +173,14 @@
                         @endforeach
                     </div>
                 @endif
-            @endif
-        </div>
-        
-        <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end bg-zinc-50 dark:bg-zinc-900/50 gap-3">
-            <flux:button variant="ghost" size="sm" wire:click="$set('showFailedJobsModal', false)">Close</flux:button>
-            <flux:button variant="primary" size="sm" wire:click="retry('{{ $selectedDocumentId }}')">
-                Retry Document
-            </flux:button>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end bg-zinc-50 dark:bg-zinc-900/50 gap-3">
+                <flux:button variant="ghost" size="sm" wire:click="$set('showFailedJobsModal', false)">Close</flux:button>
+                <flux:button variant="primary" size="sm" wire:click="retry('{{ $selectedDocumentId }}')">
+                    Retry Document
+                </flux:button>
+            </div>
         </div>
     </flux:modal>
-</div>
+@endif

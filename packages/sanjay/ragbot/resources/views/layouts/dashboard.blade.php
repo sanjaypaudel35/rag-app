@@ -29,7 +29,6 @@
             <flux:sidebar.nav>
                 <flux:sidebar.item icon="squares-2x2" href="{{ app()->bound('ragbot.project') ? route('ragbot.dashboard', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.dashboard')">Dashboard</flux:sidebar.item>
                 <flux:sidebar.item icon="document-duplicate" href="{{ app()->bound('ragbot.project') ? route('ragbot.documents', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.documents')">Documents</flux:sidebar.item>
-                <flux:sidebar.item icon="rectangle-stack" href="#">Collections</flux:sidebar.item>
                 <flux:sidebar.item icon="arrow-path" href="{{ app()->bound('ragbot.project') ? route('ragbot.processing-queue', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.processing-queue')">Processing Queue</flux:sidebar.item>
                 
                 <flux:separator class="my-4 mx-4" />
@@ -38,14 +37,15 @@
                 <flux:sidebar.item icon="users" href="{{ app()->bound('ragbot.project') ? route('ragbot.team', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.team')">Team</flux:sidebar.item>
                 <flux:sidebar.item icon="chat-bubble-left-right" href="{{ app()->bound('ragbot.project') ? route('ragbot.settings.chatbots', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.settings.chatbots')">Chatbots</flux:sidebar.item>
                 <flux:sidebar.item icon="credit-card" href="{{ app()->bound('ragbot.project') ? route('ragbot.billing', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.billing')">Billing</flux:sidebar.item>
-                <flux:sidebar.item icon="list-bullet" href="#">Activity Logs</flux:sidebar.item>
+                <flux:sidebar.item icon="list-bullet" href="#" class="opacity-50 pointer-events-none">Activity Logs <flux:badge size="sm" class="ml-2">Soon</flux:badge></flux:sidebar.item>
 
                 <flux:separator class="my-4 mx-4" />
 
                 <div class="px-4 mb-2">
                     <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Integration and Setup Guide</flux:text>
                 </div>
-                <flux:sidebar.item icon="code-bracket" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.integration-guide')">Integration Guide</flux:sidebar.item>
+                <flux:sidebar.item icon="code-bracket" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.integration-guide') && !request()->query('tab')">Integration Guide</flux:sidebar.item>
+                <flux:sidebar.item icon="wrench-screwdriver" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug, 'tab' => 'developer']) : '#' }}" :current="request()->routeIs('ragbot.integration-guide') && request()->query('tab') === 'developer'">Developer Extension</flux:sidebar.item>
             </flux:sidebar.nav>
 
             <flux:sidebar.spacer />

@@ -15,6 +15,10 @@ class IntegrationGuide extends Component
     public function mount(): void
     {
         $this->project = app('ragbot.project');
+
+        if (request()->query('tab') === 'developer') {
+            $this->activeTab = 'developer';
+        }
     }
     public function render(): View
     {
