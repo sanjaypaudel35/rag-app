@@ -1,6 +1,6 @@
-# 🤖 RAGBot: Multi-Tenant AI Platform
+# 🤖 RAGBot: Intelligent AI assistant
 
-RAGBot is a sophisticated **multi-tenant Retrieval-Augmented Generation (RAG)** system built with Laravel. It empowers businesses and developers to create custom AI chatbots grounded in their own unique data, ensuring accurate, contextual, and domain-specific responses.
+RAGBot is a sophisticated **Retrieval-Augmented Generation (RAG)** system built with Laravel. It empowers businesses and developers to create custom AI chatbots grounded in their own unique data, ensuring accurate, contextual, and domain-specific responses.
 
 ---
 
@@ -35,10 +35,9 @@ Generation:  Context + Prompt → LLM (OpenAI/Anthropic) → Response
 ### Core Tech Stack
 -   **Framework:** Laravel 13
 -   **Frontend:** Livewire 4 + Flux UI
--   **AI Engine:** Integrated with `laravel/ai` for pluggable LLM support (OpenAI, Anthropic).
 -   **Vector Storage:** Native support for PostgreSQL (`pgvector`) and MySQL.
 -   **Processing:** Asynchronous bus batching for high-volume document ingestion.
--   **Isolation:** Strict multi-tenant data separation via `ragbot.project` context.
+
 
 ---
 
@@ -47,7 +46,22 @@ Generation:  Context + Prompt → LLM (OpenAI/Anthropic) → Response
 Ragbot is designed to be highly extensible. You can override core logic by implementing interfaces and extending managers.
 
 ### Custom Embedding Logic
-Implement the `EmbeddingInterface` and register it in your `AppServiceProvider@boot`.
+If you need to use a local embedding model (via Ollama or Llama.cpp), a specialized private API, or custom pre-processing logic, you can easily do so. Simply implement the `EmbeddingInterface` and register it in your `AppServiceProvider@boot`.
+
+**The Interface:**
+```php
+interface EmbeddingInterface
+{
+    /**
+     * Generates vector embeddings for text.
+     *
+     * @return array<float>
+     */
+    public function embed(string $text, ?Project $project = null): array;
+}
+```
+
+**Registration:**
 ```php
 $this->app->make(EmbeddingManager::class)->extend('my-driver', function ($app, $project) {
     return new MyLocalEmbedding();
@@ -55,12 +69,33 @@ $this->app->make(EmbeddingManager::class)->extend('my-driver', function ($app, $
 ```
 
 ### Custom Vector Store
-Implement the `VectorStoreInterface` and extend the `VectorStoreManager`.
+If you want to use other specialized vector databases such as **Pinecone**, **Weaviate**, **Milvus**, or **ChromaDB**, you can easily integrate them. Just implement the `VectorStoreInterface` and extend the `VectorStoreManager` to register your custom driver.
+
+**The Interface:**
+```php
+interface VectorStoreInterface
+{
+    /**
+     * Stores vector embedding for a chunk.
+     */
+    public function store(Project $project, string $chunkId, array $vector): void;
+
+    /**
+     * Searches for chunks similar to the query vector.
+     *
+     * @return \Illuminate\Support\Collection  (Collection of \Sanjay\Ragbot\Models\Chunk)
+     */
+    public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection;
+}
+```
+
+**Registration:**
 ```php
 $this->app->make(VectorStoreManager::class)->extend('pinecone', function ($app) {
     return new PineconeStore();
 });
 ```
+*Once registered, you can select "Custom" in the LLM Settings tab and provide your driver name (e.g., `pinecone`).*
 
 ---
 

@@ -20,6 +20,7 @@ class IntegrationGuide extends Component
             $this->activeTab = 'developer';
         }
     }
+
     public function render(): View
     {
         return view('ragbot::livewire.tenant.integration-guide')
