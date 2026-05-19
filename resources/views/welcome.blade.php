@@ -34,9 +34,9 @@
                 
                 <div class="flex items-center gap-4 ml-4">
                     @auth('ragbot')
-                        <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/tenant/' . (app()->bound('ragbot.project') ? app('ragbot.project')->slug : 'test') . '/dashboard') }}">Dashboard</flux:button>
+                        <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/tenant/' . (app()->bound('ragbot.project') ? app('ragbot.project')->slug : 'test-project') . '/dashboard') }}">Dashboard</flux:button>
                     @else
-                        <flux:navbar.item href="{{ url(config('ragbot.prefix', 'ragbot') . '/login') }}">Log in</flux:navbar.item>
+                        <flux:navbar.item href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}">Get Started</flux:navbar.item>
                     @endauth
                 </div>
             </flux:navbar>
@@ -56,7 +56,7 @@
                         Connect your documents, automate your support, and empower your team with Ragbot's powerful RAG engine. The smartest way to talk to your data.
                     </flux:text>
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/login') }}" class="w-full sm:w-auto">Get Started for Free</flux:button>
+                        <flux:button href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}" class="w-full sm:w-auto">Get Started for Free</flux:button>
                         <flux:button href="#features" class="w-full sm:w-auto">Explore Features</flux:button>
                     </div>
                 </div>
@@ -252,7 +252,7 @@
                     Join hundreds of companies using Ragbot to transform their documents into intelligent, actionable knowledge.
                 </flux:text>
                 <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                    <flux:button href="{{ url(config('ragbot.prefix', 'ragbot') . '/login') }}" class="bg-white text-indigo-600 hover:bg-zinc-100 w-full sm:w-auto">Get Started for Free</flux:button>
+                    <flux:button href="{{ route('ragbot.tenant.register', ['project_slug' => 'test-project']) }}" class="bg-white text-indigo-600 hover:bg-zinc-100 w-full sm:w-auto">Get Started for Free</flux:button>
                 </div>
             </div>
         </section>
