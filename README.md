@@ -83,7 +83,7 @@ interface VectorStoreInterface
     /**
      * Searches for chunks similar to the query vector.
      *
-     * @return \Illuminate\Support\Collection  (Collection of \Sanjay\Ragbot\Models\Chunk)
+     * @return \Illuminate\Support\Collection
      */
     public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection;
 }
