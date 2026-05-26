@@ -2,8 +2,10 @@
 
 namespace Sanjay\Ragbot\Services\Tenant;
 
+use Sanjay\Ragbot\Contracts\Repositories\ChatbotRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ConversationRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\MessageRepositoryInterface;
+use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\PromptBuilderServiceInterface;
 use Sanjay\Ragbot\Contracts\Services\RetrievalServiceInterface;
 use Sanjay\Ragbot\Enums\MessageRole;
@@ -13,7 +15,6 @@ use Sanjay\Ragbot\Exceptions\RetrievalException;
 use Sanjay\Ragbot\Models\Chatbot;
 use Sanjay\Ragbot\Models\Conversation;
 use Sanjay\Ragbot\Models\Project;
-use Sanjay\Ragbot\Models\ProjectSetting;
 
 /**
  * Generic chat service to handle the RAG chat workflow.
@@ -26,6 +27,8 @@ class ChatService
     public function __construct(
         protected ConversationRepositoryInterface $conversationRepository,
         protected MessageRepositoryInterface $messageRepository,
+        protected ChatbotRepositoryInterface $chatbotRepository,
+        protected ProjectSettingRepositoryInterface $projectSettingRepository,
         protected RetrievalServiceInterface $retrievalService,
         protected PromptBuilderServiceInterface $promptBuilderService,
         protected LlmManager $llmManager,
@@ -54,15 +57,11 @@ class ChatService
 
         // Increment conversation count if new
         if ($conversation->wasRecentlyCreated) {
-            if ($chatbot) {
-                $chatbot->increment('total_conversations');
+            if ($chatbotId) {
+                $this->chatbotRepository->increment($chatbotId, 'total_conversations');
             }
 
-            /** @var ProjectSetting $settings */
-            $settings = $project->settings()->withoutGlobalScope('project')->first();
-            if ($settings) {
-                $settings->increment('total_conversations');
-            }
+            $this->projectSettingRepository->incrementForProject($project->id, 'total_conversations');
         }
 
         // 2. Store user message
@@ -110,31 +109,26 @@ class ChatService
         ]);
 
         // 8. Update aggregates
-        if ($chatbot) {
-            $chatbot->increment('total_tokens_used', $llmResponse->totalTokens());
-            $chatbot->increment('total_input_tokens', $llmResponse->inputTokens);
-            $chatbot->increment('total_output_tokens', $llmResponse->outputTokens);
-            $chatbot->increment('total_cost', $cost);
+        if ($chatbotId) {
+            $this->chatbotRepository->increment($chatbotId, 'total_tokens_used', $llmResponse->totalTokens());
+            $this->chatbotRepository->increment($chatbotId, 'total_input_tokens', $llmResponse->inputTokens);
+            $this->chatbotRepository->increment($chatbotId, 'total_output_tokens', $llmResponse->outputTokens);
+            $this->chatbotRepository->increment($chatbotId, 'total_cost', $cost);
 
             // Update per-model usage
-            $usage = $chatbot->modelUsage()->firstOrCreate(
-                ['model' => $llmResponse->model ?? 'unknown'],
-                ['project_id' => $project->id] // assuming we want project_id if it was there, but it's not in the table yet.
+            $this->chatbotRepository->updateModelUsage(
+                $chatbotId,
+                $llmResponse->model ?? 'unknown',
+                $llmResponse->inputTokens,
+                $llmResponse->outputTokens,
+                $cost
             );
-
-            $usage->increment('input_tokens', $llmResponse->inputTokens);
-            $usage->increment('output_tokens', $llmResponse->outputTokens);
-            $usage->increment('cost', $cost);
         }
 
-        /** @var ProjectSetting $settings */
-        $settings = $project->settings()->withoutGlobalScope('project')->first();
-        if ($settings) {
-            $settings->increment('total_tokens_used', $llmResponse->totalTokens());
-            $settings->increment('total_input_tokens', $llmResponse->inputTokens);
-            $settings->increment('total_output_tokens', $llmResponse->outputTokens);
-            $settings->increment('total_cost', $cost);
-        }
+        $this->projectSettingRepository->incrementForProject($project->id, 'total_tokens_used', $llmResponse->totalTokens());
+        $this->projectSettingRepository->incrementForProject($project->id, 'total_input_tokens', $llmResponse->inputTokens);
+        $this->projectSettingRepository->incrementForProject($project->id, 'total_output_tokens', $llmResponse->outputTokens);
+        $this->projectSettingRepository->incrementForProject($project->id, 'total_cost', $cost);
 
         return $llmResponse->content;
     }

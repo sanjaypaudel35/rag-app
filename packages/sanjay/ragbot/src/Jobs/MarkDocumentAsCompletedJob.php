@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
 use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Models\Document;
 
@@ -28,9 +29,9 @@ class MarkDocumentAsCompletedJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(DocumentRepositoryInterface $documentRepository): void
     {
-        $this->document->update([
+        $documentRepository->update($this->document->id, [
             'status' => DocumentStatus::Completed,
         ]);
     }

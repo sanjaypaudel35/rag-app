@@ -5,17 +5,25 @@ namespace Sanjay\Ragbot\Http\Controllers\Auth\Tenant;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
+use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
 use Sanjay\Ragbot\Models\RagbotUser;
 
 class EmailVerificationController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(
+        protected UserRepositoryInterface $userRepository
+    ) {}
+
     /**
      * Mark the authenticated user's email address as verified.
      */
     public function __invoke(string $project_slug, string $id, string $hash): RedirectResponse
     {
         /** @var RagbotUser|null $user */
-        $user = RagbotUser::findOrFail($id);
+        $user = $this->userRepository->findById($id);
 
         if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
             abort(403);

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Sanjay\Ragbot\Enums\DocumentStatus;
+use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
 use Sanjay\Ragbot\Exceptions\DocumentProcessingException;
 use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Models\Project;
@@ -103,7 +103,7 @@ class DocumentManager extends Component
     /**
      * Render the component.
      */
-    public function render(DocumentService $documentService): View
+    public function render(DocumentService $documentService, DocumentRepositoryInterface $documentRepository): View
     {
         if (! app()->bound('ragbot.project')) {
             $this->errorMessage = 'Project context could not be resolved. Please try refreshing the page.';
@@ -116,26 +116,15 @@ class DocumentManager extends Component
 
         $project = app('ragbot.project');
 
-        $baseQuery = Document::where('project_id', $project->id);
+        // Fetch stats for all documents in project via repository
+        $stats = $documentRepository->getStats($project->id);
 
-        // Fetch stats for all documents in project
-        $stats = [
-            'total' => (clone $baseQuery)->count(),
-            'processing' => (clone $baseQuery)->where('status', DocumentStatus::Processing)->count(),
-            'completed' => (clone $baseQuery)->where('status', DocumentStatus::Completed)->count(),
-            'failed' => (clone $baseQuery)->where('status', DocumentStatus::Failed)->count(),
-        ];
-
-        $documents = (clone $baseQuery)
-            ->withCount('chunks')
-            ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%'.$this->search.'%');
-            })
-            ->when($this->statusFilter, function ($query) {
-                $query->where('status', $this->statusFilter);
-            })
-            ->latest()
-            ->paginate(10);
+        $documents = $documentRepository->searchForProject(
+            $project->id,
+            $this->search,
+            $this->statusFilter,
+            10
+        );
 
         // Calculate file sizes and fetch batch info for display
         $documents->each(function ($doc) {
@@ -182,7 +171,7 @@ class DocumentManager extends Component
     /**
      * Open preview modal for a document.
      */
-    public function preview(string $documentId): void
+    public function preview(string $documentId, DocumentRepositoryInterface $documentRepository): void
     {
         $project = app('ragbot.project');
         $this->previewUrl = route('ragbot.documents.preview', [
@@ -190,7 +179,7 @@ class DocumentManager extends Component
             'document' => $documentId,
         ]);
 
-        $document = Document::find($documentId);
+        $document = $documentRepository->findById($documentId);
         $this->previewName = $document ? $document->name : 'Document Preview';
 
         $this->showPreviewModal = true;

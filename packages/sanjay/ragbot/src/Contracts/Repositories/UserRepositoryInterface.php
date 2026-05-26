@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Contracts\Repositories;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -20,4 +21,14 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
      * @param  array<string, mixed>  $data
      */
     public function createForProject(string $projectId, array $data): Model;
+
+    /**
+     * Search and filter users for a project with pagination.
+     */
+    public function searchForProject(
+        string $projectId,
+        ?string $search = null,
+        ?string $status = null,
+        int $perPage = 10
+    ): LengthAwarePaginator;
 }

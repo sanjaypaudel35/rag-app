@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
 use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Jobs\ProcessDocumentJob;
 use Sanjay\Ragbot\Models\Document;
@@ -64,39 +65,38 @@ class ProcessingQueue extends Component
     #[Computed]
     public function documents()
     {
-        return $this->project->documents()
-            ->whereIn('status', [
-                DocumentStatus::Pending,
-                DocumentStatus::Processing,
-                DocumentStatus::Failed,
-                DocumentStatus::Completed,
-            ])
-            ->latest()
-            ->take(10) // Limit to recent 10 to keep the queue clean
-            ->get()
-            ->map(function ($document) {
-                $batch = null;
-                if ($document->processing_batch_id) {
-                    $batch = Bus::findBatch($document->processing_batch_id);
-                }
+        return app(DocumentRepositoryInterface::class)->getRecentForProject(
+            $this->project->id,
+            [
+                DocumentStatus::Pending->value,
+                DocumentStatus::Processing->value,
+                DocumentStatus::Failed->value,
+                DocumentStatus::Completed->value,
+            ],
+            10
+        )->map(function ($document) {
+            $batch = null;
+            if ($document->processing_batch_id) {
+                $batch = Bus::findBatch($document->processing_batch_id);
+            }
 
-                return (object) [
-                    'id' => $document->id,
-                    'name' => $document->name,
-                    'status' => $document->status,
-                    'error_message' => $document->error_message,
-                    'batch' => $batch,
-                    'created_at' => $document->created_at,
-                ];
-            });
+            return (object) [
+                'id' => $document->id,
+                'name' => $document->name,
+                'status' => $document->status,
+                'error_message' => $document->error_message,
+                'batch' => $batch,
+                'created_at' => $document->created_at,
+            ];
+        });
     }
 
     /**
      * View failed jobs for a specific document.
      */
-    public function viewFailedJobs(string $documentId): void
+    public function viewFailedJobs(string $documentId, DocumentRepositoryInterface $documentRepository): void
     {
-        $document = Document::findOrFail($documentId);
+        $document = $documentRepository->findById($documentId);
         $this->selectedDocumentName = $document->name;
         $this->selectedDocumentId = $document->id;
         $this->totalBatchJobs = 0;
@@ -154,14 +154,14 @@ class ProcessingQueue extends Component
     /**
      * Retry processing for a specific document.
      */
-    public function retry(string $documentId): void
+    public function retry(string $documentId, DocumentRepositoryInterface $documentRepository): void
     {
-        $document = Document::findOrFail($documentId);
+        $document = $documentRepository->findById($documentId);
 
         DB::beginTransaction();
         try {
             // Reset state
-            $document->update([
+            $documentRepository->update($document->id, [
                 'status' => DocumentStatus::Pending,
                 'error_message' => null,
                 'processing_batch_id' => null,

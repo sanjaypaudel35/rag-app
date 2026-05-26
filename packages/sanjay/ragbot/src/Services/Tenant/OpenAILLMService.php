@@ -21,7 +21,7 @@ class OpenAILLMService extends BaseLlmService
     public function complete(string $prompt, array $options = []): LlmResponse
     {
         $apiKey = $this->settings->llm_api_key;
-        $baseUrl = $this->settings->llm_api_endpoint ?? 'https://api.openai.com/v1';
+        $baseUrl = $this->settings->llm_api_endpoint ?? config('ragbot.llm.providers.openai.base_url');
         $model = $this->settings->llm_model ?? config('ragbot.llm.providers.openai.model');
 
         $response = Http::withToken($apiKey)

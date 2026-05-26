@@ -52,4 +52,14 @@ class ProjectSettingRepository extends BaseRepository implements ProjectSettingR
 
         return $record;
     }
+
+    /**
+     * Increment a column value for project settings.
+     */
+    public function incrementForProject(string $projectId, string $column, int $amount = 1): void
+    {
+        $this->model->withoutGlobalScope('project')
+            ->where('project_id', $projectId)
+            ->increment($column, $amount);
+    }
 }

@@ -8,8 +8,8 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
 use Sanjay\Ragbot\Models\Project;
-use Sanjay\Ragbot\Models\RagbotUser;
 
 class TeamManager extends Component
 {
@@ -44,7 +44,7 @@ class TeamManager extends Component
         $this->project = app('ragbot.project');
     }
 
-    public function addTeamMember(): void
+    public function addTeamMember(UserRepositoryInterface $userRepository): void
     {
         $this->validate([
             'newMember.firstname' => 'required|string|max:255',
@@ -53,8 +53,7 @@ class TeamManager extends Component
             'newMember.password' => 'required|string|min:8',
         ]);
 
-        $user = RagbotUser::create([
-            'project_id' => $this->project->id,
+        $user = $userRepository->createForProject($this->project->id, [
             'firstname' => $this->newMember['firstname'],
             'lastname' => $this->newMember['lastname'],
             'name' => $this->newMember['firstname'].' '.$this->newMember['lastname'],
@@ -78,23 +77,12 @@ class TeamManager extends Component
     #[Computed]
     public function teamMembers()
     {
-        return $this->project->users()
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('firstname', 'like', '%'.$this->search.'%')
-                        ->orWhere('lastname', 'like', '%'.$this->search.'%')
-                        ->orWhere('email', 'like', '%'.$this->search.'%');
-                });
-            })
-            ->when($this->status !== '', function ($query) {
-                if ($this->status === 'verified') {
-                    $query->whereNotNull('email_verified_at');
-                } elseif ($this->status === 'pending') {
-                    $query->whereNull('email_verified_at');
-                }
-            })
-            ->latest()
-            ->paginate(10);
+        return app(UserRepositoryInterface::class)->searchForProject(
+            $this->project->id,
+            $this->search,
+            $this->status,
+            10
+        );
     }
 
     public function render(): View

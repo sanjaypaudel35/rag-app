@@ -9,7 +9,8 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
-use Sanjay\Ragbot\Enums\DocumentStatus;
+use Sanjay\Ragbot\Contracts\Repositories\ChatbotRepositoryInterface;
+use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
 use Sanjay\Ragbot\Models\Chatbot;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Services\Tenant\ApiKeyService;
@@ -118,7 +119,7 @@ class ChatbotManager extends Component
     #[Computed]
     public function testingChatbot(): ?Chatbot
     {
-        return $this->testingChatbotId ? Chatbot::find($this->testingChatbotId) : null;
+        return $this->testingChatbotId ? app(ChatbotRepositoryInterface::class)->findById($this->testingChatbotId) : null;
     }
 
     public function regenerateProjectKey(ApiKeyService $service): void
@@ -141,13 +142,13 @@ class ChatbotManager extends Component
     #[Computed]
     public function chatbots(): Collection
     {
-        return $this->project->chatbots()->with(['documents', 'modelUsage'])->latest()->get();
+        return app(ChatbotRepositoryInterface::class)->getForProject($this->project->id, ['documents', 'modelUsage']);
     }
 
     #[Computed]
     public function availableDocuments(): Collection
     {
-        return $this->project->documents()->where('status', DocumentStatus::Completed)->get();
+        return app(DocumentRepositoryInterface::class)->getForProject($this->project->id);
     }
 
     public function openCreateModal(): void
@@ -156,7 +157,7 @@ class ChatbotManager extends Component
         $this->showingCreateModal = true;
     }
 
-    public function createChatbot(): void
+    public function createChatbot(ChatbotRepositoryInterface $chatbotRepository): void
     {
         $this->validate([
             'name' => 'required|string|max:255',
@@ -169,7 +170,8 @@ class ChatbotManager extends Component
             $apiKey = 'rb_c_'.Str::random(60);
 
             /** @var Chatbot $chatbot */
-            $chatbot = $this->project->chatbots()->create([
+            $chatbot = $chatbotRepository->create([
+                'project_id' => $this->project->id,
                 'name' => $this->name,
                 'api_key' => hash('sha256', $apiKey),
             ]);
@@ -189,13 +191,13 @@ class ChatbotManager extends Component
         $this->showingCreateModal = false;
     }
 
-    public function regenerateKey(Chatbot $chatbot): void
+    public function regenerateKey(Chatbot $chatbot, ChatbotRepositoryInterface $chatbotRepository): void
     {
         DB::beginTransaction();
 
         try {
             $newKey = 'rb_c_'.Str::random(60);
-            $chatbot->update(['api_key' => hash('sha256', $newKey)]);
+            $chatbotRepository->update($chatbot->id, ['api_key' => hash('sha256', $newKey)]);
 
             $this->newlyGeneratedKey = $newKey;
 
@@ -208,10 +210,10 @@ class ChatbotManager extends Component
         }
     }
 
-    public function toggleActive(Chatbot $chatbot): void
+    public function toggleActive(Chatbot $chatbot, ChatbotRepositoryInterface $chatbotRepository): void
     {
         try {
-            $chatbot->update(['is_active' => ! $chatbot->is_active]);
+            $chatbotRepository->update($chatbot->id, ['is_active' => ! $chatbot->is_active]);
             $status = $chatbot->is_active ? 'activated' : 'deactivated';
             session()->flash('success', "Chatbot {$chatbot->name} has been {$status}.");
         } catch (\Throwable $e) {
@@ -220,12 +222,12 @@ class ChatbotManager extends Component
         }
     }
 
-    public function deleteChatbot(Chatbot $chatbot): void
+    public function deleteChatbot(Chatbot $chatbot, ChatbotRepositoryInterface $chatbotRepository): void
     {
         DB::beginTransaction();
 
         try {
-            $chatbot->delete();
+            $chatbotRepository->delete($chatbot->id);
 
             DB::commit();
             session()->flash('success', 'Chatbot deleted successfully.');

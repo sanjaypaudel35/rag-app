@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
+use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
 use Sanjay\Ragbot\Enums\DocumentStatus;
 use Sanjay\Ragbot\Models\Document;
 use Throwable;
@@ -40,7 +41,7 @@ class EmbedChunksJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(DocumentRepositoryInterface $documentRepository): void
     {
         try {
             // 1. Validation: Ensure chunks exist
@@ -51,7 +52,7 @@ class EmbedChunksJob implements ShouldQueue
             }
 
             // 2. Update Status -> Processing
-            $this->document->update([
+            $documentRepository->update($this->document->id, [
                 'status' => DocumentStatus::Processing,
             ]);
 
@@ -64,13 +65,15 @@ class EmbedChunksJob implements ShouldQueue
                 ->name("Embedding: {$this->document->name}")
                 ->allowFailures()
                 ->finally(function ($batch) use ($documentId) {
-                    $document = Document::find($documentId);
+                    $documentRepository = app(DocumentRepositoryInterface::class);
+                    $document = $documentRepository->findById($documentId);
+
                     if (! $document) {
                         return;
                     }
 
                     if ($batch->failedJobs > 0) {
-                        $document->update([
+                        $documentRepository->update($document->id, [
                             'status' => DocumentStatus::Failed,
                             'error_message' => "Embedding failed for {$batch->failedJobs} out of {$batch->totalJobs} chunks.",
                         ]);
@@ -81,12 +84,12 @@ class EmbedChunksJob implements ShouldQueue
                 })
                 ->dispatch();
 
-            $this->document->update([
+            $documentRepository->update($this->document->id, [
                 'processing_batch_id' => $batch->id,
             ]);
 
         } catch (Throwable $e) {
-            $this->document->update([
+            $documentRepository->update($this->document->id, [
                 'status' => DocumentStatus::Failed,
                 'error_message' => $e->getMessage(),
             ]);

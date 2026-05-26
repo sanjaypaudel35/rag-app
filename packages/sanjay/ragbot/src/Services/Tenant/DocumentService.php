@@ -140,6 +140,8 @@ class DocumentService
      */
     public function listForProject(): Collection
     {
-        return Document::withCount('chunks')->latest()->get();
+        $project = app('ragbot.project');
+
+        return $this->documentRepository->getForProject($project->id);
     }
 }

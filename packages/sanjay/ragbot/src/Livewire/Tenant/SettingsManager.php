@@ -9,6 +9,8 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Sanjay\Ragbot\Contracts\Repositories\ChatbotRepositoryInterface;
+use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
 use Sanjay\Ragbot\Enums\LlmProvider;
 use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Models\Chatbot;
@@ -81,7 +83,7 @@ class SettingsManager extends Component
         $this->loadChatbotSettings();
     }
 
-    public function saveProjectSettings(): void
+    public function saveProjectSettings(ProjectRepositoryInterface $projectRepository): void
     {
         $this->validate([
             'projectName' => 'required|string|max:255',
@@ -98,7 +100,7 @@ class SettingsManager extends Component
             $this->currentLogo = $path;
         }
 
-        $this->project->update($data);
+        $projectRepository->update($this->project->id, $data);
 
         session()->flash('success', 'Project settings updated successfully.');
     }
@@ -117,22 +119,22 @@ class SettingsManager extends Component
     #[Computed]
     public function chatbots()
     {
-        return $this->project->chatbots()->latest()->get();
+        return app(ChatbotRepositoryInterface::class)->getForProject($this->project->id);
     }
 
-    public function saveChatbotSettings(string $chatbotId): void
+    public function saveChatbotSettings(string $chatbotId, ChatbotRepositoryInterface $chatbotRepository): void
     {
         $this->validate([
             "chatbotSettings.{$chatbotId}.rate_limit_per_minute" => 'required|integer|min:1|max:1000',
             "chatbotSettings.{$chatbotId}.session_rate_limit_per_minute" => 'required|integer|min:1|max:100',
         ]);
 
-        $chatbot = Chatbot::findOrFail($chatbotId);
+        $chatbot = $chatbotRepository->findById($chatbotId);
         $settings = $this->chatbotSettings[$chatbotId];
 
         $origins = array_filter(array_map('trim', explode("\n", $settings['allowed_origins'])));
 
-        $chatbot->update([
+        $chatbotRepository->update($chatbot->id, [
             'allowed_origins' => $origins,
             'rate_limit_per_minute' => $settings['rate_limit_per_minute'],
             'session_rate_limit_per_minute' => $settings['session_rate_limit_per_minute'],

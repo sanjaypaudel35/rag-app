@@ -21,7 +21,7 @@ class AnthropicLLMService extends BaseLlmService
     public function complete(string $prompt, array $options = []): LlmResponse
     {
         $apiKey = $this->settings->llm_api_key;
-        $baseUrl = $this->settings->llm_api_endpoint ?? 'https://api.anthropic.com';
+        $baseUrl = $this->settings->llm_api_endpoint ?? config('ragbot.llm.providers.anthropic.base_url');
         $model = $this->settings->llm_model ?? config('ragbot.llm.providers.anthropic.model');
 
         $response = Http::withHeaders([

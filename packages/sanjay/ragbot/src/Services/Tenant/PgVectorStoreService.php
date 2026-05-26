@@ -4,12 +4,19 @@ namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Sanjay\Ragbot\Contracts\Repositories\EmbeddingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
-use Sanjay\Ragbot\Models\Embedding;
 use Sanjay\Ragbot\Models\Project;
 
 class PgVectorStoreService implements VectorStoreInterface
 {
+    /**
+     * Create a new service instance.
+     */
+    public function __construct(
+        protected EmbeddingRepositoryInterface $embeddingRepository
+    ) {}
+
     /**
      * Stores vector embeddings in PostgreSQL.
      *
@@ -21,7 +28,7 @@ class PgVectorStoreService implements VectorStoreInterface
         // or format it as a string for raw queries.
         // Eloquent with array cast might work depending on the DB driver setup.
 
-        Embedding::updateOrCreate(
+        $this->embeddingRepository->updateOrCreate(
             [
                 'project_id' => $project->id,
                 'chunk_id' => $chunkId,
@@ -42,18 +49,12 @@ class PgVectorStoreService implements VectorStoreInterface
     {
         $vectorString = '['.implode(',', $queryVector).']';
 
-        $query = Embedding::where('project_id', $project->id)
-            ->with('chunk');
-
-        if (! empty($documentIds)) {
-            $query->whereHas('chunk', function ($q) use ($documentIds) {
-                $q->whereIn('document_id', $documentIds);
-            });
-        }
-
-        return $query->orderByRaw('vector <=> ?::vector', [$vectorString])
-            ->take($topK)
-            ->get()
-            ->pluck('chunk');
+        return $this->embeddingRepository->searchWithChunks(
+            $project->id,
+            $documentIds,
+            'vector <=> ?::vector',
+            [$vectorString],
+            $topK
+        )->pluck('chunk');
     }
 }

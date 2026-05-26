@@ -2,6 +2,7 @@
 
 namespace Sanjay\Ragbot\Services\Tenant;
 
+use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Models\Project;
 
 /**
@@ -10,11 +11,18 @@ use Sanjay\Ragbot\Models\Project;
 class WidgetService
 {
     /**
+     * Create a new service instance.
+     */
+    public function __construct(
+        protected ProjectSettingRepositoryInterface $projectSettingRepository
+    ) {}
+
+    /**
      * Get the widget JavaScript script.
      */
     public function getScript(Project $project, string $baseUrl): string
     {
-        $settings = $project->settings()->withoutGlobalScopes()->first();
+        $settings = $this->projectSettingRepository->findOneBy(['project_id' => $project->id]);
 
         if (! $settings || ! $settings->widget_enabled) {
             return '/* Chat widget is disabled for this project. */';

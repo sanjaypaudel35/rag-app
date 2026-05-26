@@ -3,13 +3,20 @@
 namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Collection;
+use Sanjay\Ragbot\Contracts\Repositories\EmbeddingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
-use Sanjay\Ragbot\Models\Embedding;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Support\VectorHelper;
 
 class MysqlVectorStoreService implements VectorStoreInterface
 {
+    /**
+     * Create a new service instance.
+     */
+    public function __construct(
+        protected EmbeddingRepositoryInterface $embeddingRepository
+    ) {}
+
     /**
      * Stores and retrieves vector embeddings.
      *
@@ -17,7 +24,7 @@ class MysqlVectorStoreService implements VectorStoreInterface
      */
     public function store(Project $project, string $chunkId, array $vector): void
     {
-        Embedding::updateOrCreate(
+        $this->embeddingRepository->updateOrCreate(
             [
                 'project_id' => $project->id,
                 'chunk_id' => $chunkId,
@@ -36,16 +43,7 @@ class MysqlVectorStoreService implements VectorStoreInterface
      */
     public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection
     {
-        $query = Embedding::where('project_id', $project->id)
-            ->with('chunk');
-
-        if (! empty($documentIds)) {
-            $query->whereHas('chunk', function ($q) use ($documentIds) {
-                $q->whereIn('document_id', $documentIds);
-            });
-        }
-
-        return $query->get()
+        return $this->embeddingRepository->getWithChunks($project->id, $documentIds)
             ->map(function ($embedding) use ($queryVector) {
                 $embedding->similarity = VectorHelper::cosineSimilarity($queryVector, $embedding->vector);
 

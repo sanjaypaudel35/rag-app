@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
 use Sanjay\Ragbot\Models\RagbotUser;
 
 class ProfileSettings extends Component
@@ -36,7 +37,7 @@ class ProfileSettings extends Component
         $this->current_photo = $user->profile_photo_path;
     }
 
-    public function updateProfile(): void
+    public function updateProfile(UserRepositoryInterface $userRepository): void
     {
         $this->validate([
             'name' => 'required|string|max:255',
@@ -56,12 +57,12 @@ class ProfileSettings extends Component
             $this->current_photo = $path;
         }
 
-        $user->update($data);
+        $userRepository->update($user->id, $data);
 
         session()->flash('success', 'Profile updated successfully.');
     }
 
-    public function updatePassword(): void
+    public function updatePassword(UserRepositoryInterface $userRepository): void
     {
         $this->validate([
             'current_password' => ['required', 'current_password:ragbot'],
@@ -71,7 +72,7 @@ class ProfileSettings extends Component
         /** @var RagbotUser $user */
         $user = auth('ragbot')->user();
 
-        $user->update([
+        $userRepository->update($user->id, [
             'password' => Hash::make($this->new_password),
         ]);
 

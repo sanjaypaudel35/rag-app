@@ -13,6 +13,8 @@ interface BaseRepositoryInterface
 {
     /**
      * Find a model by its unique identifier.
+     *
+     * @param  array<string>  $relationships
      */
     public function findById(string $id, array $relationships = []): Model;
 
@@ -27,7 +29,6 @@ interface BaseRepositoryInterface
      * Update an existing model instance.
      *
      * @param  array<string, mixed>  $data
-     * @return TModel
      */
     public function update(string $id, array $data): Model;
 
@@ -36,7 +37,6 @@ interface BaseRepositoryInterface
      *
      * @param  array<string, mixed>  $attributes
      * @param  array<string, mixed>  $values
-     * @return TModel
      */
     public function updateOrCreate(array $attributes, array $values = []): Model;
 

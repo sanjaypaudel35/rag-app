@@ -9,8 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Sanjay\Ragbot\Contracts\Repositories\ChunkRepositoryInterface;
+use Sanjay\Ragbot\Contracts\Repositories\DocumentRepositoryInterface;
 use Sanjay\Ragbot\Enums\DocumentStatus;
-use Sanjay\Ragbot\Models\Chunk;
 use Sanjay\Ragbot\Models\Document;
 use Sanjay\Ragbot\Services\Tenant\ChunkingService;
 use Sanjay\Ragbot\Support\TextExtractor;
@@ -45,8 +46,12 @@ class ChunkDocumentJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(ChunkingService $chunkingService, TextExtractor $extractor): void
-    {
+    public function handle(
+        ChunkingService $chunkingService,
+        TextExtractor $extractor,
+        DocumentRepositoryInterface $documentRepository,
+        ChunkRepositoryInterface $chunkRepository
+    ): void {
         try {
             // 1. Validation: Skip if already completed
             if ($this->document->status === DocumentStatus::Completed) {
@@ -56,7 +61,7 @@ class ChunkDocumentJob implements ShouldQueue
             }
 
             // 2. State transition -> Processing
-            $this->document->update(['status' => DocumentStatus::Processing]);
+            $documentRepository->update($this->document->id, ['status' => DocumentStatus::Processing]);
 
             // 3. Extraction
             $text = $extractor->extract($this->document->file_path, $this->document->mime_type);
@@ -79,7 +84,7 @@ class ChunkDocumentJob implements ShouldQueue
                 $this->document->chunks()->delete();
 
                 foreach ($chunks as $index => $content) {
-                    Chunk::create([
+                    $chunkRepository->create([
                         'project_id' => $this->document->project_id,
                         'document_id' => $this->document->id,
                         'content' => $content,
@@ -88,7 +93,7 @@ class ChunkDocumentJob implements ShouldQueue
                     ]);
                 }
 
-                $this->document->update(['status' => DocumentStatus::Processing]);
+                $documentRepository->update($this->document->id, ['status' => DocumentStatus::Processing]);
 
                 DB::commit();
             } catch (Throwable $e) {
@@ -100,7 +105,7 @@ class ChunkDocumentJob implements ShouldQueue
             EmbedChunksJob::dispatch($this->document)->afterCommit();
 
         } catch (Throwable $e) {
-            $this->document->update([
+            $documentRepository->update($this->document->id, [
                 'status' => DocumentStatus::Failed,
                 'error_message' => $e->getMessage(),
             ]);
