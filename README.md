@@ -68,6 +68,30 @@ $this->app->make(EmbeddingManager::class)->extend('my-driver', function ($app, $
 });
 ```
 
+### Custom LLM Service
+If you need to use a local LLM (like Ollama, LocalAI, or vLLM), a private inference server, or a specialized model not supported out-of-the-box, you can register a custom driver. Implement the `LlmInterface` and register it in your `AppServiceProvider@boot`.
+
+**The Interface:**
+```php
+interface LlmInterface
+{
+    /**
+     * Generate a completion for the given prompt.
+     *
+     * @param  array<string, mixed>  $options
+     */
+    public function complete(string $prompt, array $options = []): LlmResponse;
+}
+```
+
+**Registration:**
+```php
+$this->app->make(LlmManager::class)->extend('local-llm', function ($app, $project) {
+    return new MyLocalLlmService($project);
+});
+```
+*Once registered, you can set your LLM Provider to `local-llm` in your project settings.*
+
 ### Custom Vector Store
 If you want to use other specialized vector databases such as **Pinecone**, **Weaviate**, **Milvus**, or **ChromaDB**, you can easily integrate them. Just implement the `VectorStoreInterface` and extend the `VectorStoreManager` to register your custom driver.
 

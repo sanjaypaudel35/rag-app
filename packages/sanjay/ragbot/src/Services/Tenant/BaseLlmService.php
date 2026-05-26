@@ -28,13 +28,4 @@ abstract class BaseLlmService implements LlmInterface
         $this->project = $project;
         $this->settings = $project->settings()->withoutGlobalScope('project')->first();
     }
-
-    /**
-     * Build a common prompt structure.
-     */
-    protected function buildPrompt(string $system, string $user): string
-    {
-        // Simple default prompt building, can be overridden by providers if needed
-        return "System: {$system}\nUser: {$user}\nAssistant:";
-    }
 }
