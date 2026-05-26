@@ -35,7 +35,7 @@ Route::group(['middleware' => ['web']], function () {
             Route::match(['get', 'post'], 'register', fn () => abort(404))->name('register');
             Route::match(['get', 'post'], 'login', fn () => abort(404))->name('login');
 
-            /* 
+            /*
             Route::get('register', [RegisterController::class, 'create'])->name('register');
             Route::post('register', [RegisterController::class, 'store'])->name('register.store');
             Route::get('login', [LoginController::class, 'create'])->name('login');
