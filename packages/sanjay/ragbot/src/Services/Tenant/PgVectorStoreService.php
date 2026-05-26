@@ -10,7 +10,7 @@ use Sanjay\Ragbot\Contracts\Services\KeywordSearchInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Models\Project;
 
-class PgVectorStoreService implements VectorStoreInterface, KeywordSearchInterface
+class PgVectorStoreService implements KeywordSearchInterface, VectorStoreInterface
 {
     /**
      * Create a new service instance.
