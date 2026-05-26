@@ -87,6 +87,11 @@ return [
     */
     'retrieval' => [
         'top_k' => 5,
+        'hybrid' => [
+            'vector_limit' => 20,
+            'keyword_limit' => 20,
+            'rrf_k' => 60,
+        ],
     ],
 
     /*

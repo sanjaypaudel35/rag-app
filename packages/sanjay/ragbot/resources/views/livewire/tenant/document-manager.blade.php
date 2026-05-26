@@ -205,8 +205,7 @@
                                         <flux:menu.item 
                                             variant="danger" 
                                             icon="trash" 
-                                            wire:click="delete('{{ $document->id }}')" 
-                                            wire:confirm="Permanently delete this document?"
+                                            wire:click="confirmDelete('{{ $document->id }}')" 
                                         >
                                             Delete
                                         </flux:menu.item>
@@ -225,6 +224,29 @@
             @endif
         @endif
     </flux:card>
+
+    <!-- Delete Confirmation Modal -->
+    <flux:modal wire:model="showDeleteConfirmation" class="max-w-md">
+        <div class="space-y-6">
+            <div class="flex items-center gap-4 text-red-600">
+                <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                    <flux:icon icon="exclamation-triangle" variant="mini" />
+                </div>
+                <flux:heading size="lg">Delete Document</flux:heading>
+            </div>
+
+            <div class="space-y-2">
+                @foreach($deleteConfirmationMessages as $message)
+                    <flux:text class="text-zinc-700 dark:text-zinc-300">{{ $message }}</flux:text>
+                @endforeach
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <flux:button variant="ghost" x-on:click="$wire.showDeleteConfirmation = false">Cancel</flux:button>
+                <flux:button variant="danger" wire:click="delete">Yes, Delete</flux:button>
+            </div>
+        </div>
+    </flux:modal>
 
     <!-- Document Preview Modal -->
     <flux:modal name="preview-modal" wire:model="showPreviewModal" class="md:min-w-[800px]">

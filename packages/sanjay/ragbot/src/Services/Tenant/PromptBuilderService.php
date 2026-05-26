@@ -18,7 +18,7 @@ class PromptBuilderService implements PromptBuilderServiceInterface
         $context = $chunks->map(fn ($chunk) => $chunk->content)->implode("\n\n");
 
         $prompt = "You are a helpful AI assistant. Use the following pieces of context to answer the user's question.\n";
-        $prompt .= "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n";
+        $prompt .= "If you don't know the answer, just say that the relevent answer is not found in knowledge base don't try to make up an answer.\n\n";
         $prompt .= "CONTEXT:\n{$context}\n\n";
 
         if ($history->isNotEmpty()) {

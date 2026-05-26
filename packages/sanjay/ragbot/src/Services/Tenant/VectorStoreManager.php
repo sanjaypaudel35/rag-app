@@ -4,6 +4,7 @@ namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Sanjay\Ragbot\Contracts\Services\KeywordSearchInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Enums\VectorStore;
 use Sanjay\Ragbot\Models\Project;
@@ -12,7 +13,7 @@ use Sanjay\Ragbot\Models\ProjectSetting;
 /**
  * Manager class to dynamically resolve and delegate to the correct vector store driver.
  */
-class VectorStoreManager implements VectorStoreInterface
+class VectorStoreManager implements VectorStoreInterface, KeywordSearchInterface
 {
     /**
      * The registered custom driver creators.
@@ -55,6 +56,22 @@ class VectorStoreManager implements VectorStoreInterface
     public function search(Project $project, array $queryVector, int $topK = 5, array $documentIds = []): Collection
     {
         return $this->resolve($project)->search($project, $queryVector, $topK, $documentIds);
+    }
+
+    /**
+     * Searches for chunks matching the query keywords using the project's configured driver.
+     *
+     * @param  array<string>  $documentIds
+     */
+    public function searchKeyword(Project $project, string $query, int $topK = 5, array $documentIds = []): Collection
+    {
+        $driver = $this->resolve($project);
+
+        if ($driver instanceof KeywordSearchInterface) {
+            return $driver->searchKeyword($project, $query, $topK, $documentIds);
+        }
+
+        return collect();
     }
 
     /**
