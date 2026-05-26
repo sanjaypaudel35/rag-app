@@ -13,7 +13,7 @@ use Sanjay\Ragbot\Models\ProjectSetting;
 /**
  * Manager class to dynamically resolve and delegate to the correct vector store driver.
  */
-class VectorStoreManager implements VectorStoreInterface, KeywordSearchInterface
+class VectorStoreManager implements KeywordSearchInterface, VectorStoreInterface
 {
     /**
      * The registered custom driver creators.

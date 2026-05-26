@@ -10,7 +10,7 @@ use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Support\VectorHelper;
 
-class MysqlVectorStoreService implements VectorStoreInterface, KeywordSearchInterface
+class MysqlVectorStoreService implements KeywordSearchInterface, VectorStoreInterface
 {
     /**
      * Create a new service instance.
