@@ -124,12 +124,41 @@ class DocumentService
     public function delete(string $documentId): void
     {
         $document = $this->documentRepository->findById($documentId);
+        if (! $document) {
+            return;
+        }
+
         $disk = config('ragbot.storage.disk', 'local');
+
+        // Identify affected chatbots and documents to re-process
+        $chatbots = $document->chatbots;
+        $documentsToReprocess = collect();
+
+        foreach ($chatbots as $chatbot) {
+            $otherDocuments = $chatbot->documents()
+                ->where('rag_documents.id', '!=', $documentId)
+                ->get();
+
+            if ($otherDocuments->isEmpty()) {
+                // If this was the only document, the chatbot is also deleted
+                $chatbot->delete();
+            } else {
+                // Otherwise, collect other documents to re-process in the queue
+                foreach ($otherDocuments as $otherDoc) {
+                    $documentsToReprocess->put($otherDoc->id, $otherDoc);
+                }
+            }
+        }
+
+        // Trigger re-processing for affected knowledge bases
+        foreach ($documentsToReprocess as $docToReprocess) {
+            ProcessDocumentJob::dispatch($docToReprocess);
+        }
 
         // Delete file from storage
         Storage::disk($disk)->delete($document->file_path);
 
-        // Delete record
+        // Delete record (cascades to chunks and embeddings in DB)
         $this->documentRepository->delete($documentId);
     }
 

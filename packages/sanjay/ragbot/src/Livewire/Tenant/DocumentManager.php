@@ -75,6 +75,21 @@ class DocumentManager extends Component
     public bool $showPreviewModal = false;
 
     /**
+     * Document ID pending deletion.
+     */
+    public ?string $documentIdToDelete = null;
+
+    /**
+     * Whether to show the delete confirmation modal.
+     */
+    public bool $showDeleteConfirmation = false;
+
+    /**
+     * Messages for the delete confirmation modal.
+     */
+    public array $deleteConfirmationMessages = [];
+
+    /**
      * Search query for documents.
      */
     public $search = '';
@@ -255,18 +270,55 @@ class DocumentManager extends Component
     }
 
     /**
+     * Open delete confirmation modal.
+     */
+    public function confirmDelete(string $documentId, DocumentRepositoryInterface $documentRepository): void
+    {
+        $document = $documentRepository->findById($documentId);
+        if (! $document) {
+            return;
+        }
+
+        $this->documentIdToDelete = $documentId;
+        $this->deleteConfirmationMessages = [];
+
+        $chatbots = $document->chatbots;
+
+        if ($chatbots->isEmpty()) {
+            $this->deleteConfirmationMessages[] = "Are you sure you want to permanently delete '{$document->name}'?";
+        } else {
+            foreach ($chatbots as $chatbot) {
+                $docCount = $chatbot->documents()->count();
+                if ($docCount === 1) {
+                    $this->deleteConfirmationMessages[] = "the chatbot using this doc is also going to be deleted, Are you sure ({$chatbot->name})";
+                } else {
+                    $this->deleteConfirmationMessages[] = "Are you sure? This document is being used by chatbot {$chatbot->name}";
+                }
+            }
+        }
+
+        $this->showDeleteConfirmation = true;
+    }
+
+    /**
      * Delete a document.
      */
-    public function delete(DocumentService $documentService, string $documentId): void
+    public function delete(DocumentService $documentService): void
     {
+        if (! $this->documentIdToDelete) {
+            return;
+        }
+
         DB::beginTransaction();
 
         try {
-            $documentService->delete($documentId);
+            $documentService->delete($this->documentIdToDelete);
 
             DB::commit();
             $this->successMessage = 'Document deleted successfully.';
             $this->errorMessage = null;
+            $this->showDeleteConfirmation = false;
+            $this->documentIdToDelete = null;
         } catch (\Throwable $e) {
             DB::rollBack();
             $this->errorMessage = 'Failed to delete document.';

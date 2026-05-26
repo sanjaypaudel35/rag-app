@@ -68,11 +68,16 @@
 
                 <flux:table.rows>
                     @foreach($this->performanceData as $chatbot)
-                        <flux:table.row :key="$chatbot['id']" class="bg-zinc-50/50 dark:bg-zinc-800/20">
+                        <flux:table.row :key="$chatbot['id']" class="{{ $chatbot['deleted_at'] ? 'opacity-50 grayscale bg-red-50/30 dark:bg-red-950/10' : 'bg-zinc-50/50 dark:bg-zinc-800/20' }}">
                             <flux:table.cell>
                                 <div class="flex items-center gap-2">
-                                    <flux:icon icon="chat-bubble-left-right" variant="mini" class="text-zinc-400" />
-                                    <span class="font-semibold text-zinc-900 dark:text-white">{{ $chatbot['name'] }}</span>
+                                    <flux:icon icon="chat-bubble-left-right" variant="mini" class="{{ $chatbot['deleted_at'] ? 'text-red-400' : 'text-zinc-400' }}" />
+                                    <span class="font-semibold {{ $chatbot['deleted_at'] ? 'text-red-600 dark:text-red-400 line-through' : 'text-zinc-900 dark:text-white' }}">
+                                        {{ $chatbot['name'] }}
+                                    </span>
+                                    @if($chatbot['deleted_at'])
+                                        <flux:badge size="sm" variant="danger" inset="top bottom">Deleted</flux:badge>
+                                    @endif
                                 </div>
                             </flux:table.cell>
                             <flux:table.cell class="font-medium">{{ number_format($chatbot['total_input_tokens']) }}</flux:table.cell>
@@ -83,16 +88,18 @@
                         </flux:table.row>
 
                         @foreach($chatbot['models'] as $model)
-                            <flux:table.row :key="$chatbot['id'].$model['model']">
+                            <flux:table.row :key="$chatbot['id'].$model['model']" class="{{ $chatbot['deleted_at'] ? 'opacity-50 grayscale' : '' }}">
                                 <flux:table.cell>
                                     <div class="pl-8 flex items-center gap-2">
-                                        <flux:icon icon="cpu-chip" variant="mini" class="text-zinc-300" />
-                                        <span class="text-sm text-zinc-600 dark:text-zinc-400 font-mono">{{ $model['model'] }}</span>
+                                        <flux:icon icon="cpu-chip" variant="mini" class="{{ $chatbot['deleted_at'] ? 'text-red-300' : 'text-zinc-300' }}" />
+                                        <span class="text-sm font-mono {{ $chatbot['deleted_at'] ? 'text-red-600 dark:text-red-400 line-through' : 'text-zinc-600 dark:text-zinc-400' }}">
+                                            {{ $model['model'] }}
+                                        </span>
                                     </div>
                                 </flux:table.cell>
-                                <flux:table.cell class="text-sm text-zinc-500">{{ number_format($model['input_tokens']) }}</flux:table.cell>
-                                <flux:table.cell class="text-sm text-zinc-500">{{ number_format($model['output_tokens']) }}</flux:table.cell>
-                                <flux:table.cell class="text-sm text-zinc-500">${{ number_format($model['cost'], 4) }}</flux:table.cell>
+                                <flux:table.cell class="text-sm {{ $chatbot['deleted_at'] ? 'text-red-500 line-through' : 'text-zinc-500' }}">{{ number_format($model['input_tokens']) }}</flux:table.cell>
+                                <flux:table.cell class="text-sm {{ $chatbot['deleted_at'] ? 'text-red-500 line-through' : 'text-zinc-500' }}">{{ number_format($model['output_tokens']) }}</flux:table.cell>
+                                <flux:table.cell class="text-sm {{ $chatbot['deleted_at'] ? 'text-red-500 line-through' : 'text-zinc-500' }}">${{ number_format($model['cost'], 4) }}</flux:table.cell>
                             </flux:table.row>
                         @endforeach
                     @endforeach

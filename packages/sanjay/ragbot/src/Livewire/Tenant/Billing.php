@@ -67,15 +67,18 @@ class Billing extends Component
             ->select([
                 'rag_chatbots.id as chatbot_id',
                 'rag_chatbots.name as chatbot_name',
+                'rag_chatbots.deleted_at as chatbot_deleted_at',
                 'rag_messages.model',
                 DB::raw('SUM(rag_messages.input_tokens) as total_input_tokens'),
                 DB::raw('SUM(rag_messages.output_tokens) as total_output_tokens'),
             ])
-            ->groupBy('rag_chatbots.id', 'rag_chatbots.name', 'rag_messages.model')
+            ->groupBy('rag_chatbots.id', 'rag_chatbots.name', 'rag_chatbots.deleted_at', 'rag_messages.model')
             ->get();
 
         return $usage->groupBy('chatbot_id')->map(function ($models, $chatbotId) use ($costCalculator) {
-            $chatbotName = $models->first()->chatbot_name;
+            $first = $models->first();
+            $chatbotName = $first->chatbot_name;
+            $chatbotDeletedAt = $first->chatbot_deleted_at;
 
             $modelBreakdown = $models->map(function ($item) use ($costCalculator) {
                 $cost = $costCalculator->calculate(
@@ -95,6 +98,7 @@ class Billing extends Component
             return [
                 'id' => $chatbotId,
                 'name' => $chatbotName,
+                'deleted_at' => $chatbotDeletedAt,
                 'total_input_tokens' => $modelBreakdown->sum('input_tokens'),
                 'total_output_tokens' => $modelBreakdown->sum('output_tokens'),
                 'total_cost' => $modelBreakdown->sum('cost'),

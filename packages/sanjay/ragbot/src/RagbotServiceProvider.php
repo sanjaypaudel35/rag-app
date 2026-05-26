@@ -31,6 +31,7 @@ use Sanjay\Ragbot\Contracts\Repositories\ProjectRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\ProjectSettingRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\UserRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Services\EmbeddingInterface;
+use Sanjay\Ragbot\Contracts\Services\KeywordSearchInterface;
 use Sanjay\Ragbot\Contracts\Services\LlmInterface;
 use Sanjay\Ragbot\Contracts\Services\PromptBuilderServiceInterface;
 use Sanjay\Ragbot\Contracts\Services\RetrievalServiceInterface;
@@ -102,6 +103,7 @@ class RagbotServiceProvider extends ServiceProvider
         $this->app->singleton(LlmInterface::class, LlmManager::class);
         $this->app->singleton(EmbeddingInterface::class, EmbeddingManager::class);
         $this->app->singleton(VectorStoreInterface::class, VectorStoreManager::class);
+        $this->app->singleton(KeywordSearchInterface::class, VectorStoreManager::class);
 
         $this->app->singleton(RetrievalServiceInterface::class, RetrievalService::class);
         $this->app->singleton(PromptBuilderServiceInterface::class, PromptBuilderService::class);

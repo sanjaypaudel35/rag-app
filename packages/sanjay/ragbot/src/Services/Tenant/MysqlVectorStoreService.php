@@ -3,18 +3,21 @@
 namespace Sanjay\Ragbot\Services\Tenant;
 
 use Illuminate\Support\Collection;
+use Sanjay\Ragbot\Contracts\Repositories\ChunkRepositoryInterface;
 use Sanjay\Ragbot\Contracts\Repositories\EmbeddingRepositoryInterface;
+use Sanjay\Ragbot\Contracts\Services\KeywordSearchInterface;
 use Sanjay\Ragbot\Contracts\Services\VectorStoreInterface;
 use Sanjay\Ragbot\Models\Project;
 use Sanjay\Ragbot\Support\VectorHelper;
 
-class MysqlVectorStoreService implements VectorStoreInterface
+class MysqlVectorStoreService implements VectorStoreInterface, KeywordSearchInterface
 {
     /**
      * Create a new service instance.
      */
     public function __construct(
-        protected EmbeddingRepositoryInterface $embeddingRepository
+        protected EmbeddingRepositoryInterface $embeddingRepository,
+        protected ChunkRepositoryInterface $chunkRepository
     ) {}
 
     /**
@@ -52,5 +55,15 @@ class MysqlVectorStoreService implements VectorStoreInterface
             ->sortByDesc('similarity')
             ->take($topK)
             ->pluck('chunk');
+    }
+
+    /**
+     * Searches for chunks matching the query keywords.
+     *
+     * @param  array<string>  $documentIds
+     */
+    public function searchKeyword(Project $project, string $query, int $topK = 5, array $documentIds = []): Collection
+    {
+        return $this->chunkRepository->searchKeyword($project->id, $query, $documentIds, $topK);
     }
 }
