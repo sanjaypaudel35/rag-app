@@ -49,6 +49,7 @@ use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
 use Sanjay\Ragbot\Livewire\Tenant\Billing;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
+use Sanjay\Ragbot\Livewire\Tenant\DeveloperExtension;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
 use Sanjay\Ragbot\Livewire\Tenant\SettingsManager;
@@ -169,6 +170,7 @@ class RagbotServiceProvider extends ServiceProvider
         Livewire::component('ragbot.chatbot-manager', ChatbotManager::class);
         Livewire::component('ragbot.team-manager', TeamManager::class);
         Livewire::component('ragbot.integration-guide', IntegrationGuide::class);
+        Livewire::component('ragbot.developer-extension', DeveloperExtension::class);
         Livewire::component('ragbot.processing-queue', ProcessingQueue::class);
         Livewire::component('ragbot.profile-settings', ProfileSettings::class);
         Livewire::component('ragbot.billing', Billing::class);
