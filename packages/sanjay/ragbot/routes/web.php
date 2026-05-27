@@ -13,6 +13,7 @@ use Sanjay\Ragbot\Http\Middleware\SetRagbotAuthGuard;
 use Sanjay\Ragbot\Livewire\Dashboard;
 use Sanjay\Ragbot\Livewire\Tenant\Billing;
 use Sanjay\Ragbot\Livewire\Tenant\ChatbotManager;
+use Sanjay\Ragbot\Livewire\Tenant\DeveloperExtension;
 use Sanjay\Ragbot\Livewire\Tenant\DocumentManager;
 use Sanjay\Ragbot\Livewire\Tenant\IntegrationGuide;
 use Sanjay\Ragbot\Livewire\Tenant\ProcessingQueue;
@@ -90,6 +91,7 @@ Route::group([
         Route::get('team', TeamManager::class)->name('team');
         Route::get('profile', ProfileSettings::class)->name('profile');
         Route::get('integration-guide', IntegrationGuide::class)->name('integration-guide');
+        Route::get('developer-extension', DeveloperExtension::class)->name('developer-extension');
         Route::get('billing', Billing::class)->name('billing');
     });
 });

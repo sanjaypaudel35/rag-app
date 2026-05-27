@@ -44,8 +44,8 @@
                 <div class="px-4 mb-2">
                     <flux:text size="xs" class="font-bold uppercase tracking-widest text-zinc-400">Integration and Setup Guide</flux:text>
                 </div>
-                <flux:sidebar.item icon="code-bracket" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.integration-guide') && !request()->query('tab')">Integration Guide</flux:sidebar.item>
-                <flux:sidebar.item icon="wrench-screwdriver" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug, 'tab' => 'developer']) : '#' }}" :current="request()->routeIs('ragbot.integration-guide') && request()->query('tab') === 'developer'">Developer Extension</flux:sidebar.item>
+                <flux:sidebar.item icon="code-bracket" href="{{ app()->bound('ragbot.project') ? route('ragbot.integration-guide', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.integration-guide')">Integration Guide</flux:sidebar.item>
+                <flux:sidebar.item icon="wrench-screwdriver" href="{{ app()->bound('ragbot.project') ? route('ragbot.developer-extension', ['project_slug' => app('ragbot.project')->slug]) : '#' }}" :current="request()->routeIs('ragbot.developer-extension')">Developer Extension</flux:sidebar.item>
             </flux:sidebar.nav>
 
             <flux:sidebar.spacer />
